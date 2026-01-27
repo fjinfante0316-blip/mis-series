@@ -83,48 +83,44 @@ function ampliarSerie(idSerie) {
     modal.classList.remove('hidden');
 }
 
-// ACTUALIZACIÓN DE RENDERIZAR TODO
 function renderizarTodo() {
-    // Portadas principales (opcional: también puedes hacer que estas se amplíen)
-    document.getElementById('series-grid').innerHTML = coleccionSeries.map(s => `
-        <img src="https://image.tmdb.org/t/p/w500${s.poster_path}" onclick="ampliarSerie('${s.id}')" style="cursor:pointer;">
-    `).join('');
+    // 1. RENDERIZAR SERIES CON CARRUSEL DE TEMPORADAS
+    const gridSeries = document.getElementById('series-grid');
+    gridSeries.innerHTML = coleccionSeries.map(s => {
+        // Generamos el HTML de todas las temporadas disponibles
+        const temporadasHTML = s.seasons.map(temp => {
+            // Si la temporada no tiene póster, usamos el de la serie
+            const path = temp.poster_path ? temp.poster_path : s.poster_path;
+            return `
+                <div class="season-card" onclick="ampliarSerie('${s.id}')">
+                    <img src="https://image.tmdb.org/t/p/w500${path}">
+                    <div class="season-number">${temp.name}</div>
+                </div>
+            `;
+        }).join('');
 
-    let actHTML = ""; 
-    let creHTML = "";
+        return `
+            <div class="serie-group">
+                <div class="serie-title-tag">${s.name}</div>
+                <div class="seasons-carousel">
+                    ${temporadasHTML}
+                </div>
+            </div>
+        `;
+    }).join('');
 
+    // 2. RENDERIZAR ACTORES Y CREADORES (Se mantiene igual)
+    let actHTML = ""; let creHTML = "";
     coleccionSeries.forEach(s => {
-        // Actores
         s.credits.cast.slice(0, 10).forEach(a => {
-            const imgUrl = a.profile_path ? `https://image.tmdb.org/t/p/w200${a.profile_path}` : 'https://via.placeholder.com/200x200?text=N/A';
-            actHTML += `
-                <div class="person-card">
-                    <img class="photo-circle" src="${imgUrl}" onclick="ampliarFoto('${imgUrl}', '${a.name}', '${a.character || 'Desconocido'}')">
-                    <span class="person-name">${a.name}</span>
-                    <img class="mini-serie-poster" 
-                         src="https://image.tmdb.org/t/p/w200${s.poster_path}" 
-                         onclick="ampliarSerie('${s.id}')" 
-                         style="cursor:pointer; border: 1px solid var(--rojo);">
-                </div>`;
+            actHTML += crearFicha(a, s.poster_path);
         });
-
-        // Creadores
         if (s.created_by) {
             s.created_by.forEach(c => {
-                const imgUrl = c.profile_path ? `https://image.tmdb.org/t/p/w200${c.profile_path}` : 'https://via.placeholder.com/200x200?text=N/A';
-                creHTML += `
-                    <div class="person-card">
-                        <img class="photo-circle" src="${imgUrl}" onclick="ampliarFoto('${imgUrl}', '${c.name}', 'Creador')">
-                        <span class="person-name">${c.name}</span>
-                        <img class="mini-serie-poster" 
-                             src="https://image.tmdb.org/t/p/w200${s.poster_path}" 
-                             onclick="ampliarSerie('${s.id}')" 
-                             style="cursor:pointer; border: 1px solid var(--rojo);">
-                    </div>`;
+                creHTML += crearFicha(c, s.poster_path);
             });
         }
     });
-
     document.getElementById('actors-grid').innerHTML = actHTML;
     document.getElementById('directors-grid').innerHTML = creHTML;
 }
