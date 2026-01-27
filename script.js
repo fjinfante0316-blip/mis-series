@@ -139,4 +139,35 @@ function generarStats() {
         <div id="genero-chart" style="background: conic-gradient(${gradientParts.join(', ')})"></div>
         ${legendHTML}
     `;
+    // Función para abrir el modal
+function ampliarFoto(url, nombre) {
+    const modal = document.getElementById('photo-modal');
+    const img = document.getElementById('img-ampliada');
+    const caption = document.getElementById('modal-caption');
+
+    // Cambiamos 'w200' por 'w500' para que la imagen se vea en alta resolución
+    img.src = url.replace('w200', 'w500');
+    caption.innerText = nombre;
+    modal.classList.remove('hidden');
+}
+
+    // Función para cerrar el modal
+    function cerrarModal() {
+        document.getElementById('photo-modal').classList.add('hidden');
+    }
+
+    // MODIFICACIÓN: Actualiza tu función crearFicha para que sea así:
+    function crearFicha(p, poster) {
+        const imgUrl = p.profile_path ? `https://image.tmdb.org/t/p/w200${p.profile_path}` : 'https://via.placeholder.com/200x200?text=N/A';
+    
+        return `
+            <div class="person-card">
+                <img class="photo-circle" 
+                     src="${imgUrl}" 
+                     onclick="ampliarFoto('${imgUrl}', '${p.name}')"
+                     onerror="this.src='https://via.placeholder.com/200'">
+                <span class="person-name">${p.name}</span>
+                <img class="mini-serie-poster" src="https://image.tmdb.org/t/p/w200${poster}">
+            </div>`;
+    }
 }
