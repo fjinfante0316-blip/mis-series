@@ -1,26 +1,37 @@
 const API_KEY = 'e8b61af0cf42a633e3aa581bb73127f8';
 let coleccionSeries = [];
 
+// ELEMENTOS
 const sidebar = document.getElementById('sidebar');
 const btnMenu = document.getElementById('sidebarCollapse');
+const headerSearch = document.getElementById('mini-search');
 
 // CONTROL MENÚ
-if (btnMenu) {
-    btnMenu.onclick = (e) => { e.stopPropagation(); sidebar.classList.toggle('active'); };
-}
+btnMenu.onclick = (e) => { 
+    e.stopPropagation(); 
+    sidebar.classList.toggle('active'); 
+};
+
 document.addEventListener('click', (e) => {
-    if (sidebar && !sidebar.contains(e.target) && !btnMenu.contains(e.target)) sidebar.classList.remove('active');
+    if (sidebar.classList.contains('active') && !sidebar.contains(e.target)) {
+        sidebar.classList.remove('active');
+    }
 });
 
 // NAVEGACIÓN
 function showSection(id) {
+    const welcome = document.getElementById('welcome-screen');
+    const mainApp = document.getElementById('main-app');
+
     if (id === 'welcome') {
-        document.getElementById('welcome-screen').classList.remove('hidden');
-        document.getElementById('main-app').classList.add('hidden');
+        welcome.classList.remove('hidden');
+        mainApp.classList.add('hidden');
+        headerSearch.classList.add('hidden'); // Ocultar mini buscador en portada
         if(coleccionSeries.length > 0) document.getElementById('btn-volver').classList.remove('hidden');
     } else {
-        document.getElementById('welcome-screen').classList.add('hidden');
-        document.getElementById('main-app').classList.remove('hidden');
+        welcome.classList.add('hidden');
+        mainApp.classList.remove('hidden');
+        headerSearch.classList.remove('hidden'); // Mostrar mini buscador
         document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
         document.getElementById(`sec-${id}`).classList.remove('hidden');
     }
@@ -44,12 +55,12 @@ async function buscarYAñadir(esInicio) {
             coleccionSeries.push(serie);
             renderizarTodo();
             showSection('series');
-        } else { alert("No se encontró la serie"); }
+        } else { alert("Serie no encontrada"); }
     } catch (e) { console.error(e); }
     document.getElementById(inputId).value = "";
 }
 
-// RENDER
+// RENDERIZADO
 function renderizarTodo() {
     document.getElementById('series-grid').innerHTML = coleccionSeries.map(s => `
         <img src="https://image.tmdb.org/t/p/w500${s.poster_path}">
@@ -57,21 +68,25 @@ function renderizarTodo() {
 
     let actHTML = ""; let creHTML = "";
     coleccionSeries.forEach(s => {
-        s.credits.cast.slice(0, 10).forEach(a => { actHTML += crearFicha(a, s.poster_path); });
-        if (s.created_by) { s.created_by.forEach(c => { creHTML += crearFicha(c, s.poster_path); }); }
+        s.credits.cast.slice(0, 10).forEach(a => {
+            actHTML += `<div class="person-card">
+                <img class="photo-circle" src="https://image.tmdb.org/t/p/w200${a.profile_path}" onerror="this.src='https://via.placeholder.com/200'">
+                <span class="person-name">${a.name}</span>
+                <img class="mini-serie-poster" src="https://image.tmdb.org/t/p/w200${s.poster_path}">
+            </div>`;
+        });
+        if (s.created_by) {
+            s.created_by.forEach(c => {
+                creHTML += `<div class="person-card">
+                    <img class="photo-circle" src="https://image.tmdb.org/t/p/w200${c.profile_path}" onerror="this.src='https://via.placeholder.com/200'">
+                    <span class="person-name">${c.name}</span>
+                    <img class="mini-serie-poster" src="https://image.tmdb.org/t/p/w200${s.poster_path}">
+                </div>`;
+            });
+        }
     });
     document.getElementById('actors-grid').innerHTML = actHTML;
     document.getElementById('directors-grid').innerHTML = creHTML;
-}
-
-function crearFicha(p, poster) {
-    const img = p.profile_path ? `https://image.tmdb.org/t/p/w200${p.profile_path}` : 'https://via.placeholder.com/200x200?text=N/A';
-    return `
-        <div class="person-card">
-            <img class="photo-circle" src="${img}">
-            <span class="person-name">${p.name}</span>
-            <img class="mini-serie-poster" src="https://image.tmdb.org/t/p/w200${poster}">
-        </div>`;
 }
 
 function generarStats() {
