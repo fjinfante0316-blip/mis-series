@@ -22,6 +22,10 @@ function showSection(id) {
     document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
     document.getElementById(`sec-${id}`).classList.remove('hidden');
     sidebar.classList.remove('active'); // Cerrar menú al navegar
+    // SI LA SECCIÓN ES STATS, DIBUJAMOS
+    if (id === 'stats') {
+        generarStats();
+    }
 }
 
 // --- BÚSQUEDA Y RENDERIZADO ---
