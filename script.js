@@ -1,20 +1,30 @@
 const API_KEY = 'e8b61af0cf42a633e3aa581bb73127f8';
 let coleccionSeries = [];
 
-// Control de Menú
-document.getElementById('sidebarCollapse').addEventListener('click', () => {
-    document.getElementById('sidebar').classList.toggle('active');
+// --- LÓGICA DEL MENÚ DESPLEGABLE ---
+const sidebar = document.getElementById('sidebar');
+const btnMenu = document.getElementById('sidebarCollapse');
+
+// Al hacer click en la hamburguesa, ponemos o quitamos la clase 'active'
+btnMenu.onclick = function() {
+    sidebar.classList.toggle('active');
+};
+
+// Cerrar menú si se hace click fuera de él
+document.addEventListener('click', function(event) {
+    if (!sidebar.contains(event.target) && !btnMenu.contains(event.target)) {
+        sidebar.classList.remove('active');
+    }
 });
 
-// Cambiar de sección
+// --- LÓGICA DE SECCIONES ---
 function showSection(id) {
     document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
     document.getElementById(`sec-${id}`).classList.remove('hidden');
-    document.getElementById('sidebar').classList.remove('active');
-    if(id === 'stats') generarStats();
+    sidebar.classList.remove('active'); // Cerrar menú al navegar
 }
 
-// Función de búsqueda adaptada
+// --- BÚSQUEDA Y RENDERIZADO ---
 async function buscarYAñadir(esInicio) {
     const inputId = esInicio ? 'initialInput' : 'serieInput';
     const query = document.getElementById(inputId).value;
@@ -24,7 +34,7 @@ async function buscarYAñadir(esInicio) {
         const r = await fetch(`https://api.themoviedb.org/3/search/tv?api_key=${API_KEY}&query=${query}&language=es-ES`);
         const d = await r.json();
         
-        if (d.results.length > 0) {
+        if (d.results && d.results.length > 0) {
             const id = d.results[0].id;
             const det = await fetch(`https://api.themoviedb.org/3/tv/${id}?api_key=${API_KEY}&append_to_response=credits&language=es-ES`);
             const serie = await det.json();
@@ -32,64 +42,51 @@ async function buscarYAñadir(esInicio) {
             coleccionSeries.push(serie);
             renderizarTodo();
 
-            // Si es la primera serie, ocultamos la pantalla de bienvenida
             if (esInicio) {
-                document.getElementById('welcome-screen').style.opacity = '0';
-                setTimeout(() => {
-                    document.getElementById('welcome-screen').classList.add('hidden');
-                    document.getElementById('main-app').classList.remove('hidden');
-                }, 500);
+                document.getElementById('welcome-screen').classList.add('hidden');
+                document.getElementById('main-app').classList.remove('hidden');
             }
         } else {
             alert("No se encontró la serie");
         }
-    } catch (e) { console.error(e); }
+    } catch (e) {
+        console.error("Error:", e);
+    }
     document.getElementById(inputId).value = "";
 }
 
 function renderizarTodo() {
+    // Portadas Series
     document.getElementById('series-grid').innerHTML = coleccionSeries.map(s => `
-        <img src="https://image.tmdb.org/t/p/w500${s.poster_path}">
+        <img src="https://image.tmdb.org/t/p/w500${s.poster_path}" style="width:100%; border-radius:8px;">
     `).join('');
 
+    // Actores y Creadores
     let actHTML = "";
     let creHTML = "";
 
     coleccionSeries.forEach(s => {
         s.credits.cast.slice(0, 10).forEach(a => {
-            actHTML += crearFichaPersona(a, s.poster_path);
+            actHTML += `
+                <div class="person-card">
+                    <img class="photo-circle" src="https://image.tmdb.org/t/p/w200${a.profile_path}" onerror="this.src='https://via.placeholder.com/200'">
+                    <p>${a.name}</p>
+                    <img class="mini-serie-poster" src="https://image.tmdb.org/t/p/w200${s.poster_path}">
+                </div>`;
         });
 
-        if (s.created_by && s.created_by.length > 0) {
+        if (s.created_by) {
             s.created_by.forEach(c => {
-                creHTML += crearFichaPersona(c, s.poster_path);
+                creHTML += `
+                    <div class="person-card">
+                        <img class="photo-circle" src="https://image.tmdb.org/t/p/w200${c.profile_path}" onerror="this.src='https://via.placeholder.com/200'">
+                        <p>${c.name}</p>
+                        <img class="mini-serie-poster" src="https://image.tmdb.org/t/p/w200${s.poster_path}">
+                    </div>`;
             });
         }
     });
 
     document.getElementById('actors-grid').innerHTML = actHTML;
     document.getElementById('directors-grid').innerHTML = creHTML;
-}
-
-function crearFichaPersona(p, posterSerie) {
-    const foto = p.profile_path ? `https://image.tmdb.org/t/p/w200${p.profile_path}` : 'https://via.placeholder.com/200x200?text=N/A';
-    return `
-        <div class="person-card">
-            <img class="photo-circle" src="${foto}">
-            <span class="person-name">${p.name}</span>
-            <img class="mini-serie-poster" src="https://image.tmdb.org/t/p/w200${posterSerie}">
-        </div>
-    `;
-}
-
-// Función de estadísticas simplificada
-function generarStats() {
-    const counts = {};
-    coleccionSeries.forEach(s => s.genres.forEach(g => counts[g.name] = (counts[g.name] || 0) + 1));
-    document.getElementById('stats-area').innerHTML = Object.keys(counts).map(g => `
-        <div style="margin-bottom:15px">
-            <small>${g} (${counts[g]})</small>
-            <div style="background:#333; height:8px; border-radius:4px"><div style="background:var(--rojo); height:100%; width:${(counts[g]/coleccionSeries.length)*100}%"></div></div>
-        </div>
-    `).join('');
 }
