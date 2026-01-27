@@ -22,6 +22,14 @@
         </ul>
     </nav>
 
+    <header class="app-header">
+        <button id="sidebarCollapse" class="menu-icon"><i class="fas fa-bars"></i></button>
+        <div id="mini-search" class="header-search hidden">
+            <input type="text" id="serieInput" placeholder="Añadir otra...">
+            <button onclick="buscarYAñadir(false)"><i class="fas fa-plus"></i></button>
+        </div>
+    </header>
+
     <div id="welcome-screen">
         <div class="welcome-content">
             <h1 class="logo">MIS<span>SERIES</span></h1>
@@ -35,14 +43,6 @@
     </div>
 
     <div id="main-app" class="hidden">
-        <header class="app-header">
-            <button id="sidebarCollapse" class="menu-icon"><i class="fas fa-bars"></i></button>
-            <div class="header-search">
-                <input type="text" id="serieInput" placeholder="Añadir otra...">
-                <button onclick="buscarYAñadir(false)"><i class="fas fa-plus"></i></button>
-            </div>
-        </header>
-
         <main>
             <section id="sec-series" class="section active">
                 <div id="series-grid" class="grid-series"></div>
