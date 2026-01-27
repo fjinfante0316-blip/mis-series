@@ -5,18 +5,56 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mis Series Pro</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
-    <header>
-        <h1>MIS<span>SERIES</span></h1>
-        <div class="search-box">
-            <input type="text" id="serieInput" placeholder="Escribe el nombre de una serie...">
-            <button onclick="buscarSerie()">Añadir Serie</button>
+    <div id="sidebar">
+        <div class="sidebar-header">
+            <h2>Menú</h2>
         </div>
-    </header>
+        <ul>
+            <li><a href="#" id="showSeries">Mis Series</a></li>
+            <li><a href="#" id="showDirectors">Directores</a></li>
+            <li><a href="#" id="showActors">Actores</a></li>
+            <li><a href="#" id="showStats">Estadísticas de Género</a></li>
+        </ul>
+    </div>
 
-    <main id="series-grid" class="container-series">
+    <div id="main-content">
+        <header>
+            <i class="fas fa-bars" id="sidebarToggle"></i> <h1>MIS<span>SERIES</span></h1>
+            <div class="search-box">
+                <input type="text" id="serieInput" placeholder="Escribe el nombre de una serie...">
+                <button onclick="buscarSerie()">Añadir Serie</button>
+            </div>
+        </header>
+
+        <main id="content-area">
+            <section id="series-section" class="active-section">
+                <h2 class="section-title">Mi Colección de Series</h2>
+                <div id="series-grid" class="container-series">
+                    </div>
+            </section>
+
+            <section id="directors-section" class="hidden-section">
+                <h2 class="section-title">Mis Directores</h2>
+                <div id="directors-grid" class="container-people">
+                    </div>
+            </section>
+
+            <section id="actors-section" class="hidden-section">
+                <h2 class="section-title">Mis Actores Favoritos</h2>
+                <div id="actors-grid" class="container-people">
+                    </div>
+            </section>
+
+            <section id="stats-section" class="hidden-section">
+                <h2 class="section-title">Estadísticas de Género</h2>
+                <div id="genre-stats">
+                    </div>
+            </section>
         </main>
+    </div>
 
     <script src="script.js"></script>
 </body>
