@@ -117,11 +117,12 @@ main {
 }
 
 .modal-content {
-    max-width: 85%;
-    max-height: 60%; /* Un poco más pequeña para que quepa el texto debajo en móviles cortos */
-    border-radius: 15px;
+    max-width: 100%;
+    max-height: 45vh; /* Limitamos la imagen al 45% de la altura de la pantalla */
+    object-fit: contain; /* Asegura que la imagen no se deforme */
+    border-radius: 12px;
     border: 2px solid var(--rojo);
-    object-fit: cover;
+    box-shadow: 0 0 20px rgba(0,0,0,0.8);
 }
 
 .close-modal {
@@ -137,21 +138,36 @@ main {
 }
 
 .modal-wrapper {
-    width: 85%;
-    max-height: 90vh;
+    width: 90%;
+    max-width: 450px;
+    max-height: 95vh; /* Altura máxima del contenedor total */
     display: flex;
     flex-direction: column;
     align-items: center;
-    overflow-y: auto; /* El scroll ocurre aquí dentro */
-    padding-top: 40px;
+    background: rgba(10, 10, 10, 0.8); /* Fondo semi-transparente tras el texto */
+    padding: 15px;
+    border-radius: 20px;
 }
 
 #modal-caption {
     width: 100%;
-    max-height: 250px; /* Evita que el texto empuje todo hacia afuera */
-    overflow-y: auto;
-    margin-top: 15px;
-    padding: 0 10px;
+    color: white;
+    text-align: center;
+    margin-top: 10px;
+    overflow-y: visible; /* Intentamos que no necesite scroll */
+}
+
+#modal-caption h2 {
+    font-size: 1.2rem;
+    margin: 10px 0 5px 0;
+    color: var(--rojo);
+}
+
+#modal-caption div {
+    font-size: 0.9rem;
+    line-height: 1.3;
+    text-align: justify;
+    padding: 0 5px;
 }
 
 .close-modal {
@@ -240,21 +256,18 @@ main {
 
 .close-fixed {
     position: fixed;
-    top: 20px;
-    right: 20px;
-    width: 60px;  /* Área táctil grande */
-    height: 60px;
+    top: 15px;
+    right: 15px;
+    width: 45px;
+    height: 45px;
     background: var(--rojo);
     color: white;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 40px;
-    font-weight: bold;
-    cursor: pointer;
-    z-index: 10000; /* Por encima de la propia imagen */
-    box-shadow: 0 0 15px rgba(0,0,0,0.5);
+    font-size: 25px;
+    z-index: 10001;
 }
 
 #modal-caption {
