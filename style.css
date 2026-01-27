@@ -1,0 +1,75 @@
+body {
+    background-color: #050505;
+    color: white;
+    font-family: sans-serif;
+    padding: 20px;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+h1 span { color: #e50914; }
+
+.search-box {
+    margin-top: 20px;
+}
+
+input {
+    padding: 10px;
+    width: 300px;
+    border-radius: 5px;
+    border: none;
+}
+
+button {
+    padding: 10px 20px;
+    background: #e50914;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.container-series {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 30px;
+}
+
+.serie-card {
+    position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+    transition: 0.3s;
+    border: 1px solid #333;
+}
+
+.serie-card:hover {
+    transform: translateY(-10px);
+    border-color: #e50914;
+}
+
+.serie-card img {
+    width: 100%;
+    display: block;
+}
+
+.overlay {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.9);
+    padding: 15px;
+    opacity: 0;
+    transition: 0.3s;
+    font-size: 0.8rem;
+    overflow-y: auto;
+}
+
+.serie-card:hover .overlay {
+    opacity: 1;
+}
+
+.overlay h3 { color: #e50914; margin-bottom: 10px; }
+.overlay p { margin-bottom: 8px; line-height: 1.2; }
