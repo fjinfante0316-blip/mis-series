@@ -120,17 +120,18 @@ main {
 
 .modal-content {
     max-width: 85%;
-    max-height: 70%;
-    border-radius: 10px;
-    border: 3px solid var(--rojo);
-    box-shadow: 0 0 20px rgba(229, 9, 20, 0.5);
+    max-height: 60%; /* Un poco más pequeña para que quepa el texto debajo en móviles cortos */
+    border-radius: 15px;
+    border: 2px solid var(--rojo);
+    object-fit: cover;
 }
 
 #modal-caption {
-    margin-top: 15px;
+    margin-top: 20px;
     color: white;
-    font-size: 1.2rem;
-    font-weight: bold;
+    text-align: center;
+    font-family: 'Helvetica', sans-serif;
+    padding: 0 20px;
 }
 
 .close-modal {
