@@ -23,9 +23,11 @@
     </nav>
 
     <header class="app-header">
-        <button id="sidebarCollapse" class="menu-icon"><i class="fas fa-bars"></i></button>
+        <button id="sidebarCollapse" class="menu-icon">
+            <i class="fas fa-bars"></i>
+        </button>
         <div id="mini-search" class="header-search hidden">
-            <input type="text" id="serieInput" placeholder="Añadir otra...">
+            <input type="text" id="serieInput" placeholder="Añadir otra serie...">
             <button onclick="buscarYAñadir(false)"><i class="fas fa-plus"></i></button>
         </div>
     </header>
@@ -33,38 +35,54 @@
     <div id="welcome-screen">
         <div class="welcome-content">
             <h1 class="logo">MIS<span>SERIES</span></h1>
-            <p>Busca tu próxima serie favorita</p>
+            <p>Tu colección personal de televisión</p>
             <div class="search-box-large">
                 <input type="text" id="initialInput" placeholder="Escribe el nombre aquí...">
                 <button onclick="buscarYAñadir(true)"><i class="fas fa-plus"></i></button>
             </div>
-            <button id="btn-volver" class="hidden" onclick="showSection('series')">Ver mi colección</button>
+            <button id="btn-volver" class="hidden" onclick="showSection('series')">
+                <i class="fas fa-arrow-left"></i> Volver a mi colección
+            </button>
         </div>
     </div>
 
     <div id="main-app" class="hidden">
         <main>
             <section id="sec-series" class="section active">
-                <div id="series-grid" class="grid-series"></div>
+                <div id="series-grid" class="grid-series">
+                    </div>
             </section>
+
             <section id="sec-directors" class="section hidden">
+                <h2 class="section-title">Creadores</h2>
                 <div id="directors-grid" class="grid-people"></div>
             </section>
+
             <section id="sec-actors" class="section hidden">
+                <h2 class="section-title">Actores Principales</h2>
                 <div id="actors-grid" class="grid-people"></div>
             </section>
+
             <section id="sec-stats" class="section hidden">
-                <div id="stats-area" class="stats-container"></div>
+                <h2 class="section-title">Estadísticas</h2>
+                <div id="stats-area" class="stats-container">
+                    </div>
             </section>
         </main>
     </div>
-    
-<div id="photo-modal" class="modal hidden" onclick="cerrarModal()">
-    <span class="close-modal">&times;</span>
-    <img class="modal-content" id="img-ampliada">
+
+    <div id="photo-modal" class="modal hidden">
+        <div id="modalCloseBtn" class="close-fixed">
+            <i class="fas fa-times"></i>
+        </div>
         
-    <div id="modal-caption"></div>
-</div>
+        <div class="modal-wrapper">
+            <img class="modal-content" id="img-ampliada" alt="Imagen ampliada">
+            <div id="modal-caption">
+                </div>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>
