@@ -187,3 +187,51 @@ main {
     background: var(--rojo);
     border-radius: 10px;
 }
+
+/* Contenedor del grupo de la serie */
+.serie-group {
+    grid-column: span 3; /* Ocupa todo el ancho para que el carrusel luzca */
+    margin-bottom: 20px;
+}
+
+.serie-title-tag {
+    font-size: 14px;
+    font-weight: bold;
+    margin: 5px 10px;
+    color: var(--rojo);
+    text-transform: uppercase;
+}
+
+/* El Carrusel */
+.seasons-carousel {
+    display: flex;
+    overflow-x: auto;
+    gap: 10px;
+    padding: 5px 10px;
+    scroll-snap-type: x mandatory; /* Efecto de imán al deslizar */
+    -webkit-overflow-scrolling: touch;
+}
+
+.seasons-carousel::-webkit-scrollbar {
+    display: none; /* Ocultamos barra para que parezca app nativa */
+}
+
+.season-card {
+    flex: 0 0 120px; /* Ancho fijo de cada portada de temporada */
+    scroll-snap-align: start;
+    transition: transform 0.2s;
+}
+
+.season-card img {
+    width: 100%;
+    border-radius: 8px;
+    border: 1px solid #333;
+    display: block;
+}
+
+.season-number {
+    font-size: 10px;
+    text-align: center;
+    margin-top: 4px;
+    color: #888;
+}
