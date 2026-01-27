@@ -150,15 +150,19 @@ function ampliarFoto(url, nombre, personaje) {
 function ampliarSerie(idSerie) {
     const s = coleccionSeries.find(item => item.id == idSerie);
     if (!s) return;
+    
     const img = document.getElementById('img-ampliada');
     const caption = document.getElementById('modal-caption');
+    
     img.src = `https://image.tmdb.org/t/p/w500${s.poster_path}`;
     const año = s.first_air_date ? s.first_air_date.substring(0, 4) : "N/A";
+    
+    // Simplificamos el HTML para ahorrar espacio
     caption.innerHTML = `
-        <h2 style="color:var(--rojo);">${s.name} (${año})</h2>
-        <div style="text-align:left; font-size:14px; margin-top:10px; line-height:1.4; max-height:150px; overflow-y:auto;">
-            ${s.overview || "Sin sinopsis disponible."}
-        </div>`;
+        <h2>${s.name} (${año})</h2>
+        <div>${s.overview || "Sin sinopsis disponible."}</div>
+    `;
+    
     document.body.style.overflow = 'hidden';
     modal.classList.remove('hidden');
 }
