@@ -3,46 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mis Series Pro</title>
+    <title>Mis Series - App</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <nav id="sidebar">
-        <div class="sidebar-header"><h3>PANEL</h3></div>
-        <ul>
+        <div class="sidebar-user">
+            <div class="avatar"><i class="fas fa-user"></i></div>
+            <span>Mi Perfil</span>
+        </div>
+        <ul class="nav-links">
             <li><a href="#" onclick="showSection('series')"><i class="fas fa-tv"></i> Mis Series</a></li>
             <li><a href="#" onclick="showSection('directors')"><i class="fas fa-pen-nib"></i> Creadores</a></li>
             <li><a href="#" onclick="showSection('actors')"><i class="fas fa-users"></i> Actores</a></li>
-            <li><a href="#" onclick="showSection('stats')"><i class="fas fa-chart-bar"></i> Estadísticas</a></li>
+            <li><a href="#" onclick="showSection('stats')"><i class="fas fa-chart-pie"></i> Estadísticas</a></li>
         </ul>
     </nav>
 
-    <div id="content">
-        <header>
-            <button id="sidebarCollapse" class="btn-hamburguesa"><i class="fas fa-bars"></i></button>
+    <div id="welcome-screen">
+        <div class="welcome-content">
             <h1 class="logo">MIS<span>SERIES</span></h1>
-        </header>
-        
-        <div class="search-container">
-            <input type="text" id="serieInput" placeholder="Añadir serie...">
-            <button onclick="buscarYAñadir()">+</button>
+            <p>Busca y añade tu primera serie para empezar</p>
+            <div class="search-box-large">
+                <input type="text" id="initialInput" placeholder="Nombre de la serie...">
+                <button onclick="buscarYAñadir(true)"><i class="fas fa-search"></i></button>
+            </div>
         </div>
+    </div>
+
+    <div id="main-app" class="hidden">
+        <header class="app-header">
+            <button id="sidebarCollapse" class="menu-icon"><i class="fas fa-bars"></i></button>
+            <div class="header-search">
+                <input type="text" id="serieInput" placeholder="Añadir otra...">
+                <button onclick="buscarYAñadir(false)"><i class="fas fa-plus"></i></button>
+            </div>
+        </header>
 
         <main>
             <section id="sec-series" class="section active">
-                <div id="series-grid" class="grid-layout"></div>
+                <div id="series-grid" class="grid-series"></div>
             </section>
-
             <section id="sec-directors" class="section hidden">
-                <div id="directors-grid" class="people-layout"></div>
+                <div id="directors-grid" class="grid-people"></div>
             </section>
-
             <section id="sec-actors" class="section hidden">
-                <div id="actors-grid" class="actors-mobile-grid"></div>
+                <div id="actors-grid" class="grid-people"></div>
             </section>
-
             <section id="sec-stats" class="section hidden">
                 <div id="stats-area" class="stats-container"></div>
             </section>
