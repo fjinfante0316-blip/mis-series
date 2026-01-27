@@ -60,31 +60,50 @@ async function buscarYAñadir(esInicio) {
     document.getElementById(inputId).value = "";
 }
 
-// RENDERIZADO
+// RENDERIZADO ACTUALIZADO
 function renderizarTodo() {
+    // Portadas Series
     document.getElementById('series-grid').innerHTML = coleccionSeries.map(s => `
-        <img src="https://image.tmdb.org/t/p/w500${s.poster_path}">
+        <img src="https://image.tmdb.org/t/p/w500${s.poster_path}" style="width:100%; border-radius:8px;">
     `).join('');
 
-    let actHTML = ""; let creHTML = "";
+    let actHTML = ""; 
+    let creHTML = "";
+
     coleccionSeries.forEach(s => {
+        // ACTORES: Los 10 primeros (que son los de más peso/capítulos)
         s.credits.cast.slice(0, 10).forEach(a => {
-            actHTML += `<div class="person-card">
-                <img class="photo-circle" src="https://image.tmdb.org/t/p/w200${a.profile_path}" onerror="this.src='https://via.placeholder.com/200'">
-                <span class="person-name">${a.name}</span>
-                <img class="mini-serie-poster" src="https://image.tmdb.org/t/p/w200${s.poster_path}">
-            </div>`;
-        });
-        if (s.created_by) {
-            s.created_by.forEach(c => {
-                creHTML += `<div class="person-card">
-                    <img class="photo-circle" src="https://image.tmdb.org/t/p/w200${c.profile_path}" onerror="this.src='https://via.placeholder.com/200'">
-                    <span class="person-name">${c.name}</span>
+            const imgUrl = a.profile_path ? `https://image.tmdb.org/t/p/w200${a.profile_path}` : 'https://via.placeholder.com/200x200?text=N/A';
+            const personaje = a.character || 'Desconocido';
+
+            actHTML += `
+                <div class="person-card">
+                    <img class="photo-circle" 
+                         src="${imgUrl}" 
+                         onclick="ampliarFoto('${imgUrl}', '${a.name}', '${personaje}')"
+                         onerror="this.src='https://via.placeholder.com/200'">
+                    <span class="person-name">${a.name}</span>
                     <img class="mini-serie-poster" src="https://image.tmdb.org/t/p/w200${s.poster_path}">
                 </div>`;
+        });
+
+        // CREADORES
+        if (s.created_by) {
+            s.created_by.forEach(c => {
+                const imgUrl = c.profile_path ? `https://image.tmdb.org/t/p/w200${c.profile_path}` : 'https://via.placeholder.com/200x200?text=N/A';
+                creHTML += `
+                    <div class="person-card">
+                        <img class="photo-circle" 
+                             src="${imgUrl}" 
+                             onclick="ampliarFoto('${imgUrl}', '${c.name}', 'Creador / Showrunner')"
+                             onerror="this.src='https://via.placeholder.com/200'">
+                        <span class="person-name">${c.name}</span>
+                        <img class="mini-serie-poster" src="https://image.tmdb.org/t/p/w200${s.poster_path}">
+                    </div>`;
             });
         }
     });
+
     document.getElementById('actors-grid').innerHTML = actHTML;
     document.getElementById('directors-grid').innerHTML = creHTML;
 }
@@ -140,14 +159,20 @@ function generarStats() {
         ${legendHTML}
     `;
     // Función para abrir el modal
-function ampliarFoto(url, nombre) {
+function ampliarFoto(url, nombre, personaje) {
     const modal = document.getElementById('photo-modal');
     const img = document.getElementById('img-ampliada');
     const caption = document.getElementById('modal-caption');
 
-    // Cambiamos 'w200' por 'w500' para que la imagen se vea en alta resolución
+    // Usamos imagen de alta calidad
     img.src = url.replace('w200', 'w500');
-    caption.innerText = nombre;
+    
+    // Mostramos Nombre Real + Nombre Personaje
+    caption.innerHTML = `
+        <div style="color:var(--rojo); font-size:1.4rem;">${nombre}</div>
+        <div style="color:#aaa; font-size:1rem; font-weight:normal; margin-top:5px;">Personaje: ${personaje}</div>
+    `;
+    
     modal.classList.remove('hidden');
 }
 
