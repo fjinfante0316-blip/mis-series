@@ -29,39 +29,53 @@ async function buscarYAñadir() {
     document.getElementById('serieInput').value = "";
 }
 
+// ... (resto del código igual arriba)
+
 function dibujarTodo() {
-    // Dibujar Series
-    document.getElementById('series-grid').innerHTML = seriesAgregadas.map(s => `
-        <div class="card"><img src="https://image.tmdb.org/t/p/w500${s.poster_path}"></div>
+    // 1. Dibujar Portadas de Series (Sin overlays de guionistas/productores)
+    document.getElementById('series-grid').innerHTML = coleccionSeries.map(s => `
+        <div class="card">
+            <img src="https://image.tmdb.org/t/p/w500${s.poster_path}">
+        </div>
     `).join('');
 
-    // Dibujar Actores con mini póster
-    let htmlActores = "";
-    seriesAgregadas.forEach(s => {
-        s.credits.cast.slice(0, 10).forEach(actor => {
-            htmlActores += `
-                <div class="actor-card">
-                    <img class="actor-photo" src="https://image.tmdb.org/t/p/w200${actor.profile_path}" onerror="this.src='https://via.placeholder.com/200'">
-                    <span class="actor-name">${actor.name}</span>
-                    <img class="mini-poster" src="https://image.tmdb.org/t/p/w200${s.poster_path}">
-                </div>
-            `;
-        });
-    });
-    document.getElementById('actors-grid').innerHTML = htmlActores;
+    let actHTML = "";
+    let creHTML = "";
 
-    // Directores (similar)
-    let htmlDirs = "";
-    seriesAgregadas.forEach(s => {
-        s.credits.crew.filter(c => c.job === 'Director').forEach(dir => {
-            htmlDirs += `
-                <div class="actor-card">
-                    <img class="actor-photo" src="https://image.tmdb.org/t/p/w200${dir.profile_path}" onerror="this.src='https://via.placeholder.com/200'">
-                    <span class="actor-name">${dir.name}</span>
-                    <img class="mini-poster" src="https://image.tmdb.org/t/p/w200${s.poster_path}">
-                </div>
-            `;
+    coleccionSeries.forEach(s => {
+        // 2. Actores (Top 10)
+        s.credits.cast.slice(0, 10).forEach(a => {
+            actHTML += crearFichaPersona(a, s.poster_path);
         });
+
+        // 3. Creadores (Buscamos específicamente 'Created By')
+        // TMDB tiene una propiedad directa llamada 'created_by' en las series
+        if (s.created_by && s.created_by.length > 0) {
+            s.created_by.forEach(c => {
+                creHTML += crearFichaPersona(c, s.poster_path);
+            });
+        } else {
+            // Si no hay 'created_by' definido, buscamos productores ejecutivos/directores destacados
+            s.credits.crew.filter(c => c.job === 'Executive Producer' || c.job === 'Director').slice(0, 1).forEach(d => {
+                creHTML += crearFichaPersona(d, s.poster_path);
+            });
+        }
     });
-    document.getElementById('directors-grid').innerHTML = htmlDirs;
+
+    document.getElementById('actors-grid').innerHTML = actHTML;
+    document.getElementById('directors-grid').innerHTML = creHTML; // Ahora se llena con creadores
 }
+
+function crearFichaPersona(p, posterSerie) {
+    // Usamos profile_path si existe, si no una imagen genérica
+    const foto = p.profile_path ? `https://image.tmdb.org/t/p/w200${p.profile_path}` : 'https://via.placeholder.com/200x200?text=Sin+Foto';
+    
+    return `
+        <div class="person-card">
+            <img class="photo-circle" src="${foto}">
+            <span class="person-name">${p.name}</span>
+            <img class="mini-serie-poster" src="https://image.tmdb.org/t/p/w200${posterSerie}">
+        </div>
+    `;
+}
+
