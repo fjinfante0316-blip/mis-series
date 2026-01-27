@@ -7,47 +7,52 @@
 
 body { margin: 0; font-family: 'Segoe UI', sans-serif; background: var(--negro); color: var(--blanco); overflow-x: hidden; }
 
+/* HEADER GLOBAL */
+.app-header { 
+    display: flex; 
+    align-items: center; 
+    padding: 15px; 
+    background: transparent; /* Transparente para no molestar en portada */
+    position: fixed; 
+    top: 0; 
+    width: 100%; 
+    z-index: 2500; 
+    gap: 10px; 
+}
+
+.menu-icon { background: none; border: none; color: white; font-size: 28px; cursor: pointer; text-shadow: 0 0 10px rgba(0,0,0,0.5); }
+
 /* PORTADA */
 #welcome-screen {
     position: fixed; width: 100%; height: 100%; background: #000;
-    display: flex; align-items: center; justify-content: center; z-index: 2000; transition: 0.5s;
+    display: flex; align-items: center; justify-content: center; z-index: 1500; transition: 0.5s;
 }
 .welcome-content { text-align: center; width: 85%; }
 .search-box-large { display: flex; background: white; border-radius: 30px; padding: 5px; margin: 20px 0; }
-.search-box-large input { flex: 1; border: none; padding: 15px; border-radius: 30px; outline: none; }
+.search-box-large input { flex: 1; border: none; padding: 15px; border-radius: 30px; outline: none; color: #333; }
 .search-box-large button { background: var(--rojo); border: none; color: white; width: 45px; height: 45px; border-radius: 50%; }
-#btn-volver { background: none; border: 1px solid white; color: white; padding: 10px 20px; border-radius: 20px; cursor: pointer; }
 
 /* SIDEBAR */
 #sidebar {
     position: fixed; left: -280px; width: 280px; height: 100vh;
-    background: var(--gris); z-index: 3000; transition: 0.3s ease;
-    box-shadow: 5px 0 15px rgba(0,0,0,0.5);
+    background: var(--gris); z-index: 4000; transition: 0.3s ease;
 }
 #sidebar.active { left: 0; }
-.sidebar-header { padding: 30px 20px; background: #000; text-align: center; border-bottom: 1px solid #333; }
+.sidebar-header { padding: 40px 20px; background: #000; text-align: center; }
 .nav-links { list-style: none; padding: 0; margin: 0; }
-.nav-links li a { padding: 18px 25px; display: block; color: #eee; text-decoration: none; border-bottom: 1px solid #222; }
-.nav-links li a i { color: var(--rojo); margin-right: 15px; width: 20px; text-align: center; }
+.nav-links li a { padding: 20px 25px; display: block; color: #eee; text-decoration: none; border-bottom: 1px solid #222; }
+.nav-links li a i { color: var(--rojo); margin-right: 15px; width: 20px; }
 
-/* APP HEADER */
-.app-header { display: flex; align-items: center; padding: 10px 15px; background: #000; gap: 10px; sticky: top; }
-.menu-icon { background: none; border: none; color: white; font-size: 24px; cursor: pointer; }
-.header-search { flex: 1; display: flex; background: #222; border-radius: 20px; padding: 5px 15px; align-items: center; }
-.header-search input { background: none; border: none; color: white; flex: 1; outline: none; }
-.header-search button { background: none; border: none; color: var(--rojo); font-size: 18px; }
-
-/* GRIDS */
-.grid-series { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 10px; }
+/* GRIDS MÓVIL (3 columnas) */
+.grid-series, .grid-people { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 80px 10px 20px; }
 .grid-series img { width: 100%; border-radius: 8px; }
-
-.grid-people { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; padding: 15px; }
-.person-card { display: flex; flex-direction: column; align-items: center; text-align: center; }
 .photo-circle { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 2px solid var(--rojo); margin-bottom: 5px; }
-.person-name { font-size: 10px; font-weight: bold; line-height: 1.2; height: 24px; overflow: hidden; }
-.mini-serie-poster { width: 35px; height: 50px; border-radius: 3px; margin-top: 5px; }
+.person-card { display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 15px; }
+.person-name { font-size: 10px; font-weight: bold; line-height: 1.1; color: #fff; }
+.mini-serie-poster { width: 30px; height: 45px; border-radius: 3px; margin-top: 4px; }
 
-/* STATS */
-.stats-container { padding: 20px; }
+/* AUXILIARES */
 .logo span { color: var(--rojo); }
 .hidden { display: none !important; }
+.header-search { flex: 1; display: flex; background: #222; border-radius: 20px; padding: 5px 15px; }
+.header-search input { background: none; border: none; color: white; flex: 1; outline: none; }
