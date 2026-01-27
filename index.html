@@ -3,55 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mis Series - Catálogo</title>
+    <title>Mis Series Pro</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
-    <div id="sidebar">
+
+    <nav id="sidebar">
         <div class="sidebar-header">
-            <h2>Menú</h2>
+            <h3>PANEL CONTROL</h3>
         </div>
-        <ul>
+        <ul class="list-unstyled components">
             <li><a href="#" onclick="showSection('series')"><i class="fas fa-tv"></i> Mis Series</a></li>
             <li><a href="#" onclick="showSection('directors')"><i class="fas fa-video"></i> Directores</a></li>
             <li><a href="#" onclick="showSection('actors')"><i class="fas fa-users"></i> Actores</a></li>
-            <li><a href="#" onclick="showSection('stats')"><i class="fas fa-chart-pie"></i> Estadísticas</a></li>
+            <li><a href="#" onclick="showSection('stats')"><i class="fas fa-chart-bar"></i> Estadísticas</a></li>
         </ul>
-    </div>
+    </nav>
 
-    <div id="main-content">
+    <div id="content">
         <header>
-            <i class="fas fa-bars" id="sidebarToggle"></i> <h1>MIS<span>SERIES</span></h1>
+            <button type="button" id="sidebarCollapse" class="btn-hamburguesa">
+                <i class="fas fa-bars"></i>
+            </button>
+            <h1 class="logo">MIS<span>SERIES</span></h1>
             <div class="search-box">
-                <input type="text" id="serieInput" placeholder="Escribe el nombre de una serie...">
-                <button onclick="buscarSerie()">Añadir Serie</button>
+                <input type="text" id="serieInput" placeholder="Nombre de la serie...">
+                <button onclick="buscarYAñadir()">Añadir</button>
             </div>
         </header>
 
-        <main id="content-area">
-            <section id="series-section" class="active-section">
-                <h2 class="section-title">Mi Colección de Series</h2>
-                <div id="series-grid" class="container-series">
-                    </div>
+        <main>
+            <section id="sec-series" class="section active">
+                <h2 class="title">Mi Colección</h2>
+                <div id="series-grid" class="grid-layout"></div>
             </section>
 
-            <section id="directors-section" class="hidden-section">
-                <h2 class="section-title">Directores</h2>
-                <div id="directors-grid" class="container-people">
-                    </div>
+            <section id="sec-directors" class="section hidden">
+                <h2 class="title">Directores</h2>
+                <div id="directors-grid" class="people-layout"></div>
             </section>
 
-            <section id="actors-section" class="hidden-section">
-                <h2 class="section-title">Actores</h2>
-                <div id="actors-grid" class="container-people">
-                    </div>
+            <section id="sec-actors" class="section hidden">
+                <h2 class="title">Actores Principales</h2>
+                <div id="actors-grid" class="people-layout"></div>
             </section>
 
-            <section id="stats-section" class="hidden-section">
-                <h2 class="section-title">Estadísticas</h2>
-                <div id="genre-stats">
-                    </div>
+            <section id="sec-stats" class="section hidden">
+                <h2 class="title">Estadísticas de Género</h2>
+                <div id="stats-area" class="stats-container"></div>
             </section>
         </main>
     </div>
