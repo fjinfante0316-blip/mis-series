@@ -151,3 +151,21 @@ main {
 .photo-circle:active {
     transform: scale(0.9);
 }
+
+.mini-serie-poster {
+    transition: transform 0.2s;
+    z-index: 10;
+}
+
+.mini-serie-poster:hover {
+    transform: scale(1.1);
+}
+
+/* Ajuste para que la sinopsis no se corte en móviles */
+#modal-caption div::-webkit-scrollbar {
+    width: 4px;
+}
+#modal-caption div::-webkit-scrollbar-thumb {
+    background: var(--rojo);
+    border-radius: 10px;
+}
