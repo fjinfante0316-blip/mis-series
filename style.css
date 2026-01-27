@@ -1,69 +1,184 @@
 body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: #050505;
     color: white;
-    font-family: sans-serif;
+    display: flex; /* Para el layout del sidebar y el contenido principal */
+}
+
+/* Sidebar */
+#sidebar {
+    width: 250px;
+    background-color: #1a1a1a;
+    position: fixed;
+    height: 100%;
+    left: -250px; /* Oculto por defecto */
+    transition: left 0.3s ease;
+    z-index: 2000;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.5);
+}
+
+#sidebar.active {
+    left: 0;
+}
+
+.sidebar-header {
     padding: 20px;
-}
-
-header {
+    background-color: #e50914;
+    color: white;
     text-align: center;
-    margin-bottom: 50px;
+    font-size: 1.2rem;
 }
 
-h1 span { color: #e50914; }
-
-.search-box {
+#sidebar ul {
+    list-style: none;
+    padding: 0;
     margin-top: 20px;
 }
 
-input {
-    padding: 10px;
-    width: 300px;
-    border-radius: 5px;
-    border: none;
+#sidebar ul li a {
+    display: block;
+    padding: 15px 20px;
+    color: #ccc;
+    text-decoration: none;
+    transition: 0.2s;
 }
 
-button {
+#sidebar ul li a:hover {
+    background-color: #333;
+    color: white;
+}
+
+/* Main Content Wrapper */
+#main-content {
+    flex-grow: 1; /* Ocupa el espacio restante */
+    transition: margin-left 0.3s ease;
+    margin-left: 0; /* Por defecto */
+}
+
+#main-content.shifted {
+    margin-left: 250px; /* Cuando el sidebar está abierto */
+}
+
+/* Header */
+header {
+    display: flex;
+    align-items: center;
+    padding: 20px 30px;
+    background-color: #0a0a0a;
+    border-bottom: 1px solid #333;
+    position: sticky; /* Sticky header */
+    top: 0;
+    z-index: 1000;
+}
+
+#sidebarToggle {
+    font-size: 1.8rem;
+    cursor: pointer;
+    margin-right: 20px;
+    color: #e50914;
+}
+
+header h1 {
+    font-size: 1.8rem;
+    margin: 0 auto 0 0; /* Alinea a la izquierda, push search-box a la derecha */
+}
+
+header h1 span {
+    color: #e50914;
+}
+
+.search-box {
+    display: flex;
+    gap: 10px;
+}
+
+.search-box input {
+    padding: 10px 15px;
+    border-radius: 20px;
+    border: 1px solid #555;
+    background-color: #333;
+    color: white;
+    outline: none;
+    width: 250px;
+}
+
+.search-box button {
     padding: 10px 20px;
-    background: #e50914;
+    background-color: #e50914;
     color: white;
     border: none;
-    border-radius: 5px;
+    border-radius: 20px;
     cursor: pointer;
+    transition: background-color 0.2s;
 }
 
+.search-box button:hover {
+    background-color: #f40a17;
+}
+
+/* Contenedor de Contenido (Main Area) */
+#content-area {
+    padding: 30px;
+}
+
+.section-title {
+    font-size: 2rem;
+    margin-bottom: 30px;
+    color: #e50914;
+    border-bottom: 2px solid #333;
+    padding-bottom: 10px;
+}
+
+/* Secciones Ocultas */
+.hidden-section {
+    display: none;
+}
+.active-section {
+    display: block;
+}
+
+/* Galería de Series */
 .container-series {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 30px;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 25px;
 }
 
 .serie-card {
     position: relative;
     border-radius: 10px;
     overflow: hidden;
-    transition: 0.3s;
-    border: 1px solid #333;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+    background-color: #1a1a1a;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.5);
 }
 
 .serie-card:hover {
-    transform: translateY(-10px);
-    border-color: #e50914;
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.7);
 }
 
 .serie-card img {
     width: 100%;
+    height: 300px; /* Altura fija para el póster */
+    object-fit: cover;
     display: block;
 }
 
 .overlay {
     position: absolute;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.9);
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(transparent, rgba(0,0,0,0.9));
     padding: 15px;
     opacity: 0;
-    transition: 0.3s;
-    font-size: 0.8rem;
+    transition: opacity 0.3s;
+    font-size: 0.85rem;
+    max-height: 100%; /* Permite scroll si hay mucho texto */
     overflow-y: auto;
 }
 
@@ -71,5 +186,98 @@ button {
     opacity: 1;
 }
 
-.overlay h3 { color: #e50914; margin-bottom: 10px; }
-.overlay p { margin-bottom: 8px; line-height: 1.2; }
+.overlay h3 {
+    color: #e50914;
+    margin-bottom: 5px;
+    font-size: 1.1rem;
+}
+.overlay p {
+    margin-bottom: 3px;
+    line-height: 1.3;
+    color: #ccc;
+}
+.overlay strong {
+    color: white;
+}
+
+/* Contenedores de Personas (Actores/Directores) */
+.container-people {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 25px;
+}
+
+.person-card {
+    background-color: #1a1a1a;
+    border-radius: 10px;
+    overflow: hidden;
+    text-align: center;
+    padding-bottom: 15px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+    transition: transform 0.2s ease;
+}
+
+.person-card:hover {
+    transform: translateY(-3px);
+}
+
+.person-card img {
+    width: 100%;
+    height: 200px; /* Altura fija para la foto */
+    object-fit: cover;
+    display: block;
+    border-bottom: 3px solid #e50914;
+    margin-bottom: 10px;
+}
+
+.person-card h4 {
+    margin: 0;
+    font-size: 1rem;
+    color: white;
+}
+
+.person-card p {
+    font-size: 0.8rem;
+    color: #ccc;
+}
+
+/* Estadísticas de Género */
+#genre-stats {
+    background-color: #1a1a1a;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+}
+
+#genre-stats h3 {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    color: #e50914;
+}
+
+/* Responsividad */
+@media (max-width: 768px) {
+    #sidebar {
+        width: 100%; /* Ocupa todo el ancho en móviles */
+        left: -100%;
+    }
+    #main-content.shifted {
+        margin-left: 0; /* No desplaza el contenido, solo oculta el sidebar */
+    }
+    header {
+        flex-wrap: wrap; /* Permite que los elementos salten de línea */
+        justify-content: center;
+    }
+    header h1 {
+        margin: 10px auto;
+        width: 100%;
+        text-align: center;
+    }
+    .search-box {
+        width: 100%;
+        justify-content: center;
+    }
+    .search-box input {
+        width: calc(100% - 120px); /* Ajusta el ancho del input */
+    }
+}
