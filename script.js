@@ -91,18 +91,52 @@ function renderizarTodo() {
 
 function generarStats() {
     const container = document.getElementById('stats-area');
+    if (coleccionSeries.length === 0) {
+        container.innerHTML = "<p>Añade series para ver estadísticas.</p>";
+        return;
+    }
+
     const counts = {};
-    coleccionSeries.forEach(s => { s.genres.forEach(g => { counts[g.name] = (counts[g.name] || 0) + 1; }); });
-    container.innerHTML = Object.keys(counts).map(gen => {
-        const porc = (counts[gen] / coleccionSeries.length) * 100;
-        return `
-            <div style="margin-bottom:15px; padding:0 15px;">
-                <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:5px;">
-                    <span>${gen}</span><span>${counts[gen]}</span>
-                </div>
-                <div style="background:#333; height:8px; border-radius:4px; overflow:hidden;">
-                    <div style="background:var(--rojo); width:${porc}%; height:100%;"></div>
-                </div>
+    const coloresBase = [
+        '#e50914', '#2ecc71', '#3498db', '#f1c40f', '#9b59b6', 
+        '#e67e22', '#1abc9c', '#ecf0f1', '#95a5a6', '#d35400'
+    ];
+
+    // Contamos solo el primer género de cada serie
+    coleccionSeries.forEach(s => {
+        if (s.genres && s.genres.length > 0) {
+            const primerGenero = s.genres[0].name;
+            counts[primerGenero] = (counts[primerGenero] || 0) + 1;
+        }
+    });
+
+    const total = coleccionSeries.length;
+    let acumulado = 0;
+    let gradientParts = [];
+    let legendHTML = '<div class="chart-legend">';
+
+    Object.keys(counts).forEach((gen, index) => {
+        const porcentaje = (counts[gen] / total) * 100;
+        const color = coloresBase[index % coloresBase.length];
+        
+        // Parte del degradado para el gráfico
+        gradientParts.push(`${color} ${acumulado}% ${acumulado + porcentaje}%`);
+        acumulado += porcentaje;
+
+        // Parte de la leyenda
+        legendHTML += `
+            <div class="legend-item">
+                <div class="color-box" style="background:${color}"></div>
+                <span>${gen} (${counts[gen]})</span>
             </div>`;
-    }).join('');
+    });
+
+    legendHTML += '</div>';
+
+    // Inyectamos el gráfico y la leyenda
+    container.innerHTML = `
+        <h2 style="color:var(--rojo)">Distribución por Género</h2>
+        <div id="genero-chart" style="background: conic-gradient(${gradientParts.join(', ')})"></div>
+        ${legendHTML}
+    `;
 }
