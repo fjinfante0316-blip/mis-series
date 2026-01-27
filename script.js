@@ -1,5 +1,4 @@
 const API_KEY = 'e8b61af0cf42a633e3aa581bb73127f8';
-const API_KEY = 'TU_API_KEY_AQUI'; 
 let coleccionSeries = [];
 
 // ELEMENTOS DEL DOM
