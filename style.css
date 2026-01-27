@@ -103,3 +103,50 @@ main {
     border-radius: 2px;
     margin-right: 5px;
 }
+
+/* Estilos del Modal */
+.modal {
+    position: fixed;
+    z-index: 5000; /* Por encima de todo */
+    left: 0; top: 0;
+    width: 100%; height: 100%;
+    background-color: rgba(0,0,0,0.9);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.3s;
+}
+
+.modal-content {
+    max-width: 85%;
+    max-height: 70%;
+    border-radius: 10px;
+    border: 3px solid var(--rojo);
+    box-shadow: 0 0 20px rgba(229, 9, 20, 0.5);
+}
+
+#modal-caption {
+    margin-top: 15px;
+    color: white;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.close-modal {
+    position: absolute;
+    top: 20px; right: 30px;
+    color: white;
+    font-size: 40px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* Hacer que las fotos de los actores parezcan clickables */
+.photo-circle {
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+.photo-circle:active {
+    transform: scale(0.9);
+}
