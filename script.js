@@ -87,6 +87,44 @@ function renderizarTodo() {
         }
     });
 
+    function generarStats() {
+    const container = document.getElementById('stats-area');
+    if (!container) return; // Seguridad por si no encuentra el div
+
+    const counts = {};
+    const totalSeries = coleccionSeries.length;
+
+    if (totalSeries === 0) {
+        container.innerHTML = "<p style='text-align:center; padding:20px;'>Añade series para ver estadísticas.</p>";
+        return;
+    }
+
+    // Contar géneros
+    coleccionSeries.forEach(s => {
+        if (s.genres) {
+            s.genres.forEach(g => {
+                counts[g.name] = (counts[g.name] || 0) + 1;
+            });
+        }
+    });
+
+    // Crear el HTML de las barras
+    container.innerHTML = Object.keys(counts).map(gen => {
+        const porcentaje = (counts[gen] / totalSeries) * 100;
+        return `
+            <div style="margin-bottom:20px; padding:0 10px;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                    <span style="font-size:14px;">${gen}</span>
+                    <span style="font-size:12px; color:var(--rojo);">${counts[gen]} series</span>
+                </div>
+                <div style="background:#333; height:10px; border-radius:10px; overflow:hidden;">
+                    <div style="background:var(--rojo); width:${porcentaje}%; height:100%; border-radius:10px; transition: width 0.5s ease-in-out;"></div>
+                </div>
+            </div>
+        `;
+    }).join('');
+    }    
+
     document.getElementById('actors-grid').innerHTML = actHTML;
     document.getElementById('directors-grid').innerHTML = creHTML;
 }
