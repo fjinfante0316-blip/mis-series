@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Mis Series Pro</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
@@ -10,10 +10,8 @@
 <body>
 
     <nav id="sidebar">
-        <div class="sidebar-header">
-            <h3>PANEL CONTROL</h3>
-        </div>
-        <ul class="list-unstyled components">
+        <div class="sidebar-header"><h3>PANEL</h3></div>
+        <ul>
             <li><a href="#" onclick="showSection('series')"><i class="fas fa-tv"></i> Mis Series</a></li>
             <li><a href="#" onclick="showSection('directors')"><i class="fas fa-video"></i> Directores</a></li>
             <li><a href="#" onclick="showSection('actors')"><i class="fas fa-users"></i> Actores</a></li>
@@ -23,34 +21,29 @@
 
     <div id="content">
         <header>
-            <button type="button" id="sidebarCollapse" class="btn-hamburguesa">
-                <i class="fas fa-bars"></i>
-            </button>
+            <button id="sidebarCollapse" class="btn-hamburguesa"><i class="fas fa-bars"></i></button>
             <h1 class="logo">MIS<span>SERIES</span></h1>
-            <div class="search-box">
-                <input type="text" id="serieInput" placeholder="Nombre de la serie...">
-                <button onclick="buscarYAñadir()">Añadir</button>
-            </div>
         </header>
+        
+        <div class="search-container">
+            <input type="text" id="serieInput" placeholder="Añadir serie...">
+            <button onclick="buscarYAñadir()">+</button>
+        </div>
 
         <main>
             <section id="sec-series" class="section active">
-                <h2 class="title">Mi Colección</h2>
                 <div id="series-grid" class="grid-layout"></div>
             </section>
 
             <section id="sec-directors" class="section hidden">
-                <h2 class="title">Directores</h2>
                 <div id="directors-grid" class="people-layout"></div>
             </section>
 
             <section id="sec-actors" class="section hidden">
-                <h2 class="title">Actores Principales</h2>
-                <div id="actors-grid" class="people-layout"></div>
+                <div id="actors-grid" class="actors-mobile-grid"></div>
             </section>
 
             <section id="sec-stats" class="section hidden">
-                <h2 class="title">Estadísticas de Género</h2>
                 <div id="stats-area" class="stats-container"></div>
             </section>
         </main>
