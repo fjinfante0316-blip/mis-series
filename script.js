@@ -48,14 +48,48 @@ async function buscarYAñadir(esInicio) {
     try {
         const r = await fetch(`https://api.themoviedb.org/3/search/tv?api_key=${API_KEY}&query=${query}&language=es-ES`);
         const d = await r.json();
+        
         if (d.results && d.results.length > 0) {
-            const id = d.results[0].id;
-            const det = await fetch(`https://api.themoviedb.org/3/tv/${id}?api_key=${API_KEY}&append_to_response=credits&language=es-ES`);
-            const serie = await det.json();
+            const serieId = d.results[0].id;
+            
+            // 1. Obtener detalles básicos
+            const det = await fetch(`https://api.themoviedb.org/3/tv/${serieId}?api_key=${API_KEY}&language=es-ES`);
+            let serie = await det.json();
+
+            // 2. CREAR REPARTO POR TEMPORADAS (Sin repetir)
+            serie.repartoEspecial = [];
+            const actoresVistos = new Set();
+
+            // Solo consultamos las primeras temporadas para no saturar la API (máximo 5 temporadas por ejemplo)
+            const numTemporadas = Math.min(serie.number_of_seasons, 5);
+
+            for (let i = 1; i <= numTemporadas; i++) {
+                try {
+                    const resTemp = await fetch(`https://api.themoviedb.org/3/tv/${serieId}/season/${i}/credits?api_key=${API_KEY}&language=es-ES`);
+                    const dataTemp = await resTemp.json();
+                    
+                    if (dataTemp.cast) {
+                        let añadidosEstaTemp = 0;
+                        for (let actor of dataTemp.cast) {
+                            if (!actoresVistos.has(actor.id) && añadidosEstaTemp < 5) {
+                                actoresVistos.add(actor.id);
+                                serie.repartoEspecial.push(actor);
+                                añadidosEstaTemp++;
+                            }
+                        }
+                    }
+                } catch (err) { console.log("Temporada no encontrada"); }
+            }
+
+            // También necesitamos los creadores (estos están en el detalle principal)
+            serie.creadores = serie.created_by || [];
+
             coleccionSeries.push(serie);
             renderizarTodo();
             showSection('series');
-        } else { alert("Serie no encontrada"); }
+        } else {
+            alert("No se encontró la serie");
+        }
     } catch (e) { console.error(e); }
     document.getElementById(inputId).value = "";
 }
@@ -110,17 +144,33 @@ function renderizarTodo() {
     }).join('');
 
     // 2. RENDERIZAR ACTORES Y CREADORES (Se mantiene igual)
-    let actHTML = ""; let creHTML = "";
+let actHTML = "";
+    let creHTML = "";
+
     coleccionSeries.forEach(s => {
-        s.credits.cast.slice(0, 10).forEach(a => {
-            actHTML += crearFicha(a, s.poster_path);
+        // Usamos el reparto especial por temporadas que creamos antes
+        s.repartoEspecial.forEach(a => {
+            const imgUrl = a.profile_path ? `https://image.tmdb.org/t/p/w200${a.profile_path}` : 'https://via.placeholder.com/200x200?text=N/A';
+            actHTML += `
+                <div class="person-card">
+                    <img class="photo-circle" src="${imgUrl}" onclick="ampliarFoto('${imgUrl}', '${a.name}', '${a.character || 'Desconocido'}')">
+                    <span class="person-name">${a.name}</span>
+                    <img class="mini-serie-poster" src="https://image.tmdb.org/t/p/w200${s.poster_path}" onclick="ampliarSerie('${s.id}')">
+                </div>`;
         });
-        if (s.created_by) {
-            s.created_by.forEach(c => {
-                creHTML += crearFicha(c, s.poster_path);
-            });
-        }
+
+        // Creadores
+        s.creadores.forEach(c => {
+            const imgUrl = c.profile_path ? `https://image.tmdb.org/t/p/w200${c.profile_path}` : 'https://via.placeholder.com/200x200?text=N/A';
+            creHTML += `
+                <div class="person-card">
+                    <img class="photo-circle" src="${imgUrl}" onclick="ampliarFoto('${imgUrl}', '${c.name}', 'Creador')">
+                    <span class="person-name">${c.name}</span>
+                    <img class="mini-serie-poster" src="https://image.tmdb.org/t/p/w200${s.poster_path}" onclick="ampliarSerie('${s.id}')">
+                </div>`;
+        });
     });
+
     document.getElementById('actors-grid').innerHTML = actHTML;
     document.getElementById('directors-grid').innerHTML = creHTML;
 }
