@@ -60,9 +60,8 @@ async function buscarYAñadir(esInicio) {
     document.getElementById(inputId).value = "";
 }
 
-// Función para ampliar la información de la serie desde el mini póster
+// Función para ampliar Serie (Corregida)
 function ampliarSerie(idSerie) {
-    // Buscamos los datos de la serie en nuestra colección local
     const serie = coleccionSeries.find(s => s.id == idSerie);
     if (!serie) return;
 
@@ -70,20 +69,17 @@ function ampliarSerie(idSerie) {
     const img = document.getElementById('img-ampliada');
     const caption = document.getElementById('modal-caption');
 
-    // Imagen del póster en alta calidad
     img.src = `https://image.tmdb.org/t/p/w500${serie.poster_path}`;
-    
-    // Año de estreno (sacamos solo los 4 dígitos)
     const año = serie.first_air_date ? serie.first_air_date.substring(0, 4) : "N/A";
-    
-    // Construimos el contenido: Título, Año y Sinopsis
+
     caption.innerHTML = `
-        <div style="color:var(--rojo); font-size:1.3rem; font-weight:bold;">${serie.name} (${año})</div>
-        <div style="color:#eee; font-size:0.9rem; margin-top:10px; text-align:justify; line-height:1.4; max-height:150px; overflow-y:auto; padding-right:5px;">
+        <h3 style="color:var(--rojo); margin: 5px 0;">${serie.name}</h3>
+        <p style="color:#aaa; font-size:14px; margin-bottom:10px;">Estreno: ${año}</p>
+        <div style="text-align:left; font-size:14px; line-height:1.5; color:#eee;">
             ${serie.overview || "Sin sinopsis disponible."}
         </div>
     `;
-    
+
     modal.classList.remove('hidden');
 }
 
@@ -201,10 +197,29 @@ function ampliarFoto(url, nombre, personaje) {
     modal.classList.remove('hidden');
 }
 
-    // Función para cerrar el modal
+    // Función única para cerrar el modal
     function cerrarModal() {
-        document.getElementById('photo-modal').classList.add('hidden');
+        const modal = document.getElementById('photo-modal');
+        modal.classList.add('hidden');
+        // Limpiamos la imagen para que no parpadee la anterior al abrirlo de nuevo
+        document.getElementById('img-ampliada').src = "";
     }
+
+    // Asignar el cierre al botón y al fondo oscuro
+    document.addEventListener('DOMContentLoaded', () => {
+        const modal = document.getElementById('photo-modal');
+        const closeBtn = document.getElementById('modalCloseBtn');
+
+        // Cerrar con la X
+        closeBtn.addEventListener('click', cerrarModal);
+
+        // Cerrar al tocar el fondo negro (pero no al tocar la foto/texto)
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                cerrarModal();
+            }
+        });
+    });
 
     // MODIFICACIÓN: Actualiza tu función crearFicha para que sea así:
     function crearFicha(p, poster) {
