@@ -60,45 +60,70 @@ async function buscarYAñadir(esInicio) {
     document.getElementById(inputId).value = "";
 }
 
-// RENDERIZADO ACTUALIZADO
+// Función para ampliar la información de la serie desde el mini póster
+function ampliarSerie(idSerie) {
+    // Buscamos los datos de la serie en nuestra colección local
+    const serie = coleccionSeries.find(s => s.id == idSerie);
+    if (!serie) return;
+
+    const modal = document.getElementById('photo-modal');
+    const img = document.getElementById('img-ampliada');
+    const caption = document.getElementById('modal-caption');
+
+    // Imagen del póster en alta calidad
+    img.src = `https://image.tmdb.org/t/p/w500${serie.poster_path}`;
+    
+    // Año de estreno (sacamos solo los 4 dígitos)
+    const año = serie.first_air_date ? serie.first_air_date.substring(0, 4) : "N/A";
+    
+    // Construimos el contenido: Título, Año y Sinopsis
+    caption.innerHTML = `
+        <div style="color:var(--rojo); font-size:1.3rem; font-weight:bold;">${serie.name} (${año})</div>
+        <div style="color:#eee; font-size:0.9rem; margin-top:10px; text-align:justify; line-height:1.4; max-height:150px; overflow-y:auto; padding-right:5px;">
+            ${serie.overview || "Sin sinopsis disponible."}
+        </div>
+    `;
+    
+    modal.classList.remove('hidden');
+}
+
+// ACTUALIZACIÓN DE RENDERIZAR TODO
 function renderizarTodo() {
-    // Portadas Series
+    // Portadas principales (opcional: también puedes hacer que estas se amplíen)
     document.getElementById('series-grid').innerHTML = coleccionSeries.map(s => `
-        <img src="https://image.tmdb.org/t/p/w500${s.poster_path}" style="width:100%; border-radius:8px;">
+        <img src="https://image.tmdb.org/t/p/w500${s.poster_path}" onclick="ampliarSerie('${s.id}')" style="cursor:pointer;">
     `).join('');
 
     let actHTML = ""; 
     let creHTML = "";
 
     coleccionSeries.forEach(s => {
-        // ACTORES: Los 10 primeros (que son los de más peso/capítulos)
+        // Actores
         s.credits.cast.slice(0, 10).forEach(a => {
             const imgUrl = a.profile_path ? `https://image.tmdb.org/t/p/w200${a.profile_path}` : 'https://via.placeholder.com/200x200?text=N/A';
-            const personaje = a.character || 'Desconocido';
-
             actHTML += `
                 <div class="person-card">
-                    <img class="photo-circle" 
-                         src="${imgUrl}" 
-                         onclick="ampliarFoto('${imgUrl}', '${a.name}', '${personaje}')"
-                         onerror="this.src='https://via.placeholder.com/200'">
+                    <img class="photo-circle" src="${imgUrl}" onclick="ampliarFoto('${imgUrl}', '${a.name}', '${a.character || 'Desconocido'}')">
                     <span class="person-name">${a.name}</span>
-                    <img class="mini-serie-poster" src="https://image.tmdb.org/t/p/w200${s.poster_path}">
+                    <img class="mini-serie-poster" 
+                         src="https://image.tmdb.org/t/p/w200${s.poster_path}" 
+                         onclick="ampliarSerie('${s.id}')" 
+                         style="cursor:pointer; border: 1px solid var(--rojo);">
                 </div>`;
         });
 
-        // CREADORES
+        // Creadores
         if (s.created_by) {
             s.created_by.forEach(c => {
                 const imgUrl = c.profile_path ? `https://image.tmdb.org/t/p/w200${c.profile_path}` : 'https://via.placeholder.com/200x200?text=N/A';
                 creHTML += `
                     <div class="person-card">
-                        <img class="photo-circle" 
-                             src="${imgUrl}" 
-                             onclick="ampliarFoto('${imgUrl}', '${c.name}', 'Creador / Showrunner')"
-                             onerror="this.src='https://via.placeholder.com/200'">
+                        <img class="photo-circle" src="${imgUrl}" onclick="ampliarFoto('${imgUrl}', '${c.name}', 'Creador')">
                         <span class="person-name">${c.name}</span>
-                        <img class="mini-serie-poster" src="https://image.tmdb.org/t/p/w200${s.poster_path}">
+                        <img class="mini-serie-poster" 
+                             src="https://image.tmdb.org/t/p/w200${s.poster_path}" 
+                             onclick="ampliarSerie('${s.id}')" 
+                             style="cursor:pointer; border: 1px solid var(--rojo);">
                     </div>`;
             });
         }
