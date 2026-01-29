@@ -276,3 +276,12 @@ main {
     text-align: center;
     padding: 20px 0;
 }
+
+.nav-links li a {
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.nav-links li a:active {
+    background: #222;
+}
