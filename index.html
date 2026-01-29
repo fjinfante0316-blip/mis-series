@@ -19,6 +19,13 @@
             <li><a href="#" onclick="showSection('directors')"><i class="fas fa-pen-nib"></i> Creadores</a></li>
             <li><a href="#" onclick="showSection('actors')"><i class="fas fa-users"></i> Actores</a></li>
             <li><a href="#" onclick="showSection('stats')"><i class="fas fa-chart-pie"></i> Estadísticas</a></li>
+            <li><a href="#" onclick="exportarDatos()"><i class="fas fa-download"></i> Exportar Copia</a></li>
+            <li>
+                <a href="#" onclick="document.getElementById('importInput').click()">
+                    <i class="fas fa-upload"></i> Importar Copia
+                </a>
+                <input type="file" id="importInput" style="display:none" accept=".json" onchange="importarDatos(event)">
+            </li>
         </ul>
     </nav>
 
