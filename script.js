@@ -173,6 +173,44 @@ function renderizarTodo() {
                 <div class="mini-posters-container">${postersHTML}</div>
             </div>`;
     }).join('');
+
+    const creadoresAgrupados = {};
+    coleccionSeries.forEach(s => {
+        if (s.created_by) {
+            s.created_by.forEach(c => {
+                // Usamos el nombre como clave porque no todos tienen ID de persona único
+                if (!creadoresAgrupados[c.name]) {
+                    creadoresAgrupados[c.name] = { info: c, series: [] };
+                }
+                // Evitar duplicar series en el mismo creador
+                if (!creadoresAgrupados[c.name].series.some(ser => ser.id === s.id)) {
+                    creadoresAgrupados[c.name].series.push({ 
+                        id: s.id, 
+                        poster: s.poster_path 
+                    });
+                }
+            });
+        }
+    });
+
+    // --- RENDERIZAR CREADORES EN EL GRID ---
+    const directorsGrid = document.getElementById('directors-grid');
+    if (directorsGrid) {
+        directorsGrid.className = "grid-people seasons-carousel"; 
+        directorsGrid.innerHTML = Object.values(creadoresAgrupados).map(c => {
+            const postersHTML = c.series.map(s => `
+                <img class="mini-serie-poster" src="https://image.tmdb.org/t/p/w200${s.poster}" onclick="ampliarSerie('${s.id}')">
+            `).join('');
+            
+            return `
+                <div class="person-card">
+                    <img class="photo-circle" src="${c.info.profile_path ? 'https://image.tmdb.org/t/p/w200' + c.info.profile_path : 'https://via.placeholder.com/200'}" 
+                         onclick="ampliarFoto('https://image.tmdb.org/t/p/w500${c.info.profile_path}', '${c.info.name}', 'Creador')">
+                    <span class="person-name">${c.info.name}</span>
+                    <div class="mini-posters-container">${postersHTML}</div>
+                </div>`;
+        }).join('');
+    }
 }
 
 // --- 6. FUNCIONES DE APOYO (ELIMINAR, MODAL, STATS) ---
