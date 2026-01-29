@@ -358,3 +358,27 @@ main {
 
 .result-info h4 { margin: 0; font-size: 14px; color: white; }
 .result-info p { margin: 0; font-size: 12px; color: #888; }
+
+.btn-delete-serie {
+    position: absolute;
+    top: 0;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.6);
+    color: #888;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 8px;
+    cursor: pointer;
+    z-index: 20;
+    transition: all 0.3s;
+}
+
+.btn-delete-serie:hover {
+    color: #e50914;
+    background: rgba(0, 0, 0, 0.9);
+}
+
+/* Ajuste para el título para que no choque con el botón */
+.serie-title-tag {
+    padding-right: 40px;
+}
