@@ -95,11 +95,31 @@ async function confirmarSeleccion(serieId) {
     } catch (e) { console.error(e); }
 }
 
+function eliminarSerie(idSerie) {
+    if (confirm("¿Seguro que quieres eliminar esta serie de tu colección?")) {
+        // Filtramos la colección para quitar la serie con ese ID
+        coleccionSeries = coleccionSeries.filter(s => s.id != idSerie);
+        
+        // Volvemos a dibujar todo
+        renderizarTodo();
+        
+        // Si no quedan series, volvemos a la portada
+        if (coleccionSeries.length === 0) {
+            showSection('welcome');
+        }
+    }
+}
+
 // --- 3. RENDERIZADO DE TODO ---
+// --- ACTUALIZACIÓN DE RENDERIZADO (Con el botón de borrar) ---
 function renderizarTodo() {
     // Portadas/Carrusel
     document.getElementById('series-grid').innerHTML = coleccionSeries.map(s => `
-        <div class="serie-group">
+        <div class="serie-group" style="position: relative;">
+            <button class="btn-delete-serie" onclick="eliminarSerie('${s.id}')">
+                <i class="fas fa-trash"></i>
+            </button>
+
             <div class="serie-title-tag">${s.name}</div>
             <div class="seasons-carousel">
                 ${s.seasons.map(t => `
@@ -112,7 +132,7 @@ function renderizarTodo() {
         </div>
     `).join('');
 
-    // Actores y Creadores
+    // Actores y Creadores (Se mantiene igual que antes)
     let actHTML = ""; let creHTML = "";
     coleccionSeries.forEach(s => {
         s.repartoEspecial.forEach(a => {
@@ -127,7 +147,6 @@ function renderizarTodo() {
     document.getElementById('actors-grid').innerHTML = actHTML;
     document.getElementById('directors-grid').innerHTML = creHTML;
 }
-
 function crearFicha(p, poster, rol, sId) {
     const imgUrl = p.profile_path ? `https://image.tmdb.org/t/p/w200${p.profile_path}` : 'https://via.placeholder.com/200';
     return `
