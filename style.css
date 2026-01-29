@@ -285,3 +285,39 @@ main {
 .nav-links li a:active {
     background: #222;
 }
+
+.time-stats-container {
+    display: flex;
+    justify-content: space-around;
+    gap: 10px;
+    margin-bottom: 20px;
+    padding: 10px;
+}
+
+.time-card {
+    background: #1a1a1a;
+    padding: 15px 10px;
+    border-radius: 12px;
+    flex: 1;
+    text-align: center;
+    border: 1px solid #333;
+    transition: transform 0.3s;
+}
+
+.time-card i {
+    color: var(--rojo);
+    font-size: 1.2rem;
+    margin-bottom: 8px;
+}
+
+.time-card h3 {
+    margin: 5px 0;
+    font-size: 1.4rem;
+}
+
+.time-card span {
+    font-size: 0.7rem;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
