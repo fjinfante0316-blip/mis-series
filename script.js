@@ -205,7 +205,55 @@ function importarDatos(event) {
 // --- 7. ESTADÍSTICAS ---
 function generarStats() {
     const container = document.getElementById('stats-area');
-    if (coleccionSeries.length === 0) return;
+    if (coleccionSeries.length === 0) {
+        container.innerHTML = "<p>Añade series para calcular tu tiempo.</p>";
+        return;
+    }
+
+    let minutosTotales = 0;
+    let episodiosTotales = 0;
+
+    coleccionSeries.forEach(s => {
+        // Obtenemos la duración media (TMDB devuelve un array, solemos coger el primero)
+        const duracionMedia = (s.episode_run_time && s.episode_run_time.length > 0) 
+                              ? s.episode_run_time[0] 
+                              : 45; // Si no hay dato, estimamos 45 min
+        
+        minutosTotales += (duracionMedia * s.number_of_episodes);
+        episodiosTotales += s.number_of_episodes;
+    });
+
+    const horasTotales = Math.floor(minutosTotales / 60);
+    const diasTotales = (horasTotales / 24).toFixed(1);
+
+    // --- AQUÍ EL RENDERIZADO DE LAS NUEVAS STATS ---
+    let statsHTML = `
+        <div class="time-stats-container">
+            <div class="time-card">
+                <i class="fas fa-clock"></i>
+                <h3>${horasTotales}</h3>
+                <span>Horas Totales</span>
+            </div>
+            <div class="time-card">
+                <i class="fas fa-calendar-day"></i>
+                <h3>${diasTotales}</h3>
+                <span>Días de Vida</span>
+            </div>
+            <div class="time-card">
+                <i class="fas fa-film"></i>
+                <h3>${episodiosTotales}</h3>
+                <span>Capítulos</span>
+            </div>
+        </div>
+        <hr style="border: 0; border-top: 1px solid #333; margin: 20px 0;">
+    `;
+
+    // Añadimos el gráfico circular que ya tenías debajo
+    container.innerHTML = statsHTML + `<h3 style="margin-bottom:15px;">Géneros Favoritos</h3>` + crearGraficoCircular();
+}
+
+// Función auxiliar para separar la lógica del gráfico (para que el código sea limpio)
+function crearGraficoCircular() {
     const counts = {};
     const colores = ['#e50914', '#2ecc71', '#3498db', '#f1c40f', '#9b59b6', '#e67e22'];
     coleccionSeries.forEach(s => {
@@ -225,5 +273,5 @@ function generarStats() {
         acumulado += porc;
         legend += `<div class="legend-item"><div class="color-box" style="background:${col}"></div>${gen}</div>`;
     });
-    container.innerHTML = `<div id="genero-chart" style="background: conic-gradient(${partes.join(',')})"></div>${legend}</div>`;
+    return `<div id="genero-chart" style="background: conic-gradient(${partes.join(',')})"></div>${legend}</div>`;
 }
