@@ -113,9 +113,9 @@ function eliminarSerie(idSerie) {
 // --- 3. RENDERIZADO DE TODO ---
 // --- ACTUALIZACIÓN DE RENDERIZADO (Con el botón de borrar) ---
 function renderizarTodo() {
-    // --- 1. RENDER SERIES (Se mantiene igual) ---
+    // 1. RENDER SERIES (Carrusel de temporadas)
     document.getElementById('series-grid').innerHTML = coleccionSeries.map(s => `
-        <div class="serie-group" style="position: relative;">
+        <div class="serie-group">
             <button class="btn-delete-serie" onclick="eliminarSerie('${s.id}')"><i class="fas fa-trash"></i></button>
             <div class="serie-title-tag">${s.name}</div>
             <div class="seasons-carousel">
@@ -129,40 +129,66 @@ function renderizarTodo() {
         </div>
     `).join('');
 
-    // --- 2. AGRUPAR ACTORES Y CREADORES ---
-    const actoresAgrupados = {}; // Clave: ID del actor
-    const creadoresAgrupados = {}; // Clave: Nombre del creador
+    // 2. AGRUPACIÓN DINÁMICA (Actores y Creadores)
+    const actoresAgrupados = {};
+    const creadoresAgrupados = {};
 
     coleccionSeries.forEach(s => {
-        // Agrupar Actores
         s.repartoEspecial.forEach(a => {
             if (!actoresAgrupados[a.id]) {
-                actoresAgrupados[a.id] = {
-                    info: a,
-                    series: [] // Guardaremos objetos {id, poster}
-                };
+                actoresAgrupados[a.id] = { info: a, trabajos: [] };
             }
-            // Evitar duplicar la misma serie en el mismo actor
-            if (!actoresAgrupados[a.id].series.some(ser => ser.id === s.id)) {
-                actoresAgrupados[a.id].series.push({ id: s.id, poster: s.poster_path });
-            }
+            actoresAgrupados[a.id].trabajos.push({ 
+                serieId: s.id, 
+                poster: s.poster_path, 
+                personaje: a.character || 'N/A' 
+            });
         });
 
-        // Agrupar Creadores
         if (s.created_by) {
             s.created_by.forEach(c => {
                 if (!creadoresAgrupados[c.name]) {
-                    creadoresAgrupados[c.name] = {
-                        info: c,
-                        series: []
-                    };
+                    creadoresAgrupados[c.name] = { info: c, series: [] };
                 }
-                if (!creadoresAgrupados[c.name].series.some(ser => ser.id === s.id)) {
-                    creadoresAgrupados[c.name].series.push({ id: s.id, poster: s.poster_path });
-                }
+                creadoresAgrupados[c.name].series.push({ id: s.id, poster: s.poster_path });
             });
         }
     });
+
+    // 3. RENDERIZAR EN CARRUSELES lateralmente
+    // Actores
+    document.getElementById('actors-grid').className = "seasons-carousel"; // Reutilizamos clase de carrusel
+    document.getElementById('actors-grid').innerHTML = Object.values(actoresAgrupados).map(a => {
+        const personajes = a.trabajos.map(t => t.personaje).join(' / ');
+        const postersHTML = a.trabajos.map(t => `
+            <img class="mini-serie-poster" src="https://image.tmdb.org/t/p/w200${t.poster}" onclick="ampliarSerie('${t.serieId}')">
+        `).join('');
+        
+        return `
+            <div class="person-card">
+                <img class="photo-circle" src="${a.info.profile_path ? 'https://image.tmdb.org/t/p/w200'+a.info.profile_path : 'https://via.placeholder.com/200'}" 
+                     onclick="ampliarFoto('https://image.tmdb.org/t/p/w500${a.info.profile_path}', '${a.info.name}', '${personajes}')">
+                <span class="person-name">${a.info.name}</span>
+                <div class="mini-posters-container">${postersHTML}</div>
+            </div>`;
+    }).join('');
+
+    // Creadores
+    document.getElementById('directors-grid').className = "seasons-carousel";
+    document.getElementById('directors-grid').innerHTML = Object.values(creadoresAgrupados).map(c => {
+        const postersHTML = c.series.map(s => `
+            <img class="mini-serie-poster" src="https://image.tmdb.org/t/p/w200${s.poster}" onclick="ampliarSerie('${s.id}')">
+        `).join('');
+        
+        return `
+            <div class="person-card">
+                <img class="photo-circle" src="${c.info.profile_path ? 'https://image.tmdb.org/t/p/w200'+c.info.profile_path : 'https://via.placeholder.com/200'}" 
+                     onclick="ampliarFoto('https://image.tmdb.org/t/p/w500${c.info.profile_path}', '${c.info.name}', 'Creador')">
+                <span class="person-name">${c.info.name}</span>
+                <div class="mini-posters-container">${postersHTML}</div>
+            </div>`;
+    }).join('');
+}
 
     // --- 3. RENDERIZAR FICHAS AGRUPADAS ---
     let actHTML = "";
