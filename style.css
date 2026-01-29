@@ -412,3 +412,43 @@ main {
     align-items: center;
     margin-bottom: 20px;
 }
+
+/* Ajuste para que las secciones de personas se comporten como carrusel */
+.grid-people.seasons-carousel {
+    display: flex;
+    overflow-x: auto;
+    gap: 20px;
+    padding: 10px 0;
+    scrollbar-width: none; /* Ocultar scroll en Firefox */
+}
+
+.grid-people.seasons-carousel::-webkit-scrollbar {
+    display: none; /* Ocultar scroll en Chrome/Safari */
+}
+
+.person-card {
+    flex: 0 0 120px; /* Ancho fijo para cada actor en el carrusel */
+    text-align: center;
+}
+
+.photo-circle {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--rojo);
+    margin-bottom: 8px;
+}
+
+.mini-posters-container {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    margin-top: 5px;
+}
+
+.mini-serie-poster {
+    width: 25px;
+    height: 38px;
+    border-radius: 2px;
+}
