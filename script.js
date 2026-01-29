@@ -157,22 +157,39 @@ function renderizarTodo() {
         });
     });
 
-    const actorsGrid = document.getElementById('actors-grid');
-    actorsGrid.className = "grid-people seasons-carousel"; 
-    actorsGrid.innerHTML = Object.values(actoresAgrupados).map(a => {
-        const personajes = a.trabajos.map(t => t.personaje).join(' / ');
-        const postersHTML = a.trabajos.map(t => `
-            <img class="mini-serie-poster" src="https://image.tmdb.org/t/p/w200${t.poster}" onclick="ampliarSerie('${t.serieId}')">
-        `).join('');
-        
-        return `
-            <div class="person-card">
+    // --- RENDERIZAR ACTORES (Fila por actor con carrusel de series) ---
+const actorsGrid = document.getElementById('actors-grid');
+// Quitamos la clase 'seasons-carousel' del contenedor padre para que las filas vayan hacia abajo
+actorsGrid.className = "grid-people-rows"; 
+
+const listaActoresOrdenada = Object.values(actoresAgrupados).sort((a, b) => b.trabajos.length - a.trabajos.length);
+
+actorsGrid.innerHTML = listaActoresOrdenada.map(a => {
+    const personajes = a.trabajos.map(t => t.personaje).join(' / ');
+    
+    // Generamos las series del actor como un carrusel lateral
+    const seriesHTML = a.trabajos.map(t => `
+        <div class="mini-card-serie" onclick="ampliarSerie('${t.serieId}')">
+            <img src="https://image.tmdb.org/t/p/w200${t.poster}">
+            <span>${t.personaje}</span>
+        </div>
+    `).join('');
+    
+    return `
+        <div class="actor-row">
+            <div class="actor-info-side">
                 <img class="photo-circle" src="${a.info.profile_path ? 'https://image.tmdb.org/t/p/w200'+a.info.profile_path : 'https://via.placeholder.com/200'}" 
                      onclick="ampliarFoto('https://image.tmdb.org/t/p/w500${a.info.profile_path}', '${a.info.name}', '${personajes}')">
                 <span class="person-name">${a.info.name}</span>
-                <div class="mini-posters-container">${postersHTML}</div>
-            </div>`;
-    }).join('');
+                <div class="badge-count">${a.trabajos.length} series</div>
+            </div>
+            <div class="actor-series-carousel">
+                ${seriesHTML}
+            </div>
+        </div>`;
+}).join('');
+
+// Repite una lógica similar para 'directors-grid' si quieres el mismo estilo en creadores.
 
     const creadoresAgrupados = {};
     coleccionSeries.forEach(s => {
