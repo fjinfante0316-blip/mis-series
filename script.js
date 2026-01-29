@@ -9,22 +9,33 @@ const modal = document.getElementById('photo-modal');
 const closeBtn = document.getElementById('modalCloseBtn');
 const resultsContainer = document.getElementById('search-results');
 
-// --- 1. MENÚ Y NAVEGACIÓN ---
+// --- 1. CONTROL DEL MENÚ LATERAL ---
 if (btnMenu) {
-    btnMenu.onclick = (e) => { e.stopPropagation(); sidebar.classList.toggle('active'); };
+    btnMenu.onclick = (e) => { 
+        e.stopPropagation(); 
+        sidebar.classList.toggle('active'); 
+    };
 }
 
+document.addEventListener('click', (e) => {
+    if (sidebar && sidebar.classList.contains('active') && !sidebar.contains(e.target)) {
+        sidebar.classList.remove('active');
+    }
+});
+
+// --- 2. GESTIÓN DE SECCIONES ---
 function showSection(id) {
     const welcome = document.getElementById('welcome-screen');
     const mainApp = document.getElementById('main-app');
-    welcome.classList.add('hidden');
-    mainApp.classList.add('hidden');
-    headerSearch.classList.add('hidden');
+    const btnVolver = document.getElementById('btn-volver');
 
     if (id === 'welcome') {
         welcome.classList.remove('hidden');
-        if(coleccionSeries.length > 0) document.getElementById('btn-volver').classList.remove('hidden');
+        mainApp.classList.add('hidden');
+        headerSearch.classList.add('hidden');
+        if (coleccionSeries.length > 0) btnVolver.classList.remove('hidden');
     } else {
+        welcome.classList.add('hidden');
         mainApp.classList.remove('hidden');
         headerSearch.classList.remove('hidden');
         document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
@@ -34,40 +45,52 @@ function showSection(id) {
     if (id === 'stats') generarStats();
 }
 
-// --- 2. BUSCADOR CON SELECCIÓN PREVIA ---
+// --- 3. BÚSQUEDA CON SELECCIÓN (SOLUCIÓN AL BOTÓN) ---
 async function buscarYAñadir(esInicio) {
     const inputId = esInicio ? 'initialInput' : 'serieInput';
-    const query = document.getElementById(inputId).value;
+    const inputElement = document.getElementById(inputId);
+    const query = inputElement.value;
+    
     if (!query) return;
 
     try {
-        const r = await fetch(`https://api.themoviedb.org/3/search/tv?api_key=${API_KEY}&query=${query}&language=es-ES`);
+        const r = await fetch(`https://api.themoviedb.org/3/search/tv?api_key=${API_KEY}&query=${encodeURIComponent(query)}&language=es-ES`);
         const d = await r.json();
         
         if (d.results && d.results.length > 0) {
+            // Mostrar lista de resultados para elegir
             resultsContainer.innerHTML = d.results.slice(0, 5).map(s => `
                 <div class="result-item" onclick="confirmarSeleccion(${s.id})">
-                    <img src="https://image.tmdb.org/t/p/w200${s.poster_path}" onerror="this.src='https://via.placeholder.com/200x300'">
+                    <img src="${s.poster_path ? 'https://image.tmdb.org/t/p/w200' + s.poster_path : 'https://via.placeholder.com/200x300'}" alt="${s.name}">
                     <div class="result-info">
                         <h4>${s.name}</h4>
-                        <p>${s.first_air_date ? s.first_air_date.substring(0,4) : 'N/A'}</p>
+                        <p>${s.first_air_date ? s.first_air_date.substring(0,4) : 'Sin fecha'}</p>
                     </div>
                 </div>
             `).join('');
             resultsContainer.classList.remove('hidden');
-        } else { alert("No se encontraron resultados."); }
-    } catch (e) { console.error(e); }
+        } else {
+            alert("No se encontraron series con ese nombre.");
+        }
+    } catch (e) {
+        console.error("Error en la búsqueda:", e);
+    }
 }
 
+// --- 4. CONFIRMAR Y AÑADIR (CON ACTORES POR TEMPORADA) ---
 async function confirmarSeleccion(serieId) {
     resultsContainer.classList.add('hidden');
-    if (coleccionSeries.some(s => s.id === serieId)) return alert("Ya tienes esta serie.");
+    if (coleccionSeries.some(s => s.id === serieId)) {
+        alert("Esta serie ya está en tu colección.");
+        return;
+    }
 
     try {
+        // 1. Datos básicos
         const det = await fetch(`https://api.themoviedb.org/3/tv/${serieId}?api_key=${API_KEY}&language=es-ES`);
         let serie = await det.json();
 
-        // REPARTO POR TEMPORADAS (5 actores x temp sin repetir)
+        // 2. Actores por temporada (5 x temp sin repetir)
         serie.repartoEspecial = [];
         const actoresVistos = new Set();
         const numTemps = Math.min(serie.number_of_seasons, 5);
@@ -86,34 +109,22 @@ async function confirmarSeleccion(serieId) {
                         }
                     }
                 }
-            } catch (err) {}
+            } catch (err) { console.warn(`Error en T${i}`); }
         }
 
         coleccionSeries.push(serie);
         renderizarTodo();
         showSection('series');
-    } catch (e) { console.error(e); }
-}
-
-function eliminarSerie(idSerie) {
-    if (confirm("¿Seguro que quieres eliminar esta serie de tu colección?")) {
-        // Filtramos la colección para quitar la serie con ese ID
-        coleccionSeries = coleccionSeries.filter(s => s.id != idSerie);
-        
-        // Volvemos a dibujar todo
-        renderizarTodo();
-        
-        // Si no quedan series, volvemos a la portada
-        if (coleccionSeries.length === 0) {
-            showSection('welcome');
-        }
+        document.getElementById('initialInput').value = "";
+        document.getElementById('serieInput').value = "";
+    } catch (e) {
+        console.error("Error al obtener detalles:", e);
     }
 }
 
-// --- 3. RENDERIZADO DE TODO ---
-// --- ACTUALIZACIÓN DE RENDERIZADO (Con el botón de borrar) ---
+// --- 5. RENDERIZADO (CARRUSELES AGRUPADOS) ---
 function renderizarTodo() {
-    // 1. RENDER SERIES (Carrusel de temporadas)
+    // Series
     document.getElementById('series-grid').innerHTML = coleccionSeries.map(s => `
         <div class="serie-group">
             <button class="btn-delete-serie" onclick="eliminarSerie('${s.id}')"><i class="fas fa-trash"></i></button>
@@ -129,36 +140,26 @@ function renderizarTodo() {
         </div>
     `).join('');
 
-    // 2. AGRUPACIÓN DINÁMICA (Actores y Creadores)
+    // Agrupación de Actores para Carrusel
     const actoresAgrupados = {};
-    const creadoresAgrupados = {};
-
     coleccionSeries.forEach(s => {
         s.repartoEspecial.forEach(a => {
             if (!actoresAgrupados[a.id]) {
                 actoresAgrupados[a.id] = { info: a, trabajos: [] };
             }
-            actoresAgrupados[a.id].trabajos.push({ 
-                serieId: s.id, 
-                poster: s.poster_path, 
-                personaje: a.character || 'N/A' 
-            });
+            if (!actoresAgrupados[a.id].trabajos.some(t => t.serieId === s.id)) {
+                actoresAgrupados[a.id].trabajos.push({ 
+                    serieId: s.id, 
+                    poster: s.poster_path, 
+                    personaje: a.character || 'Desconocido' 
+                });
+            }
         });
-
-        if (s.created_by) {
-            s.created_by.forEach(c => {
-                if (!creadoresAgrupados[c.name]) {
-                    creadoresAgrupados[c.name] = { info: c, series: [] };
-                }
-                creadoresAgrupados[c.name].series.push({ id: s.id, poster: s.poster_path });
-            });
-        }
     });
 
-    // 3. RENDERIZAR EN CARRUSELES lateralmente
-    // Actores
-    document.getElementById('actors-grid').className = "seasons-carousel"; // Reutilizamos clase de carrusel
-    document.getElementById('actors-grid').innerHTML = Object.values(actoresAgrupados).map(a => {
+    const actorsGrid = document.getElementById('actors-grid');
+    actorsGrid.className = "grid-people seasons-carousel"; 
+    actorsGrid.innerHTML = Object.values(actoresAgrupados).map(a => {
         const personajes = a.trabajos.map(t => t.personaje).join(' / ');
         const postersHTML = a.trabajos.map(t => `
             <img class="mini-serie-poster" src="https://image.tmdb.org/t/p/w200${t.poster}" onclick="ampliarSerie('${t.serieId}')">
@@ -172,41 +173,19 @@ function renderizarTodo() {
                 <div class="mini-posters-container">${postersHTML}</div>
             </div>`;
     }).join('');
-
-    // Creadores
-    document.getElementById('directors-grid').className = "seasons-carousel";
-    document.getElementById('directors-grid').innerHTML = Object.values(creadoresAgrupados).map(c => {
-        const postersHTML = c.series.map(s => `
-            <img class="mini-serie-poster" src="https://image.tmdb.org/t/p/w200${s.poster}" onclick="ampliarSerie('${s.id}')">
-        `).join('');
-        
-        return `
-            <div class="person-card">
-                <img class="photo-circle" src="${c.info.profile_path ? 'https://image.tmdb.org/t/p/w200'+c.info.profile_path : 'https://via.placeholder.com/200'}" 
-                     onclick="ampliarFoto('https://image.tmdb.org/t/p/w500${c.info.profile_path}', '${c.info.name}', 'Creador')">
-                <span class="person-name">${c.info.name}</span>
-                <div class="mini-posters-container">${postersHTML}</div>
-            </div>`;
-    }).join('');
 }
 
-    // --- 3. RENDERIZAR FICHAS AGRUPADAS ---
-    let actHTML = "";
-    Object.values(actoresAgrupados).forEach(a => {
-        actHTML += crearFichaAgrupada(a.info, a.series, a.info.character);
-    });
-
-    let creHTML = "";
-    Object.values(creadoresAgrupados).forEach(c => {
-        creHTML += crearFichaAgrupada(c.info, c.series, 'Creador');
-    });
-
-    document.getElementById('actors-grid').innerHTML = actHTML;
-    document.getElementById('directors-grid').innerHTML = creHTML;
+// --- 6. FUNCIONES DE APOYO (ELIMINAR, MODAL, STATS) ---
+function eliminarSerie(idSerie) {
+    if (confirm("¿Eliminar serie?")) {
+        coleccionSeries = coleccionSeries.filter(s => s.id != idSerie);
+        renderizarTodo();
+        if (coleccionSeries.length === 0) showSection('welcome');
+    }
 }
-// --- 4. MODALES Y CIERRE ---
+
 function ampliarFoto(url, nombre, personaje) {
-    document.getElementById('img-ampliada').src = url.replace('w200', 'w500');
+    document.getElementById('img-ampliada').src = url;
     document.getElementById('modal-caption').innerHTML = `<h2>${nombre}</h2><p>${personaje}</p>`;
     document.body.style.overflow = 'hidden'; 
     modal.classList.remove('hidden');
@@ -216,76 +195,43 @@ function ampliarSerie(idSerie) {
     const s = coleccionSeries.find(item => item.id == idSerie);
     if (!s) return;
     document.getElementById('img-ampliada').src = `https://image.tmdb.org/t/p/w500${s.poster_path}`;
-    const año = s.first_air_date ? s.first_air_date.substring(0, 4) : "N/A";
     document.getElementById('modal-caption').innerHTML = `
-        <h2>${s.name} (${año})</h2>
-        <div style="font-size:14px; line-height:1.4; text-align:justify;">${s.overview || "Sin sinopsis."}</div>`;
+        <h2>${s.name}</h2>
+        <div style="font-size:14px; line-height:1.4;">${s.overview || "Sin sinopsis."}</div>`;
     document.body.style.overflow = 'hidden';
     modal.classList.remove('hidden');
 }
 
-function cerrarModal() { modal.classList.add('hidden'); document.body.style.overflow = 'auto'; }
-closeBtn.onclick = cerrarModal;
-modal.onclick = (e) => { if (e.target === modal) cerrarModal(); };
+function cerrarModal() { 
+    modal.classList.add('hidden'); 
+    document.body.style.overflow = 'auto'; 
+}
 
-// --- 5. ESTADÍSTICAS Y TIEMPO ---
+if (closeBtn) closeBtn.onclick = cerrarModal;
+if (modal) modal.onclick = (e) => { if (e.target === modal) cerrarModal(); };
+
 function generarStats() {
-    let min = 0; let eps = 0;
+    let min = 0;
     coleccionSeries.forEach(s => {
         const dur = (s.episode_run_time && s.episode_run_time[0]) || 45;
         min += (dur * s.number_of_episodes);
-        eps += s.number_of_episodes;
     });
     const hrs = Math.floor(min / 60);
-    const dias = (hrs / 24).toFixed(1);
-
-    document.getElementById('stats-area').innerHTML = `
-        <div class="time-stats-container">
-            <div class="time-card"><i>(H)</i><h3>${hrs}</h3><span>Horas</span></div>
-            <div class="time-card"><i>(D)</i><h3>${dias}</h3><span>Días</span></div>
-            <div class="time-card"><i>(E)</i><h3>${eps}</h3><span>Episodios</span></div>
-        </div>
-        <hr style="border:0; border-top:1px solid #333; margin:20px 0;">
-        ${crearGraficoCircular()}`;
+    document.getElementById('stats-area').innerHTML = `<h3>Has visto aproximadamente ${hrs} horas de series.</h3>`;
 }
 
-// Nueva función para crear la ficha con MULTIPLES pósters
-function crearFichaAgrupada(p, listaSeries, rol) {
-    const imgUrl = p.profile_path ? `https://image.tmdb.org/t/p/w200${p.profile_path}` : 'https://via.placeholder.com/200';
-    
-    // Generar el HTML de todos los mini pósters
-    const postersHTML = listaSeries.map(s => `
-        <img class="mini-serie-poster" 
-             src="https://image.tmdb.org/t/p/w200${s.poster}" 
-             onclick="ampliarSerie('${s.id}')"
-             title="Ver serie">
-    `).join('');
-
-    return `
-        <div class="person-card">
-            <img class="photo-circle" src="${imgUrl}" onclick="ampliarFoto('${imgUrl}', '${p.name}', '${rol}')">
-            <span class="person-name">${p.name}</span>
-            <div class="mini-posters-container">
-                ${postersHTML}
-            </div>
-        </div>`;
-}
-
-// --- 6. EXPORTAR / IMPORTAR ---
+// Exportar e Importar
 function exportarDatos() {
     const blob = new Blob([JSON.stringify(coleccionSeries)], {type: "application/json"});
     const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = "mis_series.json";
-    a.click();
+    a.href = URL.createObjectURL(blob); a.download = "mis_series.json"; a.click();
 }
 
 function importarDatos(e) {
     const reader = new FileReader();
     reader.onload = (event) => {
         coleccionSeries = JSON.parse(event.target.result);
-        renderizarTodo();
-        showSection('series');
+        renderizarTodo(); showSection('series');
     };
     reader.readAsText(e.target.files[0]);
 }
