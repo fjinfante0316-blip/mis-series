@@ -382,3 +382,33 @@ main {
 .serie-title-tag {
     padding-right: 40px;
 }
+
+.mini-posters-container {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    margin-top: 5px;
+    flex-wrap: wrap; /* Por si participa en muchas, que bajen a la siguiente línea */
+}
+
+.mini-serie-poster {
+    width: 35px; /* Un poco más pequeños para que quepan varios */
+    height: 50px;
+    border-radius: 4px;
+    border: 1px solid var(--rojo);
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.mini-serie-poster:hover {
+    transform: scale(1.2);
+    z-index: 5;
+}
+
+.person-card {
+    min-height: 160px; /* Ajustamos el alto para que quepan los pósters */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+}
