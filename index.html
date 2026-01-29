@@ -19,6 +19,7 @@
             <li><a href="#" onclick="showSection('directors')"><i class="fas fa-pen-nib"></i> Creadores</a></li>
             <li><a href="#" onclick="showSection('actors')"><i class="fas fa-users"></i> Actores</a></li>
             <li><a href="#" onclick="showSection('stats')"><i class="fas fa-chart-pie"></i> Estadísticas</a></li>
+            <hr style="border:0; border-top:1px solid #333; margin:10px 0;">
             <li><a href="#" onclick="exportarDatos()"><i class="fas fa-download"></i> Exportar Copia</a></li>
             <li>
                 <a href="#" onclick="document.getElementById('importInput').click()">
@@ -34,17 +35,19 @@
             <i class="fas fa-bars"></i>
         </button>
         <div id="mini-search" class="header-search hidden">
-            <input type="text" id="serieInput" placeholder="Añadir otra serie...">
+            <input type="text" id="serieInput" placeholder="Añadir serie..." onkeyup="if(event.key==='Enter') buscarYAñadir(false)">
             <button onclick="buscarYAñadir(false)"><i class="fas fa-plus"></i></button>
         </div>
     </header>
+
+    <div id="search-results" class="results-container hidden"></div>
 
     <div id="welcome-screen">
         <div class="welcome-content">
             <h1 class="logo">MIS<span>SERIES</span></h1>
             <p>Tu colección personal de televisión</p>
             <div class="search-box-large">
-                <input type="text" id="initialInput" placeholder="Escribe el nombre aquí...">
+                <input type="text" id="initialInput" placeholder="Escribe el nombre aquí..." onkeyup="if(event.key==='Enter') buscarYAñadir(true)">
                 <button onclick="buscarYAñadir(true)"><i class="fas fa-plus"></i></button>
             </div>
             <button id="btn-volver" class="hidden" onclick="showSection('series')">
@@ -56,8 +59,7 @@
     <div id="main-app" class="hidden">
         <main>
             <section id="sec-series" class="section active">
-                <div id="series-grid" class="grid-series">
-                    </div>
+                <div id="series-grid" class="grid-series"></div>
             </section>
 
             <section id="sec-directors" class="section hidden">
@@ -66,12 +68,12 @@
             </section>
 
             <section id="sec-actors" class="section hidden">
-                <h2 class="section-title">Actores Principales</h2>
+                <h2 class="section-title">Actores por Temporada</h2>
                 <div id="actors-grid" class="grid-people"></div>
             </section>
 
             <section id="sec-stats" class="section hidden">
-                <h2 class="section-title">Estadísticas</h2>
+                <h2 class="section-title">Tu Tiempo en Series</h2>
                 <div id="stats-area" class="stats-container">
                     </div>
             </section>
