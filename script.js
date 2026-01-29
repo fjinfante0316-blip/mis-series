@@ -113,13 +113,10 @@ function eliminarSerie(idSerie) {
 // --- 3. RENDERIZADO DE TODO ---
 // --- ACTUALIZACIÓN DE RENDERIZADO (Con el botón de borrar) ---
 function renderizarTodo() {
-    // Portadas/Carrusel
+    // --- 1. RENDER SERIES (Se mantiene igual) ---
     document.getElementById('series-grid').innerHTML = coleccionSeries.map(s => `
         <div class="serie-group" style="position: relative;">
-            <button class="btn-delete-serie" onclick="eliminarSerie('${s.id}')">
-                <i class="fas fa-trash"></i>
-            </button>
-
+            <button class="btn-delete-serie" onclick="eliminarSerie('${s.id}')"><i class="fas fa-trash"></i></button>
             <div class="serie-title-tag">${s.name}</div>
             <div class="seasons-carousel">
                 ${s.seasons.map(t => `
@@ -132,31 +129,55 @@ function renderizarTodo() {
         </div>
     `).join('');
 
-    // Actores y Creadores (Se mantiene igual que antes)
-    let actHTML = ""; let creHTML = "";
+    // --- 2. AGRUPAR ACTORES Y CREADORES ---
+    const actoresAgrupados = {}; // Clave: ID del actor
+    const creadoresAgrupados = {}; // Clave: Nombre del creador
+
     coleccionSeries.forEach(s => {
+        // Agrupar Actores
         s.repartoEspecial.forEach(a => {
-            actHTML += crearFicha(a, s.poster_path, a.character, s.id);
+            if (!actoresAgrupados[a.id]) {
+                actoresAgrupados[a.id] = {
+                    info: a,
+                    series: [] // Guardaremos objetos {id, poster}
+                };
+            }
+            // Evitar duplicar la misma serie en el mismo actor
+            if (!actoresAgrupados[a.id].series.some(ser => ser.id === s.id)) {
+                actoresAgrupados[a.id].series.push({ id: s.id, poster: s.poster_path });
+            }
         });
+
+        // Agrupar Creadores
         if (s.created_by) {
             s.created_by.forEach(c => {
-                creHTML += crearFicha(c, s.poster_path, 'Creador', s.id);
+                if (!creadoresAgrupados[c.name]) {
+                    creadoresAgrupados[c.name] = {
+                        info: c,
+                        series: []
+                    };
+                }
+                if (!creadoresAgrupados[c.name].series.some(ser => ser.id === s.id)) {
+                    creadoresAgrupados[c.name].series.push({ id: s.id, poster: s.poster_path });
+                }
             });
         }
     });
+
+    // --- 3. RENDERIZAR FICHAS AGRUPADAS ---
+    let actHTML = "";
+    Object.values(actoresAgrupados).forEach(a => {
+        actHTML += crearFichaAgrupada(a.info, a.series, a.info.character);
+    });
+
+    let creHTML = "";
+    Object.values(creadoresAgrupados).forEach(c => {
+        creHTML += crearFichaAgrupada(c.info, c.series, 'Creador');
+    });
+
     document.getElementById('actors-grid').innerHTML = actHTML;
     document.getElementById('directors-grid').innerHTML = creHTML;
 }
-function crearFicha(p, poster, rol, sId) {
-    const imgUrl = p.profile_path ? `https://image.tmdb.org/t/p/w200${p.profile_path}` : 'https://via.placeholder.com/200';
-    return `
-        <div class="person-card">
-            <img class="photo-circle" src="${imgUrl}" onclick="ampliarFoto('${imgUrl}', '${p.name}', '${rol}')">
-            <span class="person-name">${p.name}</span>
-            <img class="mini-serie-poster" src="https://image.tmdb.org/t/p/w200${poster}" onclick="ampliarSerie('${sId}')">
-        </div>`;
-}
-
 // --- 4. MODALES Y CIERRE ---
 function ampliarFoto(url, nombre, personaje) {
     document.getElementById('img-ampliada').src = url.replace('w200', 'w500');
@@ -202,19 +223,26 @@ function generarStats() {
         ${crearGraficoCircular()}`;
 }
 
-function crearGraficoCircular() {
-    const counts = {};
-    const colores = ['#e50914', '#2ecc71', '#3498db', '#f1c40f', '#9b59b6'];
-    coleccionSeries.forEach(s => { if(s.genres[0]) counts[s.genres[0].name] = (counts[s.genres[0].name] || 0) + 1; });
-    let acum = 0; let partes = []; let legend = '<div class="chart-legend">';
-    Object.keys(counts).forEach((gen, i) => {
-        const porc = (counts[gen] / coleccionSeries.length) * 100;
-        const col = colores[i % colores.length];
-        partes.push(`${col} ${acum}% ${acum + porc}%`);
-        acum += porc;
-        legend += `<div class="legend-item"><div class="color-box" style="background:${col}"></div>${gen}</div>`;
-    });
-    return `<h3>Géneros</h3><div id="genero-chart" style="background: conic-gradient(${partes.join(',')})"></div>${legend}</div>`;
+// Nueva función para crear la ficha con MULTIPLES pósters
+function crearFichaAgrupada(p, listaSeries, rol) {
+    const imgUrl = p.profile_path ? `https://image.tmdb.org/t/p/w200${p.profile_path}` : 'https://via.placeholder.com/200';
+    
+    // Generar el HTML de todos los mini pósters
+    const postersHTML = listaSeries.map(s => `
+        <img class="mini-serie-poster" 
+             src="https://image.tmdb.org/t/p/w200${s.poster}" 
+             onclick="ampliarSerie('${s.id}')"
+             title="Ver serie">
+    `).join('');
+
+    return `
+        <div class="person-card">
+            <img class="photo-circle" src="${imgUrl}" onclick="ampliarFoto('${imgUrl}', '${p.name}', '${rol}')">
+            <span class="person-name">${p.name}</span>
+            <div class="mini-posters-container">
+                ${postersHTML}
+            </div>
+        </div>`;
 }
 
 // --- 6. EXPORTAR / IMPORTAR ---
