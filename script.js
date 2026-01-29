@@ -16,14 +16,13 @@ if (btnMenu) {
     };
 }
 
-// Cerrar menú al tocar fuera
 document.addEventListener('click', (e) => {
     if (sidebar.classList.contains('active') && !sidebar.contains(e.target)) {
         sidebar.classList.remove('active');
     }
 });
 
-// --- 2. GESTIÓN DE SECCIONES ---
+// --- 2. NAVEGACIÓN ENTRE SECCIONES ---
 function showSection(id) {
     const welcome = document.getElementById('welcome-screen');
     const mainApp = document.getElementById('main-app');
@@ -44,7 +43,7 @@ function showSection(id) {
     if (id === 'stats') generarStats();
 }
 
-// --- 3. BÚSQUEDA AVANZADA (Temporadas + Actores por temporada) ---
+// --- 3. BÚSQUEDA Y CONTROL DE DUPLICADOS ---
 async function buscarYAñadir(esInicio) {
     const inputId = esInicio ? 'initialInput' : 'serieInput';
     const query = document.getElementById(inputId).value;
@@ -56,47 +55,50 @@ async function buscarYAñadir(esInicio) {
         
         if (d.results && d.results.length > 0) {
             const serieId = d.results[0].id;
-            
-            // Obtener detalles completos de la serie
+
+            // BLOQUEO DE DUPLICADOS
+            if (coleccionSeries.some(s => s.id === serieId)) {
+                alert("Esta serie ya está en tu colección.");
+                document.getElementById(inputId).value = "";
+                return;
+            }
+
             const det = await fetch(`https://api.themoviedb.org/3/tv/${serieId}?api_key=${API_KEY}&language=es-ES`);
             let serie = await det.json();
 
-            // Lógica: 5 actores por temporada sin repetir
+            // REPARTO: 5 actores por temporada sin repetir
             serie.repartoEspecial = [];
             const actoresVistos = new Set();
-            const numTemporadas = Math.min(serie.number_of_seasons, 5); // Limitamos a 5 para rapidez
+            const numTemporadas = Math.min(serie.number_of_seasons, 5);
 
             for (let i = 1; i <= numTemporadas; i++) {
                 try {
                     const resTemp = await fetch(`https://api.themoviedb.org/3/tv/${serieId}/season/${i}/credits?api_key=${API_KEY}&language=es-ES`);
                     const dataTemp = await resTemp.json();
-                    
                     if (dataTemp.cast) {
-                        let añadidosTemp = 0;
+                        let añadidos = 0;
                         for (let actor of dataTemp.cast) {
-                            if (!actoresVistos.has(actor.id) && añadidosTemp < 5) {
+                            if (!actoresVistos.has(actor.id) && añadidos < 5) {
                                 actoresVistos.add(actor.id);
                                 serie.repartoEspecial.push(actor);
-                                añadidosTemp++;
+                                añadidos++;
                             }
                         }
                     }
-                } catch (err) { console.warn(`T${i} no encontrada`); }
+                } catch (err) { console.warn(`T${i} no disponible`); }
             }
 
             coleccionSeries.push(serie);
             renderizarTodo();
             showSection('series');
-        } else {
-            alert("No se encontró la serie");
-        }
-    } catch (e) { console.error("Error API:", e); }
+        } else { alert("No se encontró la serie"); }
+    } catch (e) { console.error(e); }
     document.getElementById(inputId).value = "";
 }
 
-// --- 4. RENDERIZADO (Carruseles y Fichas) ---
+// --- 4. RENDERIZADO (CARRUSELES Y FICHAS) ---
 function renderizarTodo() {
-    // Render Series (Carrusel)
+    // Render Series
     document.getElementById('series-grid').innerHTML = coleccionSeries.map(s => `
         <div class="serie-group">
             <div class="serie-title-tag">${s.name}</div>
@@ -137,12 +139,12 @@ function crearFicha(p, poster, rol, sId) {
         </div>`;
 }
 
-// --- 5. MODALES (Ampliar y Cerrar) ---
+// --- 5. MODALES (INFO Y CIERRE) ---
 function ampliarFoto(url, nombre, personaje) {
     const img = document.getElementById('img-ampliada');
     const caption = document.getElementById('modal-caption');
     img.src = url.replace('w200', 'w500');
-    caption.innerHTML = `<h2 style="color:var(--rojo);">${nombre}</h2><p>Personaje: ${personaje}</p>`;
+    caption.innerHTML = `<h2>${nombre}</h2><p>Personaje: ${personaje}</p>`;
     document.body.style.overflow = 'hidden'; 
     modal.classList.remove('hidden');
 }
@@ -150,19 +152,15 @@ function ampliarFoto(url, nombre, personaje) {
 function ampliarSerie(idSerie) {
     const s = coleccionSeries.find(item => item.id == idSerie);
     if (!s) return;
-    
     const img = document.getElementById('img-ampliada');
     const caption = document.getElementById('modal-caption');
-    
     img.src = `https://image.tmdb.org/t/p/w500${s.poster_path}`;
     const año = s.first_air_date ? s.first_air_date.substring(0, 4) : "N/A";
-    
-    // Simplificamos el HTML para ahorrar espacio
     caption.innerHTML = `
         <h2>${s.name} (${año})</h2>
-        <div>${s.overview || "Sin sinopsis disponible."}</div>
-    `;
-    
+        <div style="font-size:14px; line-height:1.4; text-align:justify;">
+            ${s.overview || "Sin sinopsis disponible."}
+        </div>`;
     document.body.style.overflow = 'hidden';
     modal.classList.remove('hidden');
 }
@@ -172,39 +170,60 @@ function cerrarModal() {
     document.body.style.overflow = 'auto';
 }
 
-// Eventos de cierre
 if (closeBtn) closeBtn.onclick = cerrarModal;
 modal.onclick = (e) => { if (e.target === modal) cerrarModal(); };
 
-// --- 6. ESTADÍSTICAS (Gráfico Circular) ---
+// --- 6. EXPORTAR / IMPORTAR ---
+function exportarDatos() {
+    if (coleccionSeries.length === 0) return alert("Colección vacía");
+    const blob = new Blob([JSON.stringify(coleccionSeries)], {type: "application/json"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = "mis_series.json";
+    a.click();
+    sidebar.classList.remove('active');
+}
+
+function importarDatos(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        try {
+            const datos = JSON.parse(e.target.result);
+            coleccionSeries = datos;
+            renderizarTodo();
+            showSection('series');
+            alert("Colección cargada");
+        } catch (err) { alert("Archivo no válido"); }
+    };
+    reader.readAsText(file);
+    sidebar.classList.remove('active');
+}
+
+// --- 7. ESTADÍSTICAS ---
 function generarStats() {
     const container = document.getElementById('stats-area');
     if (coleccionSeries.length === 0) return;
-    
     const counts = {};
-    const colores = ['#e50914', '#2ecc71', '#3498db', '#f1c40f', '#9b59b6', '#e67e22', '#1abc9c'];
-    
+    const colores = ['#e50914', '#2ecc71', '#3498db', '#f1c40f', '#9b59b6', '#e67e22'];
     coleccionSeries.forEach(s => {
         if (s.genres && s.genres.length > 0) {
-            const gen = s.genres[0].name;
-            counts[gen] = (counts[gen] || 0) + 1;
+            const g = s.genres[0].name;
+            counts[g] = (counts[g] || 0) + 1;
         }
     });
-
     let acumulado = 0;
     let partes = [];
     let legend = '<div class="chart-legend">';
-    const total = coleccionSeries.length;
-
-    Object.keys(counts).forEach((gen, i) => {
-        const porc = (counts[gen] / total) * 100;
+    const keys = Object.keys(counts);
+    keys.forEach((gen, i) => {
+        const porc = (counts[gen] / coleccionSeries.length) * 100;
         const col = colores[i % colores.length];
         partes.push(`${col} ${acumulado}% ${acumulado + porc}%`);
         acumulado += porc;
         legend += `<div class="legend-item"><div class="color-box" style="background:${col}"></div>${gen}</div>`;
     });
-
-    container.innerHTML = `
-        <div id="genero-chart" style="background: conic-gradient(${partes.join(',')})"></div>
-        ${legend}</div>`;
+    container.innerHTML = `<div id="genero-chart" style="background: conic-gradient(${partes.join(',')})"></div>${legend}</div>`;
 }
