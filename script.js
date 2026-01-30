@@ -237,15 +237,15 @@ function cerrarModal() { modal.classList.add('hidden'); document.body.style.over
 closeBtn.onclick = cerrarModal;
 modal.onclick = (e) => { if (e.target === modal) cerrarModal(); };
 
+// --- ESTADÍSTICAS CON FILTRADO ---
 function generarStats() {
     if (coleccionSeries.length === 0) {
         document.getElementById('stats-area').innerHTML = "<p>Añade series para ver tus estadísticas.</p>";
         return;
     }
 
-    // --- CÁLCULO DE TIEMPO ---
     let min = 0; let eps = 0;
-    const counts = {}; // Para contar géneros
+    const counts = {};
     const colores = ['#e50914', '#2ecc71', '#3498db', '#f1c40f', '#9b59b6', '#e67e22', '#1abc9c', '#d35400'];
 
     coleccionSeries.forEach(s => {
@@ -253,7 +253,6 @@ function generarStats() {
         min += (dur * s.number_of_episodes);
         eps += s.number_of_episodes;
 
-        // Contar géneros
         if (s.genres && s.genres.length > 0) {
             const nombreGenero = s.genres[0].name;
             counts[nombreGenero] = (counts[nombreGenero] || 0) + 1;
@@ -263,7 +262,6 @@ function generarStats() {
     const hrs = Math.floor(min / 60);
     const dias = (hrs / 24).toFixed(1);
 
-    // --- LÓGICA DEL GRÁFICO CIRCULAR ---
     let acumulado = 0;
     let partesGrafico = [];
     let leyendaHTML = '<div class="chart-legend">';
@@ -276,20 +274,18 @@ function generarStats() {
         const porcentaje = (cantidad / totalSeries) * 100;
         const color = colores[i % colores.length];
 
-        // Crear fragmento para el gradiente cónico
         partesGrafico.push(`${color} ${acumulado}% ${acumulado + porcentaje}%`);
         acumulado += porcentaje;
 
-        // Crear elemento de la leyenda
+        // Añadimos el evento onclick para filtrar
         leyendaHTML += `
-            <div class="legend-item">
+            <div class="legend-item" onclick="filtrarPorGenero('${gen}')" style="cursor:pointer">
                 <div class="color-box" style="background:${color}"></div>
                 <span>${gen} (${cantidad})</span>
             </div>`;
     });
     leyendaHTML += '</div>';
 
-    // --- RENDERIZADO FINAL ---
     document.getElementById('stats-area').innerHTML = `
         <div class="time-stats-container">
             <div class="time-card"><i>(H)</i><h3>${hrs}</h3><span>Horas</span></div>
@@ -298,7 +294,7 @@ function generarStats() {
         </div>
         
         <div class="genres-stats-section">
-            <h3 class="section-subtitle">Distribución por Géneros</h3>
+            <h3 class="section-subtitle">Distribución por Géneros (Pulsa para filtrar)</h3>
             <div class="chart-wrapper">
                 <div id="genero-chart" style="background: conic-gradient(${partesGrafico.join(',')})"></div>
                 ${leyendaHTML}
@@ -306,6 +302,26 @@ function generarStats() {
         </div>
     `;
 }
+
+// --- FUNCIÓN DE FILTRADO ---
+function filtrarPorGenero(genero) {
+    // 1. Filtramos la colección
+    const seriesFiltradas = coleccionSeries.filter(s => 
+        s.genres && s.genres.some(g => g.name === genero)
+    );
+
+    // 2. Modificamos temporalmente el renderizado de la sección de series
+    const grid = document.getElementById('series-grid');
+    
+    // Añadimos un encabezado de filtro y el botón de cerrar
+    grid.innerHTML = `
+        <div class="filter-header">
+            <span>Mostrando: <b>${genero}</b></span>
+            <button onclick="renderizarTodo()" class="btn-clear-filter">Ver todas ×</button>
+        </div>
+    ` + seriesFiltradas.map(s => `
+        <div class="serie-group">
+            <button class="btn-delete-serie" onclick="eliminarSerie('${
 
 // --- 6. EXPORTAR / IMPORTAR ---
 function exportarDatos() {
