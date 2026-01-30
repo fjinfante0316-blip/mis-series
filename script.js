@@ -238,21 +238,73 @@ closeBtn.onclick = cerrarModal;
 modal.onclick = (e) => { if (e.target === modal) cerrarModal(); };
 
 function generarStats() {
+    if (coleccionSeries.length === 0) {
+        document.getElementById('stats-area').innerHTML = "<p>Añade series para ver tus estadísticas.</p>";
+        return;
+    }
+
+    // --- CÁLCULO DE TIEMPO ---
     let min = 0; let eps = 0;
+    const counts = {}; // Para contar géneros
+    const colores = ['#e50914', '#2ecc71', '#3498db', '#f1c40f', '#9b59b6', '#e67e22', '#1abc9c', '#d35400'];
+
     coleccionSeries.forEach(s => {
         const dur = (s.episode_run_time && s.episode_run_time[0]) || 45;
         min += (dur * s.number_of_episodes);
         eps += s.number_of_episodes;
+
+        // Contar géneros
+        if (s.genres && s.genres.length > 0) {
+            const nombreGenero = s.genres[0].name;
+            counts[nombreGenero] = (counts[nombreGenero] || 0) + 1;
+        }
     });
+
     const hrs = Math.floor(min / 60);
     const dias = (hrs / 24).toFixed(1);
 
+    // --- LÓGICA DEL GRÁFICO CIRCULAR ---
+    let acumulado = 0;
+    let partesGrafico = [];
+    let leyendaHTML = '<div class="chart-legend">';
+    
+    const totalSeries = coleccionSeries.length;
+    const nombresGeneros = Object.keys(counts);
+
+    nombresGeneros.forEach((gen, i) => {
+        const cantidad = counts[gen];
+        const porcentaje = (cantidad / totalSeries) * 100;
+        const color = colores[i % colores.length];
+
+        // Crear fragmento para el gradiente cónico
+        partesGrafico.push(`${color} ${acumulado}% ${acumulado + porcentaje}%`);
+        acumulado += porcentaje;
+
+        // Crear elemento de la leyenda
+        leyendaHTML += `
+            <div class="legend-item">
+                <div class="color-box" style="background:${color}"></div>
+                <span>${gen} (${cantidad})</span>
+            </div>`;
+    });
+    leyendaHTML += '</div>';
+
+    // --- RENDERIZADO FINAL ---
     document.getElementById('stats-area').innerHTML = `
         <div class="time-stats-container">
             <div class="time-card"><i>(H)</i><h3>${hrs}</h3><span>Horas</span></div>
             <div class="time-card"><i>(D)</i><h3>${dias}</h3><span>Días</span></div>
             <div class="time-card"><i>(E)</i><h3>${eps}</h3><span>Episodios</span></div>
-        </div>`;
+        </div>
+        
+        <div class="genres-stats-section">
+            <h3 class="section-subtitle">Distribución por Géneros</h3>
+            <div class="chart-wrapper">
+                <div id="genero-chart" style="background: conic-gradient(${partesGrafico.join(',')})"></div>
+                ${leyendaHTML}
+            </div>
+        </div>
+    `;
 }
 
 // --- 6. EXPORTAR / IMPORTAR ---
