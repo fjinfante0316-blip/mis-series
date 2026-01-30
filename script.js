@@ -175,26 +175,35 @@ function renderizarTodo() {
             </div>`;
     }).join('');
 
-    // 4.4 RENDER CREADORES (Fila por creador)
+    // 4.4 RENDER CREADORES (Fila por creador con carrusel de series)
     const directorsGrid = document.getElementById('directors-grid');
-    directorsGrid.className = "grid-people-rows";
-    directorsGrid.innerHTML = Object.values(creadoresAgrupados).map(c => {
-        const seriesHTML = c.series.map(s => `
-            <div class="mini-card-serie" onclick="ampliarSerie('${s.id}')">
-                <img src="https://image.tmdb.org/t/p/w200${s.poster}">
-            </div>
-        `).join('');
+    directorsGrid.className = "grid-people-rows"; // Aplicamos la misma clase de filas
+    directorsGrid.innerHTML = listaCreadores.map(c => {
+        // Generamos el carrusel de las series que ha creado
+        const seriesHTML = c.series.map(s => {
+            // Buscamos el nombre de la serie para mostrarlo bajo el póster
+            const datosSerie = coleccionSeries.find(item => item.id === s.id);
+            return `
+                <div class="mini-card-serie" onclick="ampliarSerie('${s.id}')">
+                    <img src="https://image.tmdb.org/t/p/w200${s.poster}">
+                    <span>${datosSerie ? datosSerie.name : ''}</span>
+                </div>
+            `;
+        }).join('');
+
         return `
             <div class="actor-row">
                 <div class="actor-info-side">
-                    <img class="photo-circle" src="${c.info.profile_path ? 'https://image.tmdb.org/t/p/w200'+c.info.profile_path : 'https://via.placeholder.com/200'}" 
+                    <img class="photo-circle" src="${c.info.profile_path ? 'https://image.tmdb.org/t/p/w200' + c.info.profile_path : 'https://via.placeholder.com/200'}" 
                          onclick="ampliarFoto('https://image.tmdb.org/t/p/w500${c.info.profile_path}', '${c.info.name}', 'Creador')">
                     <span class="person-name">${c.info.name}</span>
+                    <div class="badge-count">${c.series.length} series</div>
                 </div>
-                <div class="actor-series-carousel">${seriesHTML}</div>
+                <div class="actor-series-carousel">
+                    ${seriesHTML}
+                </div>
             </div>`;
     }).join('');
-}
 
 // --- 5. ELIMINAR, MODALES Y STATS ---
 function eliminarSerie(idSerie) {
