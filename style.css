@@ -579,3 +579,30 @@ main {
     height: 12px;
     border-radius: 2px;
 }
+
+.filter-header {
+    grid-column: 1 / -1; /* Ocupa todo el ancho */
+    background: #222;
+    padding: 10px 15px;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-left: 4px solid var(--rojo);
+}
+
+.btn-clear-filter {
+    background: var(--rojo);
+    color: white;
+    border: none;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.legend-item:hover {
+    background: rgba(255,255,255,0.1);
+    border-radius: 4px;
+}
