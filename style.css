@@ -606,3 +606,77 @@ main {
     background: rgba(255,255,255,0.1);
     border-radius: 4px;
 }
+
+/* --- ESTILOS CRONOLOGÍA --- */
+.timeline-container {
+    position: relative;
+    padding: 20px 0;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.timeline-container::before {
+    content: '';
+    position: absolute;
+    left: 30px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--rojo);
+}
+
+.timeline-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 30px;
+    position: relative;
+}
+
+.timeline-date {
+    min-width: 70px;
+    font-weight: bold;
+    color: var(--rojo);
+    background: #1a1a1a;
+    z-index: 2;
+    text-align: center;
+}
+
+.timeline-content {
+    display: flex;
+    background: #222;
+    padding: 10px;
+    border-radius: 10px;
+    margin-left: 20px;
+    cursor: pointer;
+    transition: 0.3s;
+    width: 100%;
+}
+
+.timeline-content:hover { transform: scale(1.05); background: #333; }
+
+.timeline-content img { width: 50px; height: 75px; border-radius: 5px; object-fit: cover; }
+
+.timeline-info { margin-left: 15px; }
+
+/* --- ESTILOS BANDERAS --- */
+.flags-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.flag-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #222;
+    padding: 10px;
+    border-radius: 8px;
+    min-width: 60px;
+}
+
+.flag-img { width: 40px; border-radius: 3px; border: 1px solid #444; }
+
+.flag-count { margin-top: 5px; font-weight: bold; color: var(--rojo); }
