@@ -24,30 +24,23 @@ function guardarEnLocalStorage() {
 
 // --- 2. NAVEGACIÓN ---
 function showSection(id) {
-    const welcome = document.getElementById('welcome-screen');
-    const mainApp = document.getElementById('main-app');
-    const btnVolver = document.getElementById('btn-volver');
+    // 1. Ocultar todas las secciones primero
+    document.querySelectorAll('.section').forEach(section => {
+        section.classList.add('hidden');
+    });
 
-    welcome.classList.add('hidden');
-    mainApp.classList.add('hidden');
-    headerSearch.classList.add('hidden');
-
-    if (id === 'welcome') {
-        welcome.classList.remove('hidden');
-        if (coleccionSeries.length > 0) btnVolver.classList.remove('hidden');
-    } else {
-        mainApp.classList.remove('hidden');
-        headerSearch.classList.remove('hidden');
-        document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
-        const sec = document.getElementById(`sec-${id}`);
-        if(sec) sec.classList.remove('hidden');
+    // 2. Mostrar la sección que queremos
+    const targetSection = document.getElementById(`sec-${id}`);
+    if (targetSection) {
+        targetSection.classList.remove('hidden');
     }
-    
-    sidebar.classList.remove('active');
 
-    // Disparadores de datos
+    // 3. Si es estadísticas o cronología, disparar los datos
     if (id === 'stats') generarStats();
     if (id === 'timeline') generarCronologia();
+
+    // 4. Cerrar el menú lateral
+    if (sidebar) sidebar.classList.remove('active');
 }
 
 if (btnMenu) {
