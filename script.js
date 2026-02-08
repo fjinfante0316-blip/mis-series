@@ -342,3 +342,32 @@ function importarDatos(event) {
 
     lector.readAsText(archivo);
 }
+
+function filtrarContenido(tipo) {
+    const query = document.getElementById(`filter-${tipo}`).value.toLowerCase();
+    
+    if (tipo === 'series') {
+        const elementos = document.querySelectorAll('#series-grid .serie-group');
+        elementos.forEach(el => {
+            const nombre = el.querySelector('h4').innerText.toLowerCase();
+            el.style.display = nombre.includes(query) ? 'block' : 'none';
+        });
+    } 
+    
+    else if (tipo === 'actors' || tipo === 'directors') {
+        const gridId = tipo === 'actors' ? 'actors-grid' : 'directors-grid';
+        const filas = document.querySelectorAll(`#${gridId} .actor-row`);
+        
+        filas.forEach(fila => {
+            const nombrePersona = fila.querySelector('.person-name').innerText.toLowerCase();
+            // También buscamos en los personajes interpretados
+            const personajes = fila.querySelector('.actor-series-carousel').innerText.toLowerCase();
+            
+            if (nombrePersona.includes(query) || personajes.includes(query)) {
+                fila.style.display = 'flex';
+            } else {
+                fila.style.display = 'none';
+            }
+        });
+    }
+}
