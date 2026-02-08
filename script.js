@@ -42,7 +42,7 @@ function showSection(id) {
 
 // --- BÚSQUEDA EN PORTADA ---
 async function buscarSeries() {
-    const query = document.getElementById('initialInput').value;
+const query = document.getElementById('initialInput').value;
     const resultsCont = document.getElementById('search-results-main');
     if (!query) return;
 
@@ -50,8 +50,11 @@ async function buscarSeries() {
         const r = await fetch(`https://api.themoviedb.org/3/search/tv?api_key=${API_KEY}&query=${encodeURIComponent(query)}&language=es-ES`);
         const d = await r.json();
         
+        // Guardamos los resultados temporalmente para poder leer la sinopsis sin volver a llamar a la API
+        window.ultimosResultadosBusqueda = d.results;
+
         resultsCont.innerHTML = d.results.slice(0, 10).map(s => `
-            <div class="search-card" onclick="confirmarYVolver(${s.id})">
+            <div class="search-card" onclick="verSinopsisAntesDeAñadir(${s.id})">
                 <img src="${s.poster_path ? 'https://image.tmdb.org/t/p/w200' + s.poster_path : 'https://via.placeholder.com/200x300'}">
                 <div class="search-card-info">
                     <h4>${s.name}</h4>
@@ -61,6 +64,28 @@ async function buscarSeries() {
         `).join('');
         resultsCont.classList.remove('hidden');
     } catch (e) { console.error(e); }
+}
+
+function verSinopsisAntesDeAñadir(id) {
+    const serie = window.ultimosResultadosBusqueda.find(x => x.id == id);
+    if (!serie) return;
+
+    const modal = document.getElementById('photo-modal');
+    const img = document.getElementById('img-ampliada');
+    const caption = document.getElementById('modal-caption');
+
+    img.src = `https://image.tmdb.org/t/p/w500${serie.poster_path}`;
+    
+    // Insertamos la sinopsis y un botón de "Añadir a mi lista" dentro del modal
+    caption.innerHTML = `
+        <h2 style="color:var(--rojo); margin-bottom:10px;">${serie.name}</h2>
+        <p style="font-size:0.9rem; line-height:1.4; margin-bottom:20px;">${serie.overview || "No hay sinopsis disponible en español."}</p>
+        <button onclick="confirmarYVolver(${serie.id})" class="btn-nav" style="background:var(--rojo); border:none; width:100%;">
+            <i class="fas fa-plus"></i> Añadir a mi colección
+        </button>
+    `;
+
+    modal.classList.remove('hidden');
 }
 
 async function confirmarYVolver(id) {
@@ -75,13 +100,14 @@ async function confirmarYVolver(id) {
     coleccionSeries.push(serie);
     localStorage.setItem('mis_series_data', JSON.stringify(coleccionSeries));
     
+    // Limpieza
     document.getElementById('initialInput').value = "";
     document.getElementById('search-results-main').classList.add('hidden');
+    document.getElementById('photo-modal').classList.add('hidden'); // Cerramos modal
     
     renderizarTodo();
     alert(`"${serie.name}" añadida correctamente.`);
 }
-
 // --- RENDERIZADO ---
 function renderizarTodo() {
     // Series
