@@ -107,42 +107,50 @@ function renderizarTodo() {
     const creadoresData = {};
 
     coleccionSeries.forEach(s => {
-        s.credits?.cast?.slice(0, 8).forEach(a => {
+        // Recolección de Actores con Personaje
+        s.credits?.cast?.slice(0, 10).forEach(a => {
             if(!actoresData[a.id]) actoresData[a.id] = { info: a, trabajos: [] };
-            actoresData[a.id].trabajos.push(s.poster_path);
+            // Guardamos el poster y el personaje
+            actoresData[a.id].trabajos.push({ 
+                poster: s.poster_path, 
+                personaje: a.character,
+                serieNombre: s.name 
+            });
         });
+
+        // Recolección de Creadores
         s.created_by?.forEach(c => {
             if(!creadoresData[c.name]) creadoresData[c.name] = { info: c, trabajos: [] };
-            creadoresData[c.name].trabajos.push(s.poster_path);
+            creadoresData[c.name].trabajos.push({ 
+                poster: s.poster_path, 
+                serieNombre: s.name 
+            });
         });
     });
 
-    const renderFilas = (data) => Object.values(data)
-    .sort((a, b) => b.trabajos.length - a.trabajos.length)
-    .map(p => {
-        // Obtenemos solo trabajos únicos (por si acaso una serie se repite)
-        const trabajosUnicos = [...new Set(p.trabajos)];
-        
-        return `
+    const renderFilas = (data, esActor) => Object.values(data)
+        .sort((a, b) => b.trabajos.length - a.trabajos.length)
+        .map(p => `
         <div class="actor-row">
             <div class="actor-info-side">
                 <img src="${p.info.profile_path ? 'https://image.tmdb.org/t/p/w200'+p.info.profile_path : 'https://via.placeholder.com/200x200?text=👤'}" class="photo-circle">
                 <span class="person-name">${p.info.name}</span>
-                <span class="badge-series">${trabajosUnicos.length} ${trabajosUnicos.length === 1 ? 'Serie' : 'Series'}</span>
+                <span class="badge-series">${p.trabajos.length} ${p.trabajos.length === 1 ? 'Proyecto' : 'Proyectos'}</span>
             </div>
             
             <div class="actor-series-carousel">
-                ${trabajosUnicos.map(img => `
+                ${p.trabajos.map(t => `
                     <div class="work-item">
-                        <img src="https://image.tmdb.org/t/p/w200${img}" alt="Serie">
+                        <img src="https://image.tmdb.org/t/p/w200${t.poster}" alt="${t.serieNombre}">
+                        <div class="character-name">${esActor ? t.personaje : t.serieNombre}</div>
                     </div>
                 `).join('')}
             </div>
         </div>
-    `; }).join('');
+    `).join('');
 
-    document.getElementById('actors-grid').innerHTML = renderFilas(actoresData);
-    document.getElementById('directors-grid').innerHTML = renderFilas(creadoresData);
+    document.getElementById('actors-grid').innerHTML = renderFilas(actoresData, true);
+    document.getElementById('directors-grid').innerHTML = renderFilas(creadoresData, false);
 }
 
 // --- CRONOLOGÍA ---
