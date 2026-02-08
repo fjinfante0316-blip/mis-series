@@ -82,23 +82,38 @@ body {
 .search-card-info { padding: 8px; font-size: 0.8rem; }
 
 /* --- SIDEBAR --- */
+/* Sidebar oculto por defecto */
+#sidebar {
+    position: fixed;
+    left: -260px; /* Fuera de la pantalla */
+    top: 0;
+    width: 250px;
+    height: 100vh;
+    background: #000;
+    z-index: 3000; /* Por encima de todo */
+    transition: all 0.3s ease;
+    padding-top: 80px;
+}
+
+/* Estado ACTIVO (Cuando se pulsa el botón) */
+#sidebar.active {
+    left: 0; /* Entra en pantalla */
+    box-shadow: 5px 0 15px rgba(0,0,0,0.8);
+}
+
+/* El botón siempre debe estar arriba */
 .btn-menu {
     position: fixed;
-    top: 20px; left: 20px;
-    z-index: 2000;
+    top: 20px;
+    left: 20px;
+    z-index: 4000; /* Más que el sidebar */
     background: var(--rojo);
-    color: white; border: none;
-    padding: 10px 14px; border-radius: 8px; cursor: pointer;
+    color: white;
+    border: none;
+    padding: 12px 15px;
+    border-radius: 8px;
+    cursor: pointer;
 }
-
-#sidebar {
-    position: fixed; left: -260px; top: 0;
-    width: 250px; height: 100%;
-    background: #000; z-index: 1500;
-    transition: 0.3s; padding-top: 80px;
-}
-
-#sidebar.active { left: 0; box-shadow: 10px 0 30px rgba(0,0,0,0.5); }
 #sidebar ul li a { padding: 15px 25px; display: block; color: #fff; text-decoration: none; border-bottom: 1px solid #111; }
 
 #sidebar ul li label:hover {
