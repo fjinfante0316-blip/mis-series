@@ -346,6 +346,37 @@ function importarDatos(e) {
     reader.readAsText(e.target.files[0]);
 }
 
+// --- FUNCIÓN DE NOTIFICACIÓN (TOAST) ---
+function mostrarNotificacion(mensaje, tipo = 'success') {
+    // Creamos el elemento de la notificación
+    const toast = document.createElement('div');
+    toast.className = `toast-notification ${tipo}`;
+    toast.innerHTML = `
+        <i class="fas ${tipo === 'success' ? 'fa-check-circle' : 'fa-trash'}"></i>
+        <span>${mensaje}</span>
+    `;
+
+    // Lo añadimos al cuerpo del documento
+    document.body.appendChild(toast);
+
+    // Animación de entrada y salida
+    setTimeout(() => toast.classList.add('show'), 100);
+    
+    // Lo eliminamos tras 3 segundos
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 500);
+    }, 3000);
+}
+
+// --- DÓNDE USARLA ---
+
+// 1. En confirmarSeleccion (dentro del bloque try, tras guardar)
+// mostrarNotificacion("Serie añadida correctamente", "success");
+
+// 2. En eliminarSerie (tras filtrar y guardar)
+// mostrarNotificacion("Serie eliminada", "error");
+
 // Cerrar resultados al click fuera
 document.addEventListener('click', (e) => {
     if (!resultsContainer.contains(e.target)) resultsContainer.classList.add('hidden');
