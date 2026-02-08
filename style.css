@@ -469,3 +469,12 @@ body {
     overflow: hidden;
     text-overflow: ellipsis; /* Pone "..." si el nombre es muy largo */
 }
+
+#sidebar {
+    z-index: 9999 !important; /* Forzamos que esté por encima de los pósters */
+    background-color: #000 !important;
+}
+
+.btn-menu {
+    z-index: 10000 !important; /* El botón siempre por encima del menú */
+}
