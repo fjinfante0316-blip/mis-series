@@ -111,22 +111,25 @@ async function confirmarYVolver(id) {
 // --- RENDERIZADO ---
 function renderizarTodo() {
     // Series
-    document.getElementById('series-grid').innerHTML = coleccionSeries.map(s => `
-        <div class="serie-group" style="margin-bottom:30px">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px">
-                <span style="font-weight:bold; color:var(--rojo); font-size:1.2rem;">${s.name}</span>
-                <button onclick="eliminarSerie(${s.id})" style="background:none; border:none; color:#555; cursor:pointer"><i class="fas fa-trash"></i></button>
-            </div>
-            <div class="seasons-carousel">
-                ${s.seasons.map(t => `
-                    <div class="season-card" onclick="ampliarTemporada(${s.id}, ${t.season_number})">
-                        <img src="https://image.tmdb.org/t/p/w300${t.poster_path || s.poster_path}">
-                        <div class="season-number-tag">${t.name}</div>
-                    </div>
-                `).join('')}
-            </div>
+    // Busca esta parte en tu función renderizarTodo() y actualízala:
+document.getElementById('series-grid').innerHTML = coleccionSeries.map(s => `
+    <div class="serie-group">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; padding:0 5px;">
+            <h4 style="margin:0; font-size:0.95rem;">${s.name}</h4>
+            <button onclick="eliminarSerie(${s.id})" style="background:none; border:none; color:#444; font-size:0.8rem; cursor:pointer;">
+                <i class="fas fa-trash"></i>
+            </button>
         </div>
-    `).join('');
+        <div class="seasons-carousel">
+            ${s.seasons.map(t => `
+                <div class="season-card" onclick="ampliarTemporada(${s.id}, ${t.season_number})">
+                    <img src="https://image.tmdb.org/t/p/w200${t.poster_path || s.poster_path}">
+                    <p>${t.name}</p>
+                </div>
+            `).join('')}
+        </div>
+    </div>
+`).join('');
 
     // Actores y Creadores
     const actoresData = {};
