@@ -109,11 +109,41 @@ function renderizarTodo() {
     const actoresData = {};
     const creadoresData = {};
 
-    coleccionSeries.forEach(s => {
-        s.credits?.cast?.slice(0, 8).forEach(a => {
-            if(!actoresData[a.id]) actoresData[a.id] = { info: a, trabajos: [] };
-            actoresData[a.id].trabajos.push({ poster: s.poster_path, char: a.character, id: s.id });
-        });
+    // --- DENTRO DE RENDERIZAR TODO ---
+
+const actoresData = {};
+const actoresYaRegistrados = new Set(); // Para evitar duplicados absolutos en la lista de reparto
+
+coleccionSeries.forEach(s => {
+    // Intentamos sacar 5 actores representativos de la serie
+    // (TMDB mezcla los actores principales de todas las temporadas en credits.cast)
+    let seleccionadosDeEstaSerie = 0;
+
+    if (s.credits && s.credits.cast) {
+        for (let i = 0; i < s.credits.cast.length; i++) {
+            const a = s.credits.cast[i];
+            
+            // Si el actor no ha sido añadido antes y no hemos llegado a 5 para esta serie
+            if (!actoresYaRegistrados.has(a.id) && seleccionadosDeEstaSerie < 5) {
+                
+                if (!actoresData[a.id]) {
+                    actoresData[a.id] = { info: a, trabajos: [] };
+                }
+                
+                actoresData[a.id].trabajos.push({ 
+                    poster: s.poster_path, 
+                    char: a.character, 
+                    id: s.id 
+                });
+
+                actoresYaRegistrados.add(a.id);
+                seleccionadosDeEstaSerie++;
+            }
+        }
+    }
+});
+
+// El resto de la función renderFilas y las inserciones en el grid se mantienen igual
         s.created_by?.forEach(c => {
             if(!creadoresData[c.name]) creadoresData[c.name] = { info: c, trabajos: [] };
             creadoresData[c.name].trabajos.push({ poster: s.poster_path, nombreSerie: s.name, id: s.id });
