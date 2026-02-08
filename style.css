@@ -133,14 +133,12 @@ body {
 /* --- ESTILO HALL OF FAME (ACTORES/CREADORES) --- */
 .actor-row {
     display: flex;
-    flex-direction: column;
-    background: linear-gradient(145deg, #1e1e1e, #141414);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    margin-bottom: 25px;
-    padding: 20px;
-    border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    transition: transform 0.3s ease;
+    flex-direction: column; /* Forzamos vertical en móvil */
+    background: #1a1a1a;
+    border-radius: 15px;
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid #333;
 }
 
 @media (min-width: 768px) {
@@ -152,11 +150,13 @@ body {
 
 .actor-info-side {
     display: flex;
-    flex-direction: column;
+    flex-direction: row; /* Foto y nombre al lado en móvil */
     align-items: center;
-    min-width: 160px;
-    text-align: center;
-    padding-bottom: 15px;
+    gap: 15px;
+    width: 100%;
+    border-bottom: 1px solid #333;
+    padding-bottom: 12px;
+    margin-bottom: 12px;
 }
 
 @media (min-width: 768px) {
@@ -168,20 +168,18 @@ body {
 }
 
 .photo-circle {
-    width: 90px;
-    height: 90px;
+    width: 65px;  /* Tamaño compacto para móvil */
+    height: 65px;
     border-radius: 50%;
     object-fit: cover;
-    border: 3px solid var(--rojo);
-    margin-bottom: 12px;
-    box-shadow: 0 0 15px rgba(229, 9, 20, 0.3);
+    border: 2px solid var(--rojo);
+    flex-shrink: 0;
 }
 
 .person-name {
-    font-size: 1.1rem;
-    font-weight: 800;
+    font-size: 1rem;
+    font-weight: bold;
     color: #fff;
-    margin-bottom: 4px;
 }
 
 .badge-series {
@@ -194,35 +192,30 @@ body {
     text-transform: uppercase;
 }
 
-/* Carrusel de trabajos del actor */
+/* Carrusel de series del actor */
 .actor-series-carousel {
     display: flex;
-    overflow-x: auto;
-    gap: 12px;
-    padding: 10px 5px;
-    flex-grow: 1;
-    scrollbar-width: none; /* Firefox */
+    overflow-x: auto; /* Permite deslizar a los lados */
+    gap: 10px;
+    width: 100%;
+    padding-bottom: 5px;
+    scrollbar-width: none;
 }
 
 .actor-series-carousel::-webkit-scrollbar {
-    display: none; /* Chrome/Safari */
+    display: none;
 }
 
 .work-item {
-    min-width: 80px;
-    transition: transform 0.3s;
-}
-
-.work-item:hover {
-    transform: translateY(-5px);
+    min-width: 70px; /* Pósters más pequeños para que se vean varios */
+    text-align: center;
 }
 
 .work-item img {
-    width: 80px;
-    height: 120px;
-    border-radius: 8px;
+    width: 70px;
+    height: 105px;
+    border-radius: 5px;
     object-fit: cover;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
 }
 
 /* --- CRONOLOGÍA --- */
@@ -449,4 +442,15 @@ body {
 
 .search-card-info h4 {
     font-size: 0.75rem;
+}
+
+.character-name {
+    font-size: 0.65rem;
+    color: #aaa;
+    margin-top: 4px;
+    display: block;
+    width: 70px; /* Debe coincidir con el ancho de la imagen .work-item */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; /* Pone "..." si el nombre es muy largo */
 }
