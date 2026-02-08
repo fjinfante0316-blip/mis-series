@@ -60,54 +60,58 @@ body {
 
 .timeline-container {
     position: relative;
-    max-width: 800px;
+    max-width: 600px;
     margin: 40px auto;
-    padding-left: 60px; /* Aumentamos el espacio izquierdo */
+    padding-left: 50px; /* Espacio para que quepan la línea y los años */
+    padding-right: 15px;
 }
 
 .timeline-container::before {
     content: '';
     position: absolute;
-    left: 20px; /* Posición fija de la línea */
+    left: 25px; /* Ajustamos para que pase justo por el centro de los años */
     top: 0;
     bottom: 0;
-    width: 3px;
+    width: 4px;
     background: var(--rojo);
-    box-shadow: 0 0 10px rgba(229, 9, 20, 0.4);
+    box-shadow: 0 0 10px rgba(229, 9, 20, 0.5);
+    z-index: 1;
 }
 
 .timeline-item {
     display: flex;
     align-items: center;
-    margin-bottom: 40px;
+    margin-bottom: 45px;
     position: relative;
+    width: 100%;
 }
 
 .timeline-date {
     position: absolute;
-    left: -15px; /* Lo movemos para que quede sobre la línea */
-    background: var(--rojo); /* Fondo rojo para que resalte */
-    color: white; /* Texto blanco para máximo contraste */
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 0.85rem;
-    font-weight: bold;
-    z-index: 5;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.5);
-    min-width: 45px;
+    left: 0; /* Lo llevamos al borde del contenedor */
+    width: 50px; /* Ancho fijo para centrarlo con la línea */
+    background: #fff; /* Fondo blanco para que el texto negro se vea perfecto */
+    color: #000; /* Texto negro para máximo contraste */
+    padding: 5px 0;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 900;
+    z-index: 10; /* Por encima de la línea */
     text-align: center;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    border: 2px solid var(--rojo); /* Borde rojo para unirlo al diseño */
 }
 
 .timeline-content {
     display: flex;
-    background: #1f1f1f;
-    padding: 12px;
+    align-items: center;
+    background: #222;
+    padding: 10px;
     border-radius: 12px;
-    margin-left: 30px; /* Separación de la línea */
+    margin-left: 20px; /* Separación del año */
     width: 100%;
     cursor: pointer;
-    transition: transform 0.3s ease;
-    border: 1px solid #333;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
 }
 
 .timeline-content:hover {
@@ -115,7 +119,19 @@ body {
     border-color: var(--rojo);
 }
 
-.timeline-content img { width: 50px; height: 75px; border-radius: 4px; margin-right: 15px; }
+.timeline-content img {
+    width: 55px;
+    height: 80px;
+    border-radius: 6px;
+    object-fit: cover;
+    margin-right: 15px;
+}
+
+.timeline-info h4 {
+    margin: 0;
+    font-size: 0.95rem;
+    color: white;
+}
 
 /* Gráfico Stats */
 #genero-chart {
