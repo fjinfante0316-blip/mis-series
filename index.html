@@ -53,16 +53,19 @@
         <main>
             <section id="sec-series" class="section">
                 <h2 class="section-title">Mi Colección</h2>
+                <input type="text" id="filter-series" class="filter-input" placeholder="Filtrar series..." onkeyup="filtrarContenido('series')">
                 <div id="series-grid"></div>
             </section>
 
             <section id="sec-actors" class="section hidden">
                 <h2 class="section-title">Reparto</h2>
+                <input type="text" id="filter-actors" class="filter-input" placeholder="Buscar actor o personaje..." onkeyup="filtrarContenido('actors')">
                 <div id="actors-grid"></div>
             </section>
 
             <section id="sec-directors" class="section hidden">
                 <h2 class="section-title">Creadores</h2>
+                <input type="text" id="filter-directors" class="filter-input" placeholder="Buscar creador..." onkeyup="filtrarContenido('directors')">
                 <div id="directors-grid"></div>
             </section>
 
