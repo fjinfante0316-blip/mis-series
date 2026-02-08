@@ -13,9 +13,30 @@ window.onload = () => {
 function initMenu() {
     const btn = document.getElementById('sidebarCollapse');
     const side = document.getElementById('sidebar');
-    btn.onclick = (e) => { e.stopPropagation(); side.classList.toggle('active'); };
-    document.onclick = (e) => { if(side.classList.contains('active') && !side.contains(e.target)) side.classList.remove('active'); };
+
+    if (btn && side) {
+        btn.onclick = (e) => {
+            e.stopPropagation(); // Evita que el clic se propague al documento
+            side.classList.toggle('active');
+            console.log("Menu clickado"); // Verificación en consola
+        };
+
+        // Cerrar el menú si haces clic fuera de él
+        document.onclick = (e) => {
+            if (side.classList.contains('active') && !side.contains(e.target) && e.target !== btn) {
+                side.classList.remove('active');
+            }
+        };
+    } else {
+        console.error("No se encontró el botón o el sidebar en el HTML");
+    }
 }
+
+// ASEGÚRATE de llamar a initMenu dentro de window.onload
+window.onload = () => {
+    initMenu(); 
+    if (coleccionSeries.length > 0) renderizarTodo();
+};
 
 // --- NAVEGACIÓN ---
 function showSection(id) {
