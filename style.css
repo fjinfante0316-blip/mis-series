@@ -338,3 +338,115 @@ body {
 .season-card:hover .season-number-tag {
     background: var(--rojo);
 }
+
+.section-header-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.filter-input {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+    padding: 10px 15px;
+    border-radius: 8px;
+    outline: none;
+    font-size: 0.9rem;
+    width: 100%;
+    max-width: 250px;
+    transition: 0.3s;
+}
+
+.filter-input:focus {
+    border-color: var(--rojo);
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 10px rgba(229, 9, 20, 0.2);
+}
+
+@media (max-width: 600px) {
+    .filter-input {
+        max-width: 100%; /* En móvil ocupa todo el ancho */
+    }
+}
+
+/* --- OPTIMIZACIÓN DE TAMAÑO PARA MÓVIL --- */
+
+/* Ajuste de la cuadrícula general */
+#series-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 10px;
+}
+
+/* El contenedor de cada serie */
+.serie-group h4 {
+    font-size: 1rem; /* Título más pequeño y elegante */
+    margin-left: 5px;
+    color: #eee;
+}
+
+/* Carrusel de Temporadas en móvil */
+.seasons-carousel {
+    display: flex;
+    overflow-x: auto;
+    gap: 10px; /* Menos espacio entre pósters */
+    padding-bottom: 10px;
+    scrollbar-width: none;
+}
+
+/* TAMAÑO DE LAS CARDS (Aquí está el truco) */
+.season-card {
+    min-width: 105px; /* Tamaño reducido para que quepan más */
+    max-width: 105px;
+    flex-shrink: 0;
+    text-align: center;
+}
+
+.season-card img {
+    width: 100%;
+    height: 155px; /* Altura proporcional */
+    border-radius: 6px;
+    object-fit: cover;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+}
+
+.season-card p {
+    font-size: 0.7rem; /* Texto de temporada más pequeño */
+    margin-top: 4px;
+    color: #bbb;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Ajuste para tablets o pantallas un poco más grandes */
+@media (min-width: 600px) {
+    .season-card {
+        min-width: 140px;
+        max-width: 140px;
+    }
+    .season-card img {
+        height: 210px;
+    }
+}
+
+.results-grid {
+    display: grid;
+    /* Esto fuerza a que haya al menos 3 columnas en móviles normales */
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); 
+    gap: 12px;
+    padding: 10px;
+}
+
+.search-card img {
+    height: 150px; /* Altura más compacta */
+}
+
+.search-card-info h4 {
+    font-size: 0.75rem;
+}
