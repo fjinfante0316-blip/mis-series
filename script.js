@@ -155,25 +155,41 @@ function renderizarTodo() {
     });
 
     const renderFilas = (data, esActor) => Object.values(data)
-        .sort((a, b) => b.trabajos.length - a.trabajos.length)
-        .map(p => `
+    .sort((a, b) => b.trabajos.length - a.trabajos.length)
+    .map(p => {
+        // Filtrar trabajos únicos por poster para evitar duplicados visuales
+        const trabajosUnicos = [];
+        const m = new Map();
+        for (const t of p.trabajos) {
+            if (!m.has(t.poster)) {
+                m.set(t.poster, true);
+                trabajosUnicos.push(t);
+            }
+        }
+
+        return `
         <div class="actor-row">
             <div class="actor-info-side">
                 <img src="${p.info.profile_path ? 'https://image.tmdb.org/t/p/w200'+p.info.profile_path : 'https://via.placeholder.com/200x200?text=👤'}" class="photo-circle">
                 <span class="person-name">${p.info.name}</span>
-                <span class="badge-series">${p.trabajos.length} ${p.trabajos.length === 1 ? 'Proyecto' : 'Proyectos'}</span>
+                <span class="badge-series">${trabajosUnicos.length} ${trabajosUnicos.length === 1 ? 'Proyecto' : 'Proyectos'}</span>
             </div>
             
             <div class="actor-series-carousel">
-                ${p.trabajos.map(t => `
-                    <div class="work-item">
+                ${trabajosUnicos.map(t => {
+                    // Buscamos el ID de la serie en nuestra colección para poder abrir la sinopsis
+                    const serieOriginal = coleccionSeries.find(s => s.poster_path === t.poster);
+                    const clickAction = serieOriginal ? `onclick="ampliarSerie(${serieOriginal.id})"` : "";
+                    
+                    return `
+                    <div class="work-item" ${clickAction} style="cursor:pointer">
                         <img src="https://image.tmdb.org/t/p/w200${t.poster}" alt="${t.serieNombre}">
                         <div class="character-name">${esActor ? t.personaje : t.serieNombre}</div>
                     </div>
-                `).join('')}
+                `}).join('')}
             </div>
         </div>
-    `).join('');
+    `; }).join('');
 
     document.getElementById('actors-grid').innerHTML = renderFilas(actoresData, true);
     document.getElementById('directors-grid').innerHTML = renderFilas(creadoresData, false);
@@ -237,9 +253,22 @@ function eliminarSerie(id) {
 
 function ampliarSerie(id) {
     const s = coleccionSeries.find(x => x.id == id);
-    document.getElementById('img-ampliada').src = `https://image.tmdb.org/t/p/w500${s.poster_path}`;
-    document.getElementById('modal-caption').innerHTML = `<h2>${s.name}</h2><p>${s.overview}</p>`;
-    document.getElementById('photo-modal').classList.remove('hidden');
+    if (!s) return;
+
+    const modal = document.getElementById('photo-modal');
+    const img = document.getElementById('img-ampliada');
+    const caption = document.getElementById('modal-caption');
+
+    img.src = `https://image.tmdb.org/t/p/w500${s.poster_path}`;
+    
+    // Mostramos título, año y sinopsis
+    caption.innerHTML = `
+        <h2 style="color:var(--rojo); margin-bottom:5px;">${s.name}</h2>
+        <p style="color:#888; margin-bottom:15px; font-weight:bold;">${s.first_air_date ? s.first_air_date.split('-')[0] : 'N/A'}</p>
+        <p style="font-size:0.95rem; line-height:1.5;">${s.overview || "Sin sinopsis disponible."}</p>
+    `;
+
+    modal.classList.remove('hidden');
 }
 
 document.getElementById('modalCloseBtn').onclick = () => document.getElementById('photo-modal').classList.add('hidden');
