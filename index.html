@@ -2,120 +2,87 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mis Series - App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Series - Tracker Pro</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
+    <button type="button" id="sidebarCollapse" class="btn-menu">
+        <i class="fas fa-bars"></i>
+    </button>
+
     <nav id="sidebar">
         <div class="sidebar-header">
-            <h1 class="logo">MIS<span>SERIES</span></h1>
+            <h3>🎬 Menú</h3>
         </div>
-        <ul class="nav-links">
-            <li><a href="#" onclick="showSection('welcome')"><i class="fas fa-search"></i> Portada (Añadir)</a></li>
+        <ul class="list-unstyled components">
             <li><a href="#" onclick="showSection('series')"><i class="fas fa-tv"></i> Mis Series</a></li>
-            <li><a href="#" onclick="showSection('directors')"><i class="fas fa-pen-nib"></i> Creadores</a></li>
             <li><a href="#" onclick="showSection('actors')"><i class="fas fa-users"></i> Actores</a></li>
-            <li><a href="#" onclick="showSection('stats')"><i class="fas fa-chart-pie"></i> Estadísticas</a></li>
+            <li><a href="#" onclick="showSection('directors')"><i class="fas fa-pen-nib"></i> Creadores</a></li>
             <li><a href="#" onclick="showSection('timeline')"><i class="fas fa-history"></i> Cronología</a></li>
-            <section id="sec-timeline" class="section hidden">
-                <h2 class="section-title">Línea del Tiempo</h2>
-                <div id="sec-timeline-grid" class="timeline-container"></div>
-            </section>
-            <hr style="border:0; border-top:1px solid #333; margin:10px 0;">
-            <li><a href="#" onclick="exportarDatos()"><i class="fas fa-download"></i> Exportar Copia</a></li>
+            <li><a href="#" onclick="showSection('stats')"><i class="fas fa-chart-pie"></i> Estadísticas</a></li>
+            <li><hr></li>
+            <li><a href="#" onclick="exportarDatos()"><i class="fas fa-download"></i> Exportar</a></li>
             <li>
-                <a href="#" onclick="document.getElementById('importInput').click()">
-                    <i class="fas fa-upload"></i> Importar Copia
-                </a>
-                <input type="file" id="importInput" style="display:none" accept=".json" onchange="importarDatos(event)">
+                <label for="importFile" style="cursor:pointer; padding: 10px 20px; display:block;">
+                    <i class="fas fa-upload"></i> Importar
+                </label>
+                <input type="file" id="importFile" style="display:none" onchange="importarDatos(event)">
             </li>
         </ul>
     </nav>
 
-    <header class="app-header">
-        <button type="button" id="sidebarCollapse" class="btn-menu">
-            <i class="fas fa-bars"></i>
-        </button>
-        <nav id="sidebar">
-    <div class="sidebar-header">
-        <h3>🎬 Menú</h3>
-    </div>
-    <ul class="list-unstyled components">
-        <li><a href="#" onclick="showSection('series')">Mis Series</a></li>
-        <li><a href="#" onclick="showSection('actors')">Actores</a></li>
-        <li><a href="#" onclick="showSection('directors')">Creadores</a></li>
-        <li><a href="#" onclick="showSection('timeline')">Cronología</a></li>
-        <li><a href="#" onclick="showSection('stats')">Estadísticas</a></li>
-    </ul>
-</nav>
-        <div id="mini-search" class="header-search hidden">
-            <input type="text" id="serieInput" placeholder="Añadir serie..." onkeyup="if(event.key==='Enter') buscarYAñadir(false)">
-            <button onclick="buscarYAñadir(false)"><i class="fas fa-plus"></i></button>
+    <div id="welcome-screen" class="container-center">
+        <h1>Mis Series</h1>
+        <p>Tu videoteca personal inteligente</p>
+        <div class="search-box">
+            <input type="text" id="initialInput" placeholder="Busca tu primera serie...">
+            <button onclick="buscarYAñadir(true)">Empezar</button>
         </div>
-    </header>
-
-    <div id="search-results" class="results-container hidden"></div>
-
-    <div id="welcome-screen">
-        <div class="welcome-content">
-            <h1 class="logo">MIS<span>SERIES</span></h1>
-            <p>Tu colección personal de televisión</p>
-            <div class="search-box-large">
-                <input type="text" id="initialInput" placeholder="Escribe el nombre aquí..." onkeyup="if(event.key==='Enter') buscarYAñadir(true)">
-                <button onclick="buscarYAñadir(true)"><i class="fas fa-plus"></i></button>
-            </div>
-            <button id="btn-volver" class="hidden" onclick="showSection('series')">
-                <i class="fas fa-arrow-left"></i> Volver a mi colección
-            </button>
-        </div>
+        <button id="btn-volver" class="btn-outline hidden" onclick="showSection('series')">Volver a mi lista</button>
     </div>
 
     <div id="main-app" class="hidden">
-    <div id="mini-search" class="hidden">
-        <input type="text" id="serieInput" placeholder="Buscar nueva serie...">
-        <button onclick="buscarYAñadir(false)">Añadir</button>
-        <div id="search-results" class="results-container hidden"></div>
+        <header id="mini-search">
+            <input type="text" id="serieInput" placeholder="Añadir nueva serie...">
+            <button onclick="buscarYAñadir(false)">Añadir</button>
+            <div id="search-results" class="results-container hidden"></div>
+        </header>
+
+        <main>
+            <section id="sec-series" class="section">
+                <h2 class="section-title">Mi Colección</h2>
+                <div id="series-grid"></div>
+            </section>
+
+            <section id="sec-actors" class="section hidden">
+                <h2 class="section-title">Reparto Favorito</h2>
+                <div id="actors-grid"></div>
+            </section>
+
+            <section id="sec-directors" class="section hidden">
+                <h2 class="section-title">Creadores</h2>
+                <div id="directors-grid"></div>
+            </section>
+
+            <section id="sec-timeline" class="section hidden">
+                <h2 class="section-title">Línea del Tiempo</h2>
+                <div id="sec-timeline-grid" class="timeline-container"></div>
+            </section>
+
+            <section id="sec-stats" class="section hidden">
+                <h2 class="section-title">Estadísticas</h2>
+                <div id="stats-area"></div>
+            </section>
+        </main>
     </div>
 
-    <section id="sec-series" class="section">
-        <h2 class="section-title">Mi Colección</h2>
-        <div id="series-grid"></div>
-    </section>
-
-    <section id="sec-actors" class="section hidden">
-        <h2 class="section-title">Actores</h2>
-        <div id="actors-grid"></div>
-    </section>
-
-    <section id="sec-directors" class="section hidden">
-        <h2 class="section-title">Creadores</h2>
-        <div id="directors-grid"></div>
-    </section>
-
-    <section id="sec-timeline" class="section hidden">
-        <h2 class="section-title">Línea del Tiempo</h2>
-        <div id="sec-timeline-grid" class="timeline-container"></div>
-    </section>
-
-    <section id="sec-stats" class="section hidden">
-        <h2 class="section-title">Estadísticas</h2>
-        <div id="stats-area"></div>
-    </section>
-</div>
-
     <div id="photo-modal" class="modal hidden">
-        <div id="modalCloseBtn" class="close-fixed">
-            <i class="fas fa-times"></i>
-        </div>
-        
-        <div class="modal-wrapper">
-            <img class="modal-content" id="img-ampliada" alt="Imagen ampliada">
-            <div id="modal-caption">
-                </div>
-        </div>
+        <span id="modalCloseBtn" class="close">&times;</span>
+        <img class="modal-content" id="img-ampliada">
+        <div id="modal-caption"></div>
     </div>
 
     <script src="script.js"></script>
