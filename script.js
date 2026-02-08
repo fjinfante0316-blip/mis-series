@@ -24,27 +24,39 @@ function guardarEnLocalStorage() {
 
 // --- 2. NAVEGACIÓN ---
 function showSection(id) {
-    // 1. Ocultar todas las secciones primero
-    document.querySelectorAll('.section').forEach(section => {
-        section.classList.add('hidden');
-    });
+    const welcome = document.getElementById('welcome-screen');
+    const mainApp = document.getElementById('main-app');
+    const miniSearch = document.getElementById('mini-search');
 
-    // 2. Mostrar la sección que queremos
-    const targetSection = document.getElementById(`sec-${id}`);
-    if (targetSection) {
-        targetSection.classList.remove('hidden');
+    // 1. Resetear visibilidad general
+    if (id === 'welcome') {
+        welcome.classList.remove('hidden');
+        mainApp.classList.add('hidden');
+        if (miniSearch) miniSearch.classList.add('hidden');
+    } else {
+        welcome.classList.add('hidden');
+        mainApp.classList.remove('hidden');
+        if (miniSearch) miniSearch.classList.remove('hidden');
+
+        // 2. OCULTAR TODAS LAS SECCIONES (Esto evita que se amontonen)
+        document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
+
+        // 3. MOSTRAR LA SECCIÓN ELEGIDA
+        const target = document.getElementById(`sec-${id}`);
+        if (target) {
+            target.classList.remove('hidden');
+        }
     }
 
-    // 3. Si es estadísticas o cronología, disparar los datos
+    // 4. CERRAR MENÚ (Importante para que no tape el contenido)
+    if (sidebar) sidebar.classList.remove('active');
+
+    // 5. CARGAR CONTENIDO ESPECÍFICO
     if (id === 'stats') generarStats();
     if (id === 'timeline') generarCronologia();
-
-    // 4. Cerrar el menú lateral
-    if (sidebar) sidebar.classList.remove('active');
-}
-
-if (btnMenu) {
-    btnMenu.onclick = (e) => { e.stopPropagation(); sidebar.classList.toggle('active'); };
+    if (id === 'series') renderizarTodo();
+    if (id === 'actors') renderizarTodo(); // Renderiza actores
+    if (id === 'directors') renderizarTodo(); // Renderiza creadores
 }
 
 // --- 3. BÚSQUEDA Y SELECCIÓN ---
