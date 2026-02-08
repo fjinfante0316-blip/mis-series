@@ -28,7 +28,7 @@ function showSection(id) {
     const mainApp = document.getElementById('main-app');
     const miniSearch = document.getElementById('mini-search');
 
-    // 1. Resetear visibilidad general
+    // 1. Manejo de Pantalla de Bienvenida vs App
     if (id === 'welcome') {
         welcome.classList.remove('hidden');
         mainApp.classList.add('hidden');
@@ -38,25 +38,26 @@ function showSection(id) {
         mainApp.classList.remove('hidden');
         if (miniSearch) miniSearch.classList.remove('hidden');
 
-        // 2. OCULTAR TODAS LAS SECCIONES (Esto evita que se amontonen)
+        // 2. Limpieza total: Ocultamos todas las secciones
         document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
 
-        // 3. MOSTRAR LA SECCIÓN ELEGIDA
-        const target = document.getElementById(`sec-${id}`);
-        if (target) {
-            target.classList.remove('hidden');
+        // 3. Mostrar la sección correspondiente
+        const targetSection = document.getElementById(`sec-${id}`);
+        if (targetSection) {
+            targetSection.classList.remove('hidden');
+        } else {
+            console.error("No se encontró la sección: sec-" + id);
         }
     }
 
-    // 4. CERRAR MENÚ (Importante para que no tape el contenido)
+    // 4. Cerrar menú lateral (Hamburguesa)
+    const sidebar = document.getElementById('sidebar');
     if (sidebar) sidebar.classList.remove('active');
 
-    // 5. CARGAR CONTENIDO ESPECÍFICO
+    // 5. Cargar datos si es necesario
     if (id === 'stats') generarStats();
     if (id === 'timeline') generarCronologia();
-    if (id === 'series') renderizarTodo();
-    if (id === 'actors') renderizarTodo(); // Renderiza actores
-    if (id === 'directors') renderizarTodo(); // Renderiza creadores
+    if (id === 'series' || id === 'actors' || id === 'directors') renderizarTodo();
 }
 
 // --- 3. BÚSQUEDA Y SELECCIÓN ---
@@ -210,8 +211,16 @@ function renderizarTodo() {
 
 // --- 5. CRONOLOGÍA ---
 function generarCronologia() {
-    const timelineGrid = document.getElementById('sec-timeline-grid');
-    if (!timelineGrid) return;
+    const container = document.getElementById('sec-timeline-grid');
+    if (!container) return;
+
+    // Limpiamos por si acaso
+    container.innerHTML = "";
+
+    if (coleccionSeries.length === 0) {
+        container.innerHTML = "<p style='text-align:center; padding:20px;'>No hay series en tu colección para mostrar.</p>";
+        return;
+    }
 
     const seriesOrdenadas = [...coleccionSeries].sort((a, b) => {
         const fechaA = a.first_air_date || "9999";
@@ -219,13 +228,13 @@ function generarCronologia() {
         return fechaA.localeCompare(fechaB);
     });
 
-    timelineGrid.innerHTML = seriesOrdenadas.map(s => {
+    container.innerHTML = seriesOrdenadas.map(s => {
         const año = s.first_air_date ? s.first_air_date.substring(0, 4) : "N/A";
         return `
             <div class="timeline-item">
                 <div class="timeline-date">${año}</div>
                 <div class="timeline-content" onclick="ampliarSerie('${s.id}')">
-                    <img src="https://image.tmdb.org/t/p/w200${s.poster_path}">
+                    <img src="https://image.tmdb.org/t/p/w200${s.poster_path}" alt="${s.name}">
                     <div class="timeline-info">
                         <h4>${s.name}</h4>
                         <p>${s.number_of_seasons} Temporadas</p>
@@ -235,7 +244,6 @@ function generarCronologia() {
         `;
     }).join('');
 }
-
 // --- 6. ESTADÍSTICAS, FILTROS Y BANDERAS ---
 function generarStats() {
     if (coleccionSeries.length === 0) return;
