@@ -307,3 +307,18 @@ body {
     max-height: 50vh; /* Ajustamos la imagen para dejar espacio al texto */
     object-fit: contain;
 }
+
+.season-number-tag {
+    font-size: 0.75rem;
+    color: #fff;
+    margin-top: 5px;
+    font-weight: bold;
+    background: rgba(229, 9, 20, 0.2);
+    padding: 2px 5px;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+.season-card:hover .season-number-tag {
+    background: var(--rojo);
+}
