@@ -2,8 +2,8 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"">
-    <title>Mis Series - Tracker Pro</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mis Series - Tracker</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
@@ -18,39 +18,36 @@
             <h3>🎬 Menú</h3>
         </div>
         <ul class="list-unstyled components">
-            <li><a href="#" onclick="showSection('series')"><i class="fas fa-tv"></i> Mis Series</a></li>
+            <li><a href="#" onclick="showSection('welcome')"><i class="fas fa-home"></i> Inicio / Buscar</a></li>
+            <li><a href="#" onclick="showSection('series')"><i class="fas fa-tv"></i> Mi Colección</a></li>
             <li><a href="#" onclick="showSection('actors')"><i class="fas fa-users"></i> Actores</a></li>
             <li><a href="#" onclick="showSection('directors')"><i class="fas fa-pen-nib"></i> Creadores</a></li>
             <li><a href="#" onclick="showSection('timeline')"><i class="fas fa-history"></i> Cronología</a></li>
             <li><a href="#" onclick="showSection('stats')"><i class="fas fa-chart-pie"></i> Estadísticas</a></li>
             <li><hr></li>
-            <li><a href="#" onclick="exportarDatos()"><i class="fas fa-download"></i> Exportar</a></li>
-            <li>
-                <label for="importFile" style="cursor:pointer; padding: 10px 20px; display:block;">
-                    <i class="fas fa-upload"></i> Importar
-                </label>
-                <input type="file" id="importFile" style="display:none" onchange="importarDatos(event)">
-            </li>
+            <li><a href="#" onclick="exportarDatos()"><i class="fas fa-download"></i> Guardar Backup</a></li>
         </ul>
     </nav>
 
     <div id="welcome-screen" class="container-center">
-        <h1>Mis Series</h1>
-        <p>Tu videoteca personal inteligente</p>
-        <div class="search-box">
-            <input type="text" id="initialInput" placeholder="Busca tu primera serie...">
-            <button onclick="buscarYAñadir(true)">Empezar</button>
+        <h1 class="main-title">MIS SERIES</h1>
+        <p class="tagline">Tu biblioteca personal inteligente</p>
+        
+        <div class="search-box-container">
+            <div class="search-box">
+                <input type="text" id="initialInput" placeholder="Busca una serie para añadir..." onkeypress="if(event.key === 'Enter') buscarSeries()">
+                <button onclick="buscarSeries()"><i class="fas fa-plus"></i></button>
+            </div>
+            <div id="search-results-main" class="results-grid hidden"></div>
         </div>
-        <button id="btn-volver" class="btn-outline hidden" onclick="showSection('series')">Volver a mi lista</button>
+
+        <div class="home-nav">
+            <button onclick="showSection('series')" class="btn-nav">Ver mi Lista</button>
+            <button onclick="showSection('stats')" class="btn-nav">Stats</button>
+        </div>
     </div>
 
     <div id="main-app" class="hidden">
-        <header id="mini-search">
-            <input type="text" id="serieInput" placeholder="Añadir nueva serie...">
-            <button onclick="buscarYAñadir(false)">Añadir</button>
-            <div id="search-results" class="results-container hidden"></div>
-        </header>
-
         <main>
             <section id="sec-series" class="section">
                 <h2 class="section-title">Mi Colección</h2>
@@ -58,7 +55,7 @@
             </section>
 
             <section id="sec-actors" class="section hidden">
-                <h2 class="section-title">Reparto Favorito</h2>
+                <h2 class="section-title">Reparto</h2>
                 <div id="actors-grid"></div>
             </section>
 
