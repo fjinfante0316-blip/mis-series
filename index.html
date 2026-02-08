@@ -25,7 +25,14 @@
             <li><a href="#" onclick="showSection('timeline')"><i class="fas fa-history"></i> Cronología</a></li>
             <li><a href="#" onclick="showSection('stats')"><i class="fas fa-chart-pie"></i> Estadísticas</a></li>
             <li><hr></li>
-            <li><a href="#" onclick="exportarDatos()"><i class="fas fa-download"></i> Guardar Backup</a></li>
+            <li><a href="#" onclick="exportarDatos()"><i class="fas fa-download"></i> Exportar JSON</a></li>
+
+            <li>
+                <label for="importFile" style="cursor:pointer; padding: 15px 25px; display:block; color:#fff;">
+                    <i class="fas fa-upload"></i> Importar Datos
+                </label>
+                <input type="file" id="importFile" style="display:none" accept=".json" onchange="importarDatos(event)">
+            </li>
         </ul>
     </nav>
 
