@@ -114,14 +114,14 @@ function renderizarTodo() {
     document.getElementById('series-grid').innerHTML = coleccionSeries.map(s => `
         <div class="serie-group" style="margin-bottom:30px">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px">
-                <span style="font-weight:bold; color:var(--rojo)">${s.name}</span>
+                <span style="font-weight:bold; color:var(--rojo); font-size:1.2rem;">${s.name}</span>
                 <button onclick="eliminarSerie(${s.id})" style="background:none; border:none; color:#555; cursor:pointer"><i class="fas fa-trash"></i></button>
             </div>
             <div class="seasons-carousel">
                 ${s.seasons.map(t => `
-                    <div class="season-card" onclick="ampliarSerie(${s.id})">
+                    <div class="season-card" onclick="ampliarTemporada(${s.id}, ${t.season_number})">
                         <img src="https://image.tmdb.org/t/p/w300${t.poster_path || s.poster_path}">
-                        <div style="font-size:0.7rem; margin-top:5px">${t.name}</div>
+                        <div class="season-number-tag">${t.name}</div>
                     </div>
                 `).join('')}
             </div>
@@ -193,6 +193,33 @@ function renderizarTodo() {
 
     document.getElementById('actors-grid').innerHTML = renderFilas(actoresData, true);
     document.getElementById('directors-grid').innerHTML = renderFilas(creadoresData, false);
+}
+
+// --- FUNCIÓN PARA VER SINOPSIS DE TEMPORADA ---
+function ampliarTemporada(serieId, temporadaN) {
+    const s = coleccionSeries.find(x => x.id == serieId);
+    if (!s) return;
+
+    const temp = s.seasons.find(t => t.season_number == temporadaN);
+    if (!temp) return;
+
+    const modal = document.getElementById('photo-modal');
+    const img = document.getElementById('img-ampliada');
+    const caption = document.getElementById('modal-caption');
+
+    img.src = `https://image.tmdb.org/t/p/w500${temp.poster_path || s.poster_path}`;
+    
+    caption.innerHTML = `
+        <h4 style="color:var(--rojo); margin:0;">${s.name}</h4>
+        <h2 style="margin:5px 0 15px 0;">${temp.name}</h2>
+        <div style="background:rgba(255,255,255,0.1); padding:10px; border-radius:8px; margin-bottom:15px; font-size:0.8rem; display:flex; justify-content:space-around;">
+            <span><i class="fas fa-calendar"></i> ${temp.air_date ? temp.air_date.split('-')[0] : 'N/A'}</span>
+            <span><i class="fas fa-video"></i> ${temp.episode_count} Episodios</span>
+        </div>
+        <p style="font-size:0.95rem; line-height:1.5;">${temp.overview || "Esta temporada no tiene una sinopsis específica cargada, pero sigue la trama principal de la serie."}</p>
+    `;
+
+    modal.classList.remove('hidden');
 }
 
 // --- CRONOLOGÍA ---
