@@ -36,9 +36,21 @@
     </nav>
 
     <header class="app-header">
-        <button id="sidebarCollapse" class="menu-icon">
+        <button type="button" id="sidebarCollapse" class="btn-menu">
             <i class="fas fa-bars"></i>
         </button>
+        <nav id="sidebar">
+    <div class="sidebar-header">
+        <h3>🎬 Menú</h3>
+    </div>
+    <ul class="list-unstyled components">
+        <li><a href="#" onclick="showSection('series')">Mis Series</a></li>
+        <li><a href="#" onclick="showSection('actors')">Actores</a></li>
+        <li><a href="#" onclick="showSection('directors')">Creadores</a></li>
+        <li><a href="#" onclick="showSection('timeline')">Cronología</a></li>
+        <li><a href="#" onclick="showSection('stats')">Estadísticas</a></li>
+    </ul>
+</nav>
         <div id="mini-search" class="header-search hidden">
             <input type="text" id="serieInput" placeholder="Añadir serie..." onkeyup="if(event.key==='Enter') buscarYAñadir(false)">
             <button onclick="buscarYAñadir(false)"><i class="fas fa-plus"></i></button>
