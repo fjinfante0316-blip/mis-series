@@ -62,31 +62,37 @@
     </div>
 
     <div id="main-app" class="hidden">
-        <section id="sec-series" class="section">
-            <h2 class="section-title">Mi Colección</h2>
-            <div id="series-grid"></div>
-        </section>
-
-        <section id="sec-actors" class="section hidden">
-            <h2 class="section-title">Reparto</h2>
-            <div id="actors-grid"></div>
-        </section>
-
-        <section id="sec-directors" class="section hidden">
-            <h2 class="section-title">Creadores</h2>
-            <div id="directors-grid"></div>
-        </section>
-
-        <section id="sec-timeline" class="section hidden">
-            <h2 class="section-title">Línea del Tiempo</h2>
-            <div id="sec-timeline-grid" class="timeline-container"></div>
-        </section>
-
-        <section id="sec-stats" class="section hidden">
-            <h2 class="section-title">Estadísticas</h2>
-            <div id="stats-area"></div>
-        </section>
+    <div id="mini-search" class="hidden">
+        <input type="text" id="serieInput" placeholder="Buscar nueva serie...">
+        <button onclick="buscarYAñadir(false)">Añadir</button>
+        <div id="search-results" class="results-container hidden"></div>
     </div>
+
+    <section id="sec-series" class="section">
+        <h2 class="section-title">Mi Colección</h2>
+        <div id="series-grid"></div>
+    </section>
+
+    <section id="sec-actors" class="section hidden">
+        <h2 class="section-title">Actores</h2>
+        <div id="actors-grid"></div>
+    </section>
+
+    <section id="sec-directors" class="section hidden">
+        <h2 class="section-title">Creadores</h2>
+        <div id="directors-grid"></div>
+    </section>
+
+    <section id="sec-timeline" class="section hidden">
+        <h2 class="section-title">Línea del Tiempo</h2>
+        <div id="sec-timeline-grid" class="timeline-container"></div>
+    </section>
+
+    <section id="sec-stats" class="section hidden">
+        <h2 class="section-title">Estadísticas</h2>
+        <div id="stats-area"></div>
+    </section>
+</div>
 
     <div id="photo-modal" class="modal hidden">
         <div id="modalCloseBtn" class="close-fixed">
