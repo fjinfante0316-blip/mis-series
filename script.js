@@ -117,20 +117,29 @@ function renderizarTodo() {
         });
     });
 
-    const renderFilas = (data) => Object.values(data).sort((a,b) => b.trabajos.length - a.trabajos.length).map(p => `
+    const renderFilas = (data) => Object.values(data)
+    .sort((a, b) => b.trabajos.length - a.trabajos.length)
+    .map(p => {
+        // Obtenemos solo trabajos únicos (por si acaso una serie se repite)
+        const trabajosUnicos = [...new Set(p.trabajos)];
+        
+        return `
         <div class="actor-row">
             <div class="actor-info-side">
-                <img src="${p.info.profile_path ? 'https://image.tmdb.org/t/p/w200'+p.info.profile_path : 'https://via.placeholder.com/200'}" class="photo-circle">
-                <div>
-                    <span class="person-name">${p.info.name}</span>
-                    <small style="color:var(--rojo)">${p.trabajos.length} series</small>
-                </div>
+                <img src="${p.info.profile_path ? 'https://image.tmdb.org/t/p/w200'+p.info.profile_path : 'https://via.placeholder.com/200x200?text=👤'}" class="photo-circle">
+                <span class="person-name">${p.info.name}</span>
+                <span class="badge-series">${trabajosUnicos.length} ${trabajosUnicos.length === 1 ? 'Serie' : 'Series'}</span>
             </div>
+            
             <div class="actor-series-carousel">
-                ${p.trabajos.map(img => `<img src="https://image.tmdb.org/t/p/w200${img}" style="width:60px; border-radius:4px">`).join('')}
+                ${trabajosUnicos.map(img => `
+                    <div class="work-item">
+                        <img src="https://image.tmdb.org/t/p/w200${img}" alt="Serie">
+                    </div>
+                `).join('')}
             </div>
         </div>
-    `).join('');
+    `; }).join('');
 
     document.getElementById('actors-grid').innerHTML = renderFilas(actoresData);
     document.getElementById('directors-grid').innerHTML = renderFilas(creadoresData);
