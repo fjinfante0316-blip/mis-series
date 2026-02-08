@@ -717,6 +717,106 @@ main {
     color: var(--rojo);
 }
 
+/* Contenedor de la sección */
+#sec-timeline {
+    padding: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* La línea vertical */
+.timeline-container {
+    position: relative;
+    padding: 20px 0 20px 40px; /* Espacio para la línea a la izquierda */
+    margin-top: 20px;
+}
+
+.timeline-container::before {
+    content: '';
+    position: absolute;
+    left: 15px; /* Ajustado para que no se pegue al borde */
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: var(--rojo);
+    box-shadow: 0 0 8px var(--rojo);
+    border-radius: 2px;
+}
+
+/* Cada bloque de serie */
+.timeline-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 40px;
+    position: relative;
+}
+
+/* El punto en la línea */
+.timeline-item::after {
+    content: '';
+    position: absolute;
+    left: -30px; /* Alineado con la línea vertical */
+    width: 12px;
+    height: 12px;
+    background: #1a1a1a;
+    border: 3px solid var(--rojo);
+    border-radius: 50%;
+    z-index: 2;
+}
+
+.timeline-date {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--rojo);
+    margin-right: 20px;
+    min-width: 50px;
+}
+
+.timeline-content {
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 12px;
+    border-radius: 12px;
+    flex-grow: 1;
+    cursor: pointer;
+    transition: 0.3s;
+    border: 1px solid transparent;
+}
+
+.timeline-content:hover {
+    transform: translateX(10px);
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--rojo);
+}
+
+.timeline-content img {
+    width: 60px;
+    height: 90px;
+    border-radius: 8px;
+    object-fit: cover;
+    margin-right: 15px;
+}
+
+.timeline-info h4 {
+    margin: 0;
+    font-size: 1rem;
+    color: white;
+}
+
+.timeline-info p {
+    margin: 5px 0 0;
+    font-size: 0.85rem;
+    color: #888;
+}
+
+/* Móvil: Ajustar espacios */
+@media (max-width: 600px) {
+    .timeline-container { padding-left: 30px; }
+    .timeline-item::after { left: -21px; }
+    .timeline-date { font-size: 1rem; min-width: 40px; }
+}
+
 .flag-img { width: 40px; border-radius: 3px; border: 1px solid #444; }
 
 .flag-count { margin-top: 5px; font-weight: bold; color: var(--rojo); }
