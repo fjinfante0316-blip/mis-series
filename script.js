@@ -4,10 +4,24 @@ let coleccionSeries = JSON.parse(localStorage.getItem('mis_series_data')) || [];
 
 // --- INICIO ---
 window.onload = () => {
-    initMenu();
-    if (coleccionSeries.length > 0) {
-        renderizarTodo();
+    const btn = document.getElementById('sidebarCollapse');
+    const side = document.getElementById('sidebar');
+
+    if (btn && side) {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            side.classList.toggle('active');
+        });
+
+        // Cerrar al hacer clic fuera
+        document.addEventListener('click', (e) => {
+            if (side.classList.contains('active') && !side.contains(e.target)) {
+                side.classList.remove('active');
+            }
+        });
     }
+
+    if (coleccionSeries.length > 0) renderizarTodo();
 };
 
 function initMenu() {
@@ -205,7 +219,8 @@ document.getElementById('series-grid').innerHTML = coleccionSeries.map(s => `
         return `
         <div class="actor-row">
             <div class="actor-info-side">
-                <img src="${p.info.profile_path ? 'https://image.tmdb.org/t/p/w200'+p.info.profile_path : 'https://via.placeholder.com/200x200?text=👤'}" class="photo-circle">
+                // Dentro de la función que dibuja a los actores:
+<img src="${p.info.profile_path ? 'https://image.tmdb.org/t/p/w200' + p.info.profile_path : 'https://via.placeholder.com/200x200?text=No+Photo'}" class="photo-circle">
                 <span class="person-name">${p.info.name}</span>
                 <span class="badge-series">${trabajosUnicos.length} ${trabajosUnicos.length === 1 ? 'Proyecto' : 'Proyectos'}</span>
             </div>
