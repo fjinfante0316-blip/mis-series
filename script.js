@@ -163,22 +163,29 @@ function renderizarTodo() {
 // --- CRONOLOGÍA ---
 function generarCronologia() {
     const container = document.getElementById('sec-timeline-grid');
-    const ordenadas = [...coleccionSeries].sort((a,b) => (a.first_air_date || "").localeCompare(b.first_air_date || ""));
-container.innerHTML = ordenadas.map(s => {
-    const año = s.first_air_date ? s.first_air_date.split('-')[0] : 'N/A';
-    return `
-        <div class="timeline-item">
-            <div class="timeline-date">${año}</div>
-            <div class="timeline-content" onclick="ampliarSerie(${s.id})">
-                <img src="https://image.tmdb.org/t/p/w200${s.poster_path}" style="width:50px; border-radius:4px; margin-right:15px;">
-                <div>
-                    <h4 style="margin:0; font-size:1rem;">${s.name}</h4>
-                    <p style="margin:5px 0 0; font-size:0.8rem; color:#aaa;">${s.origin_country?.[0] || 'N/A'}</p>
+    if (!container) return;
+    
+    // Ordenar de más nueva a más vieja
+    const ordenadas = [...coleccionSeries].sort((a,b) => 
+        (b.first_air_date || "").localeCompare(a.first_air_date || "")
+    );
+
+    container.innerHTML = ordenadas.map(s => {
+        const año = s.first_air_date ? s.first_air_date.split('-')[0] : 'N/A';
+        return `
+            <div class="timeline-item">
+                <div class="timeline-date">${año}</div>
+                <div class="timeline-content" onclick="ampliarSerie(${s.id})">
+                    <img src="https://image.tmdb.org/t/p/w200${s.poster_path}">
+                    <div class="timeline-info">
+                        <h4>${s.name}</h4>
+                        <p style="color:#888; margin:2px 0 0; font-size:0.8rem;">${s.origin_country?.[0] || 'N/A'}</p>
+                    </div>
                 </div>
             </div>
-        </div>
-    `;
-}).join('');
+        `;
+    }).join('');
+}
     
 // --- ESTADÍSTICAS ---
 function generarStats() {
