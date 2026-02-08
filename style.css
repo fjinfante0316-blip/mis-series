@@ -307,6 +307,119 @@ body {
     padding: 2px 4px;
 }
 
+/* --- DISEÑO DE ESTADÍSTICAS PRO --- */
+.stats-dashboard {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 20px;
+    padding: 10px;
+}
+
+/* Tarjetas Principales */
+.stat-card-premium {
+    background: linear-gradient(145deg, #1e1e1e, #141414);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+    transition: transform 0.3s ease;
+}
+
+.stat-card-premium:hover {
+    transform: translateY(-5px);
+    border-color: var(--rojo);
+}
+
+.stat-card-premium i {
+    font-size: 1.5rem;
+    color: var(--rojo);
+    margin-bottom: 10px;
+    display: block;
+}
+
+.stat-card-premium h3 {
+    font-size: 2rem;
+    margin: 5px 0;
+    font-weight: 800;
+    letter-spacing: -1px;
+}
+
+.stat-card-premium span {
+    color: #888;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Sección de Géneros y Mapa */
+.stats-secondary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin-top: 25px;
+}
+
+.glass-panel {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 25px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Gráfico de Géneros Mejorado */
+.chart-container-pro {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#genero-chart {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    position: relative;
+    box-shadow: 0 0 30px rgba(0,0,0,0.8);
+    margin-bottom: 20px;
+}
+
+/* Círculo central para efecto "Donut" */
+#genero-chart::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60%;
+    height: 60%;
+    background: var(--negro);
+    border-radius: 50%;
+}
+
+/* Banderas Estilo "Píldora" */
+.flag-pill {
+    display: flex;
+    align-items: center;
+    background: #222;
+    padding: 8px 15px;
+    border-radius: 50px;
+    margin: 5px;
+    border: 1px solid #333;
+}
+
+.flag-pill img {
+    width: 24px;
+    border-radius: 2px;
+    margin-right: 10px;
+}
+
+.flag-pill .count {
+    font-weight: bold;
+    color: var(--rojo);
+    margin-left: 8px;
+}
+
 .mini-card-serie img { width: 100%; border-radius: 5px; }
 .mini-card-serie span { font-size: 0.7rem; color: #aaa; display: block; margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
