@@ -291,3 +291,19 @@ body {
     object-fit: cover;
     box-shadow: 0 4px 10px rgba(0,0,0,0.4);
 }
+
+#modal-caption {
+    padding: 20px;
+    text-align: left; /* Mejor lectura para sinopsis largas */
+    max-width: 500px;
+    max-height: 40vh; /* Evita que el texto se salga de la pantalla */
+    overflow-y: auto; /* Permite scroll si la sinopsis es muy larga */
+    background: rgba(0,0,0,0.5);
+    border-radius: 10px;
+    margin-top: 10px;
+}
+
+.modal-content {
+    max-height: 50vh; /* Ajustamos la imagen para dejar espacio al texto */
+    object-fit: contain;
+}
