@@ -125,4 +125,74 @@ body {
     transition: 0.5s;
     z-index: 2000;
 }
+
+/* Carrusel de Temporadas en Series */
+.seasons-carousel {
+    display: flex;
+    overflow-x: auto;
+    gap: 15px;
+    padding-bottom: 10px;
+    scrollbar-width: thin;
+}
+
+.season-card {
+    min-width: 150px;
+    text-align: center;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.season-card img { width: 100%; border-radius: 8px; }
+
+/* Diseño de Filas para Actores/Creadores */
+.actor-row {
+    display: flex;
+    align-items: center;
+    background: rgba(255,255,255,0.05);
+    margin-bottom: 20px;
+    padding: 15px;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.actor-info-side {
+    min-width: 120px;
+    text-align: center;
+    border-right: 1px solid rgba(255,255,255,0.1);
+    padding-right: 15px;
+}
+
+.photo-circle {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 8px;
+    border: 2px solid var(--rojo);
+}
+
+.person-name { font-size: 0.9rem; font-weight: bold; display: block; }
+.badge-count { font-size: 0.7rem; background: var(--rojo); padding: 2px 6px; border-radius: 10px; margin-top: 5px; display: inline-block; }
+
+.actor-series-carousel {
+    display: flex;
+    overflow-x: auto;
+    gap: 15px;
+    padding-left: 15px;
+    flex-grow: 1;
+}
+
+.mini-card-serie {
+    min-width: 80px;
+    text-align: center;
+}
+
+.mini-card-serie img { width: 100%; border-radius: 5px; }
+.mini-card-serie span { font-size: 0.7rem; color: #aaa; display: block; margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* Timeline y Otros */
+.timeline-container { padding-left: 30px; border-left: 2px solid var(--rojo); position: relative; margin: 20px; }
+.timeline-item { margin-bottom: 30px; position: relative; }
+.timeline-date { position: absolute; left: -55px; background: var(--rojo); padding: 2px 6px; border-radius: 4px; font-size: 0.8rem; }
+
 .toast-notification.show { transform: translateY(0); }
