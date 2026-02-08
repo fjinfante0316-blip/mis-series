@@ -101,6 +101,22 @@ body {
 #sidebar.active { left: 0; box-shadow: 10px 0 30px rgba(0,0,0,0.5); }
 #sidebar ul li a { padding: 15px 25px; display: block; color: #fff; text-decoration: none; border-bottom: 1px solid #111; }
 
+#sidebar ul li label:hover {
+    background: var(--gris);
+    color: var(--rojo);
+    transition: 0.3s;
+}
+
+/* Estilo para que el input file no ocupe espacio visual */
+#importFile {
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    z-index: -1;
+}
+
 /* --- SERIES Y CARRUSELES --- */
 #main-app { padding: 80px 15px 20px; }
 .section-title { border-left: 4px solid var(--rojo); padding-left: 15px; margin-bottom: 25px; }
