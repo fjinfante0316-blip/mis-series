@@ -306,3 +306,39 @@ function exportarDatos() {
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob); a.download = "mis_series.json"; a.click();
 }
+
+function importarDatos(event) {
+    const archivo = event.target.files[0];
+    if (!archivo) return;
+
+    const lector = new FileReader();
+    
+    lector.onload = function(e) {
+        try {
+            const contenido = JSON.parse(e.target.result);
+            
+            // Validación mínima: ¿es un array?
+            if (Array.isArray(contenido)) {
+                if (confirm(`Se van a importar ${contenido.length} series. Esto sobrescribirá tu lista actual. ¿Continuar?`)) {
+                    coleccionSeries = contenido;
+                    localStorage.setItem('mis_series_data', JSON.stringify(coleccionSeries));
+                    
+                    // Refrescar la interfaz
+                    renderizarTodo();
+                    if (typeof generarStats === "function") generarStats();
+                    if (typeof generarCronologia === "function") generarCronologia();
+                    
+                    alert("¡Datos importados con éxito!");
+                    showSection('series'); // Te lleva a ver tu nueva lista
+                }
+            } else {
+                alert("El archivo no tiene el formato correcto.");
+            }
+        } catch (err) {
+            alert("Error al leer el archivo JSON.");
+            console.error(err);
+        }
+    };
+
+    lector.readAsText(archivo);
+}
