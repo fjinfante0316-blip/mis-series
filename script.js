@@ -189,46 +189,77 @@ function generarCronologia() {
     
 // --- ESTADÍSTICAS ---
 function generarStats() {
-    const paises = {};
+    if (coleccionSeries.length === 0) return;
+
+    let minTotal = 0;
+    let epsTotal = 0;
     const generos = {};
-    let min = 0; let eps = 0;
+    const paises = {};
 
     coleccionSeries.forEach(s => {
         const dur = (s.episode_run_time && s.episode_run_time[0]) || 45;
-        min += (dur * s.number_of_episodes);
-        eps += s.number_of_episodes;
+        minTotal += (dur * s.number_of_episodes);
+        epsTotal += s.number_of_episodes;
 
-        if(s.origin_country?.[0]) paises[s.origin_country[0]] = (paises[s.origin_country[0]] || 0) + 1;
-        if(s.genres?.[0]) generos[s.genres[0].name] = (generos[s.genres[0].name] || 0) + 1;
+        if (s.genres) s.genres.forEach(g => generos[g.name] = (generos[g.name] || 0) + 1);
+        if (s.origin_country && s.origin_country[0]) {
+            const p = s.origin_country[0];
+            paises[p] = (paises[p] || 0) + 1;
+        }
     });
 
-    // Lógica básica del gráfico circular (CSS Conic Gradient)
+    // Lógica Gráfico
+    const colores = ['#ff4b2b', '#ff416c', '#8e2de2', '#4a00e0', '#f9d423'];
     let acumulado = 0;
-    const colores = ['#e50914', '#2ecc71', '#3498db', '#f1c40f', '#9b59b6'];
-    const partes = Object.keys(generos).map((g, i) => {
-        const p = (generos[g] / coleccionSeries.length) * 100;
-        const res = `${colores[i%5]} ${acumulado}% ${acumulado + p}%`;
-        acumulado += p;
-        return res;
-    });
+    const totalG = Object.values(generos).reduce((a, b) => a + b, 0);
+    const gradiente = Object.keys(generos).map((g, i) => {
+        const porc = (generos[g] / totalG) * 100;
+        const color = colores[i % colores.length];
+        const string = `${color} ${acumulado}% ${acumulado + porc}%`;
+        acumulado += porc;
+        return string;
+    }).join(', ');
 
     document.getElementById('stats-area').innerHTML = `
-        <div class="time-stats-container">
-            <div class="time-card"><h3>${Math.floor(min/60)}</h3><span>Horas</span></div>
-            <div class="time-card"><h3>${eps}</h3><span>Episodios</span></div>
+        <div class="stats-dashboard">
+            <div class="stat-card-premium">
+                <i class="fas fa-clock"></i>
+                <h3>${Math.floor(minTotal / 60)}</h3>
+                <span>Horas de Vida</span>
+            </div>
+            <div class="stat-card-premium">
+                <i class="fas fa-layer-group"></i>
+                <h3>${epsTotal}</h3>
+                <span>Capítulos</span>
+            </div>
+            <div class="stat-card-premium">
+                <i class="fas fa-tv"></i>
+                <h3>${coleccionSeries.length}</h3>
+                <span>Series</span>
+            </div>
         </div>
-        <div class="chart-section">
-            <h3>Tus Géneros</h3>
-            <div id="genero-chart" style="background: conic-gradient(${partes.join(',')})"></div>
-        </div>
-        <div class="paises-section">
-            <h3>Países</h3>
-            <div class="flags-container">${Object.keys(paises).map(iso => `
-                <div class="flag-card">
-                    <img src="https://purecatamphetamine.github.io/country-flag-icons/3x2/${iso}.svg" class="flag-img">
-                    <span>${paises[iso]}</span>
+
+        <div class="stats-secondary-grid">
+            <div class="glass-panel chart-container-pro">
+                <h3 class="section-subtitle">Tus Géneros</h3>
+                <div id="genero-chart" style="background: conic-gradient(${gradiente})"></div>
+                <div class="flags-container">
+                    ${Object.keys(generos).slice(0, 5).map(g => `<span class="legend-item">${g}</span>`).join('')}
                 </div>
-            `).join('')}</div>
+            </div>
+
+            <div class="glass-panel">
+                <h3 class="section-subtitle">Países de Origen</h3>
+                <div class="flags-container" style="justify-content: flex-start;">
+                    ${Object.keys(paises).map(iso => `
+                        <div class="flag-pill">
+                            <img src="https://purecatamphetamine.github.io/country-flag-icons/3x2/${iso}.svg">
+                            <span>${iso}</span>
+                            <span class="count">${paises[iso]}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
         </div>
     `;
 }
