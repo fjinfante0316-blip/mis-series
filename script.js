@@ -131,6 +131,17 @@ document.getElementById('series-grid').innerHTML = coleccionSeries.map(s => `
     </div>
 `).join('');
 
+    const actorsGrid = document.getElementById('actors-grid');
+    if (actorsGrid) {
+        actorsGrid.innerHTML = renderFilas(actoresData, true);
+    }
+
+    const directorsGrid = document.getElementById('directors-grid');
+    if (directorsGrid) {
+        directorsGrid.innerHTML = renderFilas(creadoresData, false);
+    }
+}
+    
     // Actores y Creadores
     const actoresData = {};
     const creadoresData = {};
