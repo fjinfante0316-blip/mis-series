@@ -80,19 +80,21 @@ async function confirmarSeleccion(id) {
 function renderizarTodo() {
     // 1. Render Series con Carrusel de Temporadas
     document.getElementById('series-grid').innerHTML = coleccionSeries.map(s => `
-        <div class="serie-group">
-            <button class="btn-delete" onclick="eliminarSerie(${s.id})"><i class="fas fa-trash"></i></button>
-            <div class="serie-title-tag">${s.name}</div>
-            <div class="seasons-carousel">
-                ${s.seasons.map(t => `
-                    <div class="season-card" onclick="ampliarSerie(${s.id})">
-                        <img src="https://image.tmdb.org/t/p/w300${t.poster_path || s.poster_path}">
-                        <div class="season-number">${t.name}</div>
-                    </div>
-                `).join('')}
-            </div>
+    <div class="serie-group">
+        <div class="serie-header-mobile">
+            <span class="serie-title-tag">${s.name}</span>
+            <button class="btn-delete-mini" onclick="eliminarSerie(${s.id})"><i class="fas fa-times"></i></button>
         </div>
-    `).join('');
+        <div class="seasons-carousel">
+            ${s.seasons.map(t => `
+                <div class="season-card" onclick="ampliarSerie(${s.id})">
+                    <img src="https://image.tmdb.org/t/p/w300${t.poster_path || s.poster_path}">
+                    <div class="season-number">${t.name}</div>
+                </div>
+            `).join('')}
+        </div>
+    </div>
+`).join('');
 
     // 2. Agrupar Actores y Creadores
     const actoresData = {};
