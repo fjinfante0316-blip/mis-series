@@ -35,16 +35,21 @@ function renderizarTodo() {
     const seriesGrid = document.getElementById('series-grid');
     if (seriesGrid) {
         seriesGrid.innerHTML = coleccionSeries.map(s => `
-            <div class="serie-group">
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <h4 style="font-size:0.9rem;">${s.name}</h4>
-                    <button onclick="eliminarSerie(${s.id})" style="background:none; border:none; color:gray;"><i class="fas fa-trash"></i></button>
+    <div class="serie-group" style="width: 100%; margin-bottom: 30px;">
+        <div class="serie-header" style="padding: 0 20px; display:flex; justify-content:space-between;">
+            <h4>${s.name}</h4>
+            <button onclick="eliminarSerie(${s.id})"><i class="fas fa-trash"></i></button>
+        </div>
+        <div class="seasons-carousel">
+            ${s.seasons.map(t => `
+                <div class="season-card">
+                    <img src="https://image.tmdb.org/t/p/w200${t.poster_path || s.poster_path}" onclick="ampliarTemporada(${s.id}, ${t.season_number})">
+                    <p>${t.name}</p>
                 </div>
-                <div class="seasons-carousel">
-                    ${s.seasons.map(t => `<div class="season-card" onclick="ampliarTemporada(${s.id}, ${t.season_number})"><img src="https://image.tmdb.org/t/p/w200${t.poster_path || s.poster_path}"><p>${t.name}</p></div>`).join('')}
-                </div>
-            </div>`).join('');
-    }
+            `).join('')}
+        </div>
+        </div>
+`).join('');
 
     // 2. Actores (5 por serie) y Creadores
     const actoresData = {};
