@@ -1,215 +1,94 @@
 :root {
     --rojo: #e50914;
-    --negro: #141414;
-    --gris: #1f1f1f;
+    --negro-puro: #000000;
+    --negro-suave: #141414;
+    --gris-card: #1f1f1f;
+    --glass: rgba(255, 255, 255, 0.05);
 }
 
 body {
-    margin: 0;
-    font-family: 'Segoe UI', sans-serif;
-    background-color: var(--negro);
+    background-color: var(--negro-puro);
     color: white;
-    overflow-x: hidden;
+    font-family: 'Inter', -apple-system, sans-serif;
 }
 
-.hidden { display: none !important; }
+/* --- Botón Hamburguesa Estilizado --- */
+.btn-menu {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 10001; /* Siempre arriba */
+    background: var(--rojo);
+    border: none;
+    color: white;
+    width: 45px;
+    height: 45px;
+    border-radius: 12px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(229, 9, 20, 0.4);
+    transition: transform 0.2s;
+}
 
-/* Menú Lateral */
+.btn-menu:active { transform: scale(0.9); }
+
+/* --- Sidebar Moderno --- */
 #sidebar {
     position: fixed;
-    left: -260px;
+    left: -280px;
     top: 0;
-    width: 250px;
+    width: 260px;
     height: 100vh;
-    background: #000;
-    z-index: 9999;
-    transition: 0.3s;
-    padding-top: 60px;
+    background: rgba(10, 10, 10, 0.95);
+    backdrop-filter: blur(10px); /* Efecto cristalizado */
+    z-index: 10000;
+    transition: all 0.4s cubic-bezier(0.17, 0.67, 0.83, 0.67);
+    border-right: 1px solid var(--glass);
 }
 
 #sidebar.active { left: 0; }
 
-.btn-menu {
-    position: fixed;
-    top: 15px;
-    left: 15px;
-    z-index: 10000;
-    background: var(--rojo);
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    border-radius: 5px;
+#sidebar ul li {
+    padding: 15px 25px;
+    font-size: 1.1rem;
+    color: #bbb;
     cursor: pointer;
-}
-
-/* Contenedor de Bienvenida Centrado */
-.welcome-container {
+    transition: 0.3s;
     display: flex;
-    flex-direction: column;
     align-items: center;
-    justify-content: center;
-    min-height: 80vh;
-    padding: 20px;
-    text-align: center;
-}
-
-.search-box {
-    display: flex;
-    gap: 10px;
-    width: 100%;
-    max-width: 500px;
-}
-
-.search-box input {
-    flex: 1;
-    padding: 12px;
-    border-radius: 5px;
-    border: none;
-}
-
-/* Rejillas (Grids) */
-.results-grid, #series-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
     gap: 15px;
-    width: 100%;
-    padding: 20px;
-    box-sizing: border-box;
 }
 
-/* Ajuste para que las series no ocupen todo el ancho en móvil */
-.serie-group {
-    background: var(--gris);
-    border-radius: 8px;
-    padding: 10px;
+#sidebar ul li i { color: var(--rojo); width: 20px; }
+
+#sidebar ul li:hover {
+    background: var(--glass);
+    color: white;
+    padding-left: 35px;
 }
 
+/* --- Carruseles de Ancho Completo --- */
 .seasons-carousel {
     display: flex;
     overflow-x: auto;
-    gap: 10px;
-    padding-bottom: 10px;
+    gap: 15px;
+    padding: 20px;
+    width: 100vw;
+    box-sizing: border-box;
+    scroll-behavior: smooth;
 }
 
+/* Ocultar scrollbar pero mantener funcionalidad */
+.seasons-carousel::-webkit-scrollbar { display: none; }
+
 .season-card {
-    min-width: 100px;
-    font-size: 0.8rem;
+    min-width: 140px;
+    transition: transform 0.3s ease;
 }
+
+.season-card:hover { transform: scale(1.05); z-index: 2; }
 
 .season-card img {
     width: 100%;
-    border-radius: 5px;
-}
-
-/* Actores y Creadores */
-.actor-row {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    background: var(--gris);
-    margin: 10px 20px;
-    padding: 10px;
-    border-radius: 10px;
-}
-
-.photo-circle {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid var(--rojo);
-}
-
-.actor-series-carousel {
-    display: flex;
-    gap: 10px;
-    overflow-x: auto;
-}
-
-.work-item img {
-    width: 60px;
-    height: 90px;
-    border-radius: 4px;
-}
-
-/* Stats y Timeline */
-.stat-card { background: var(--gris); padding: 15px; border-radius: 10px; text-align: center; }
-.timeline-item { border-left: 2px solid var(--rojo); margin: 10px 20px; padding: 10px 20px; position: relative; }
-
-/* Modal */
-.modal {
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.9);
-    z-index: 20000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.modal-content-wrapper { background: #222; padding: 20px; border-radius: 10px; max-width: 90%; max-height: 90vh; overflow-y: auto; }
-
-/* --- AJUSTE DE CONTENEDORES --- */
-#content {
-    width: 100%;
-    padding: 0; /* Eliminamos padding lateral para que el carrusel toque los bordes */
-    overflow-x: hidden;
-}
-
-.section {
-    width: 100%;
-    padding: 20px 0; /* Padding arriba/abajo sí, pero 0 a los lados */
-}
-
-.section-title, .section-header-flex {
-    padding: 0 20px; /* El título sí debe tener margen, pero el carrusel no */
-}
-
-/* --- CARRUSEL DE TEMPORADAS (MI COLECCIÓN) --- */
-.seasons-carousel {
-    display: flex;
-    overflow-x: auto;
-    gap: 15px;
-    width: 100vw; /* Ocupa el ancho total de la ventana */
-    padding: 10px 20px; /* Margen interno para que la primera foto no pegue al borde */
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
-    box-sizing: border-box;
-}
-
-/* --- CARRUSEL DE TRABAJOS (REPARTO/CREADORES) --- */
-.actor-series-carousel {
-    display: flex;
-    overflow-x: auto;
-    gap: 12px;
-    flex: 1; /* Toma todo el espacio restante al lado de la foto */
-    padding: 5px 10px;
-    scrollbar-width: none; /* Oculta scroll en Firefox */
-}
-
-.actor-series-carousel::-webkit-scrollbar {
-    display: none; /* Oculta scroll en Chrome/Safari */
-}
-
-/* --- FILAS DE ACTORES --- */
-.actor-row {
-    display: flex;
-    align-items: center;
-    width: 100%; /* Ancho total */
-    background: var(--gris);
-    margin: 10px 0; /* Sin margen lateral */
-    padding: 15px;
-    border-radius: 0; /* En móvil queda mejor sin bordes redondeados si es ancho total */
-    box-sizing: border-box;
-}
-
-@media (min-width: 768px) {
-    .actor-row {
-        margin: 10px 20px;
-        border-radius: 15px; /* En PC sí mantenemos el diseño de tarjeta */
-        width: calc(100% - 40px);
-    }
-    .seasons-carousel {
-        width: 100%; /* En PC se ajusta al contenedor principal */
-    }
+    border-radius: 8px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.5);
 }
