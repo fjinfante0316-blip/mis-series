@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mis Series - Tracker</title>
+    <title>Blip - Mi Colección de Series</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
@@ -15,57 +15,59 @@
 
     <nav id="sidebar">
         <div class="sidebar-header">
-            <h3>🎬 Menú</h3>
+            <h3>BLIP <span>Series</span></h3>
         </div>
         <ul class="list-unstyled components">
-            <li><a href="#" onclick="showSection('welcome')"><i class="fas fa-home"></i> Inicio / Buscar</a></li>
-            <li><a href="#" onclick="showSection('series')"><i class="fas fa-tv"></i> Mi Colección</a></li>
-            <li><a href="#" onclick="showSection('actors')"><i class="fas fa-users"></i> Actores</a></li>
-            <li><a href="#" onclick="showSection('directors')"><i class="fas fa-pen-nib"></i> Creadores</a></li>
-            <li><a href="#" onclick="showSection('timeline')"><i class="fas fa-history"></i> Cronología</a></li>
-            <li><a href="#" onclick="showSection('stats')"><i class="fas fa-chart-pie"></i> Estadísticas</a></li>
-            <li><hr></li>
-            <li><a href="#" onclick="exportarDatos()"><i class="fas fa-download"></i> Exportar JSON</a></li>
-
-            <li>
-                <label for="importFile" style="cursor:pointer; padding: 15px 25px; display:block; color:#fff;">
-                    <i class="fas fa-upload"></i> Importar Datos
-                </label>
-                <input type="file" id="importFile" style="display:none" accept=".json" onchange="importarDatos(event)">
-            </li>
+            <li onclick="showSection('welcome')"><i class="fas fa-search"></i> Buscar</li>
+            <li onclick="showSection('series')"><i class="fas fa-tv"></i> Mi Colección</li>
+            <li onclick="showSection('actors')"><i class="fas fa-users"></i> Reparto</li>
+            <li onclick="showSection('directors')"><i class="fas fa-clapperboard"></i> Creadores</li>
+            <li onclick="showSection('timeline')"><i class="fas fa-history"></i> Cronología</li>
+            <li onclick="showSection('stats')"><i class="fas fa-chart-pie"></i> Estadísticas</li>
         </ul>
+        <div class="sidebar-footer">
+            <button onclick="exportarDatos()" class="btn-side"><i class="fas fa-download"></i> Guardar Backup</button>
+            <input type="file" id="importFile" style="display:none" onchange="importarDatos(event)">
+            <button onclick="document.getElementById('importFile').click()" class="btn-side"><i class="fas fa-upload"></i> Cargar Backup</button>
+        </div>
     </nav>
 
-    <div id="welcome-screen" class="container-center">
-        <h1 class="main-title">MIS SERIES</h1>
-        <p class="tagline">Tu biblioteca personal inteligente</p>
+    <main id="content">
         
-        <div class="search-box-container">
-            <div class="search-box">
-                <input type="text" id="initialInput" placeholder="Busca una serie para añadir..." onkeypress="if(event.key === 'Enter') buscarSeries()">
-                <button onclick="buscarSeries()"><i class="fas fa-plus"></i></button>
+        <section id="welcome-screen" class="section">
+            <div class="welcome-container">
+                <h1>¿Qué serie quieres añadir?</h1>
+                <div class="search-box">
+                    <input type="text" id="initialInput" placeholder="Escribe el nombre de una serie..." onkeyup="if(event.key==='Enter') buscarSeries()">
+                    <button onclick="buscarSeries()"><i class="fas fa-search"></i></button>
+                </div>
+                <div id="search-results-main" class="results-grid hidden"></div>
             </div>
-            <div id="search-results-main" class="results-grid hidden"></div>
-        </div>
-    </div>
+        </section>
 
-    <div id="main-app" class="hidden">
-        <main>
-            <section id="sec-series" class="section">
-                <h2 class="section-title">Mi Colección</h2>
-                <input type="text" id="filter-series" class="filter-input" placeholder="Filtrar series..." onkeyup="filtrarContenido('series')">
+        <div id="main-app" class="hidden">
+            
+            <section id="sec-series" class="section hidden">
+                <div class="section-header-flex">
+                    <h2 class="section-title">Mi Colección</h2>
+                    <input type="text" id="filter-series" class="filter-input" placeholder="Filtrar series..." onkeyup="filtrarContenido('series')">
+                </div>
                 <div id="series-grid"></div>
             </section>
 
             <section id="sec-actors" class="section hidden">
-                <h2 class="section-title">Reparto</h2>
-                <input type="text" id="filter-actors" class="filter-input" placeholder="Buscar actor o personaje..." onkeyup="filtrarContenido('actors')">
+                <div class="section-header-flex">
+                    <h2 class="section-title">Actores Principales</h2>
+                    <input type="text" id="filter-actors" class="filter-input" placeholder="Buscar actor o personaje..." onkeyup="filtrarContenido('actors')">
+                </div>
                 <div id="actors-grid"></div>
             </section>
 
             <section id="sec-directors" class="section hidden">
-                <h2 class="section-title">Creadores</h2>
-                <input type="text" id="filter-directors" class="filter-input" placeholder="Buscar creador..." onkeyup="filtrarContenido('directors')">
+                <div class="section-header-flex">
+                    <h2 class="section-title">Creadores y Directores</h2>
+                    <input type="text" id="filter-directors" class="filter-input" placeholder="Buscar creador..." onkeyup="filtrarContenido('directors')">
+                </div>
                 <div id="directors-grid"></div>
             </section>
 
@@ -75,16 +77,19 @@
             </section>
 
             <section id="sec-stats" class="section hidden">
-                <h2 class="section-title">Estadísticas</h2>
+                <h2 class="section-title">Mis Estadísticas</h2>
                 <div id="stats-area"></div>
             </section>
-        </main>
-    </div>
+
+        </div>
+    </main>
 
     <div id="photo-modal" class="modal hidden">
         <span id="modalCloseBtn" class="close">&times;</span>
-        <img class="modal-content" id="img-ampliada">
-        <div id="modal-caption"></div>
+        <div class="modal-content-wrapper">
+            <img class="modal-content" id="img-ampliada">
+            <div id="modal-caption" class="modal-caption"></div>
+        </div>
     </div>
 
     <script src="script.js"></script>
