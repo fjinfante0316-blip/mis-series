@@ -479,3 +479,29 @@ body {
 #sidebar {
     z-index: 4000 !important;
 }
+
+/* Estadísticas */
+.stats-summary { display: flex; gap: 20px; margin-bottom: 30px; justify-content: center; }
+.stat-card { background: var(--gris); padding: 20px; border-radius: 15px; min-width: 100px; border-bottom: 3px solid var(--rojo); }
+.genre-bar-container { margin-bottom: 15px; }
+.genre-info { display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 5px; }
+.genre-bar-bg { background: #333; height: 8px; border-radius: 4px; overflow: hidden; }
+.genre-bar-fill { background: var(--rojo); height: 100%; transition: width 1s ease-in-out; }
+
+/* Cronología */
+.timeline-container { position: relative; padding: 20px 0; }
+.timeline-item { position: relative; margin-bottom: 30px; padding-left: 80px; }
+.timeline-date { 
+    position: absolute; left: 0; top: 10px; 
+    background: var(--rojo); color: white; 
+    padding: 5px 10px; border-radius: 5px; 
+    font-weight: bold; font-size: 0.8rem;
+}
+.timeline-content { 
+    display: flex; align-items: center; gap: 15px; 
+    background: var(--gris); padding: 10px; 
+    border-radius: 10px; cursor: pointer;
+}
+.timeline-content img { width: 50px; border-radius: 5px; }
+.timeline-content h4 { margin: 0; font-size: 1rem; }
+.timeline-content p { margin: 0; font-size: 0.8rem; color: #888; }
