@@ -1,24 +1,24 @@
+// 1. CONFIGURACIÓN Y VARIABLES GLOBALES
 const API_KEY = 'e8b61af0cf42a633e3aa581bb73127f8';
 let coleccionSeries = JSON.parse(localStorage.getItem('mis_series_data')) || [];
 
-// --- 1. INICIALIZACIÓN DE BOTONES Y MENÚ ---
+// 2. INICIALIZACIÓN AL CARGAR LA PÁGINA
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("DOM Cargado");
     initMenu();
-    if (coleccionSeries.length > 0) renderizarTodo();
+    if (coleccionSeries.length > 0) {
+        renderizarTodo();
+    }
 });
 
+// 3. MENÚ LATERAL (HAMBURGUESA)
 function initMenu() {
     const btn = document.getElementById('sidebarCollapse');
     const side = document.getElementById('sidebar');
-
     if (btn && side) {
         btn.onclick = (e) => {
             e.stopPropagation();
             side.classList.toggle('active');
-            console.log("Menú activado");
         };
-
         document.onclick = (e) => {
             if (side.classList.contains('active') && !side.contains(e.target)) {
                 side.classList.remove('active');
@@ -27,9 +27,8 @@ function initMenu() {
     }
 }
 
-// --- 2. NAVEGACIÓN ---
+// 4. NAVEGACIÓN ENTRE SECCIONES
 function showSection(id) {
-    console.log("Cambiando a sección:", id);
     const welcome = document.getElementById('welcome-screen');
     const mainApp = document.getElementById('main-app');
     
@@ -45,9 +44,164 @@ function showSection(id) {
         const target = document.getElementById(`sec-${id}`);
         if (target) target.classList.remove('hidden');
     }
-    document.getElementById('sidebar').classList.remove('active');
+
+    // Activar funciones especiales según la sección
+    if (id === 'stats') generarStats();
+    if (id === 'timeline') generarCronologia();
+    
+    const side = document.getElementById('sidebar');
+    if (side) side.classList.remove('active');
 }
-// 3. BÚSQUEDA Y PORTADA
+
+// 5. RENDERIZADO PRINCIPAL (COLECCIÓN, ACTORES Y CREADORES)
+function renderizarTodo() {
+    // --- Render de la Colección ---
+    const seriesGrid = document.getElementById('series-grid');
+    if (seriesGrid) {
+        seriesGrid.innerHTML = coleccionSeries.map(s => `
+            <div class="serie-group">
+                <div class="serie-header" style="display:flex; justify-content:space-between; align-items:center; padding: 0 5px;">
+                    <h4>${s.name}</h4>
+                    <button onclick="eliminarSerie(${s.id})" style="background:none; border:none; color:gray; cursor:pointer;">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+                <div class="seasons-carousel">
+                    ${s.seasons.map(t => `
+                        <div class="season-card" onclick="ampliarTemporada(${s.id}, ${t.season_number})">
+                            <img src="https://image.tmdb.org/t/p/w200${t.poster_path || s.poster_path}">
+                            <p>${t.name}</p>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // --- Lógica de Actores (5 por serie sin repetir) y Creadores ---
+    const actoresData = {};
+    const idsActoresVistos = new Set();
+    const creadoresData = {};
+
+    coleccionSeries.forEach(s => {
+        // Actores
+        if (s.credits && s.credits.cast) {
+            let count = 0;
+            s.credits.cast.forEach(a => {
+                if (count < 5 && !idsActoresVistos.has(a.id)) {
+                    idsActoresVistos.add(a.id);
+                    actoresData[a.id] = {
+                        info: a,
+                        trabajo: { poster: s.poster_path, char: a.character, id: s.id }
+                    };
+                    count++;
+                }
+            });
+        }
+        // Creadores
+        if (s.created_by) {
+            s.created_by.forEach(c => {
+                if (!creadoresData[c.name]) {
+                    creadoresData[c.name] = { info: c, trabajos: [] };
+                }
+                if (!creadoresData[c.name].trabajos.some(t => t.id === s.id)) {
+                    creadoresData[c.name].trabajos.push({
+                        poster: s.poster_path,
+                        nombreSerie: s.name,
+                        id: s.id
+                    });
+                }
+            });
+        }
+    });
+
+    // Inyectar Actores
+    const actorsGrid = document.getElementById('actors-grid');
+    if (actorsGrid) {
+        actorsGrid.innerHTML = Object.values(actoresData).map(a => `
+            <div class="actor-row">
+                <div class="actor-info-side">
+                    <img src="${a.info.profile_path ? 'https://image.tmdb.org/t/p/w200'+a.info.profile_path : 'https://via.placeholder.com/200'}" class="photo-circle">
+                    <span class="person-name">${a.info.name}</span>
+                </div>
+                <div class="actor-series-carousel">
+                    <div class="work-item" onclick="ampliarSerie(${a.trabajo.id})">
+                        <img src="https://image.tmdb.org/t/p/w200${a.trabajo.poster}">
+                        <div class="character-name">${a.trabajo.char}</div>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // Inyectar Creadores
+    const directorsGrid = document.getElementById('directors-grid');
+    if (directorsGrid) {
+        directorsGrid.innerHTML = Object.values(creadoresData).map(c => `
+            <div class="actor-row">
+                <div class="actor-info-side">
+                    <img src="${c.info.profile_path ? 'https://image.tmdb.org/t/p/w200'+c.info.profile_path : 'https://via.placeholder.com/200?text=Logo'}" class="photo-circle">
+                    <span class="person-name">${c.info.name}</span>
+                </div>
+                <div class="actor-series-carousel">
+                    ${c.trabajos.map(t => `
+                        <div class="work-item" onclick="ampliarSerie(${t.id})">
+                            <img src="https://image.tmdb.org/t/p/w200${t.poster}">
+                            <div class="character-name">${t.nombreSerie}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `).join('');
+    }
+}
+
+// 6. ESTADÍSTICAS
+function generarStats() {
+    const area = document.getElementById('stats-area');
+    if (!area) return;
+    const generos = {};
+    coleccionSeries.forEach(s => s.genres?.forEach(g => generos[g.name] = (generos[g.name] || 0) + 1));
+    const sorted = Object.entries(generos).sort((a,b) => b[1]-a[1]);
+
+    area.innerHTML = `
+        <div class="stats-summary" style="display:flex; justify-content:center; gap:20px; margin-bottom:25px; text-align:center;">
+            <div class="stat-card" style="background:#1a1a1a; padding:15px; border-radius:10px; min-width:80px;">
+                <h3 style="color:red; margin:0;">${coleccionSeries.length}</h3><p style="margin:0; font-size:0.8rem;">Series</p>
+            </div>
+        </div>
+        ${sorted.map(([name, count]) => `
+            <div style="margin-bottom:12px;">
+                <div style="display:flex; justify-content:space-between; font-size:0.9rem; margin-bottom:4px;">
+                    <span>${name}</span><span>${count}</span>
+                </div>
+                <div style="background:#333; height:6px; border-radius:3px; overflow:hidden;">
+                    <div style="background:red; width:${(count/coleccionSeries.length)*100}%; height:100%;"></div>
+                </div>
+            </div>
+        `).join('')}
+    `;
+}
+
+// 7. CRONOLOGÍA
+function generarCronologia() {
+    const grid = document.getElementById('sec-timeline-grid');
+    if (!grid) return;
+    const ordenadas = [...coleccionSeries].sort((a,b) => new Date(b.first_air_date) - new Date(a.first_air_date));
+    grid.innerHTML = ordenadas.map(s => `
+        <div class="timeline-item" style="display:flex; align-items:center; gap:15px; margin-bottom:15px; background:#1a1a1a; padding:10px; border-radius:10px; cursor:pointer;" onclick="ampliarSerie(${s.id})">
+            <div style="background:red; color:white; padding:5px 10px; border-radius:5px; font-weight:bold; font-size:0.8rem;">
+                ${s.first_air_date?.split('-')[0] || '????'}
+            </div>
+            <div>
+                <h4 style="margin:0; font-size:1rem;">${s.name}</h4>
+                <p style="margin:0; font-size:0.7rem; color:gray;">${s.genres?.map(g=>g.name).slice(0,2).join(', ')}</p>
+            </div>
+        </div>
+    `).join('');
+}
+
+// 8. BUSCADOR Y MODALES
 async function buscarSeries() {
     const query = document.getElementById('initialInput').value;
     const resultsCont = document.getElementById('search-results-main');
@@ -73,126 +227,31 @@ function verSinopsisAntesDeAñadir(id) {
     const modal = document.getElementById('photo-modal');
     document.getElementById('img-ampliada').src = `https://image.tmdb.org/t/p/w500${s.poster_path}`;
     document.getElementById('modal-caption').innerHTML = `
-        <h2>${s.name}</h2><p>${s.overview || 'Sin sinopsis disponible.'}</p>
-        <button onclick="confirmarYVolver(${s.id})" class="btn-menu" style="position:static; width:100%; margin-top:10px; background:var(--rojo);">Añadir a mi Lista</button>`;
+        <h2 style="margin-top:0;">${s.name}</h2>
+        <p style="font-size:0.9rem; line-height:1.4;">${s.overview || 'Sin sinopsis disponible.'}</p>
+        <button onclick="confirmarYVolver(${s.id})" style="width:100%; padding:12px; background:red; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer; margin-top:15px;">
+            Añadir a mi Colección
+        </button>`;
     modal.classList.remove('hidden');
 }
 
 async function confirmarYVolver(id) {
-    if (coleccionSeries.some(s => s.id === id)) { alert("Ya la tienes."); return; }
-    const r = await fetch(`https://api.themoviedb.org/3/tv/${id}?api_key=${API_KEY}&language=es-ES&append_to_response=credits`);
-    const serie = await r.json();
-    coleccionSeries.push(serie);
-    localStorage.setItem('mis_series_data', JSON.stringify(coleccionSeries));
-    document.getElementById('photo-modal').classList.add('hidden');
-    document.getElementById('search-results-main').classList.add('hidden');
-    document.getElementById('initialInput').value = "";
-    renderizarTodo();
-    showSection('series');
+    if (coleccionSeries.some(s => s.id === id)) { alert("Ya tienes esta serie en tu colección."); return; }
+    try {
+        const r = await fetch(`https://api.themoviedb.org/3/tv/${id}?api_key=${API_KEY}&language=es-ES&append_to_response=credits`);
+        const serie = await r.json();
+        coleccionSeries.push(serie);
+        localStorage.setItem('mis_series_data', JSON.stringify(coleccionSeries));
+        
+        document.getElementById('photo-modal').classList.add('hidden');
+        document.getElementById('search-results-main').classList.add('hidden');
+        document.getElementById('initialInput').value = "";
+        
+        renderizarTodo();
+        showSection('series');
+    } catch (e) { console.error(e); }
 }
 
-// 4. RENDERIZADO (SERIES, ACTORES, CREADORES)
-function renderizarTodo() {
-    // 1. RENDER DE SERIES (MI COLECCIÓN)
-    const seriesGrid = document.getElementById('series-grid');
-    if (seriesGrid) {
-        seriesGrid.innerHTML = coleccionSeries.map(s => `
-            <div class="serie-group">
-                <div class="serie-header">
-                    <h4>${s.name}</h4>
-                    <button onclick="eliminarSerie(${s.id})"><i class="fas fa-trash"></i></button>
-                </div>
-                <div class="seasons-carousel">
-                    ${s.seasons.map(t => `
-                        <div class="season-card" onclick="ampliarTemporada(${s.id}, ${t.season_number})">
-                            <img src="https://image.tmdb.org/t/p/w200${t.poster_path || s.poster_path}">
-                            <p>${t.name}</p>
-                        </div>
-                    `).join('')}
-                </div>
-            </div>
-        `).join('');
-    }
-
-    // 2. LÓGICA DE ACTORES (5 POR SERIE SIN REPETIR)
-    const actoresData = {};
-    const idsActoresVistos = new Set();
-
-    coleccionSeries.forEach(s => {
-        if (s.credits && s.credits.cast) {
-            let count = 0;
-            s.credits.cast.forEach(actor => {
-                if (count < 5 && !idsActoresVistos.has(actor.id)) {
-                    idsActoresVistos.add(actor.id);
-                    actoresData[actor.id] = {
-                        info: actor,
-                        trabajo: { poster: s.poster_path, char: actor.character, id: s.id }
-                    };
-                    count++;
-                }
-            });
-        }
-    });
-
-    const actorsGrid = document.getElementById('actors-grid');
-    if (actorsGrid) {
-        actorsGrid.innerHTML = Object.values(actoresData).map(a => `
-            <div class="actor-row">
-                <div class="actor-info-side">
-                    <img src="${a.info.profile_path ? 'https://image.tmdb.org/t/p/w200'+a.info.profile_path : 'https://via.placeholder.com/200'}" class="photo-circle">
-                    <span class="person-name">${a.info.name}</span>
-                </div>
-                <div class="actor-series-carousel">
-                    <div class="work-item" onclick="ampliarSerie(${a.trabajo.id})">
-                        <img src="https://image.tmdb.org/t/p/w200${a.trabajo.poster}">
-                        <div class="character-name">${a.trabajo.char}</div>
-                    </div>
-                </div>
-            </div>
-        `).join('');
-    }
-
-    // 3. LÓGICA DE CREADORES
-    const creadoresData = {};
-
-    coleccionSeries.forEach(s => {
-        if (s.created_by && s.created_by.length > 0) {
-            s.created_by.forEach(c => {
-                if (!creadoresData[c.name]) {
-                    creadoresData[c.name] = { info: c, trabajos: [] };
-                }
-                if (!creadoresData[c.name].trabajos.some(t => t.id === s.id)) {
-                    creadoresData[c.name].trabajos.push({
-                        poster: s.poster_path,
-                        serieNombre: s.name,
-                        id: s.id
-                    });
-                }
-            });
-        }
-    });
-
-    const directorsGrid = document.getElementById('directors-grid');
-    if (directorsGrid) {
-        directorsGrid.innerHTML = Object.values(creadoresData).map(c => `
-            <div class="actor-row">
-                <div class="actor-info-side">
-                    <img src="${c.info.profile_path ? 'https://image.tmdb.org/t/p/w200' + c.info.profile_path : 'https://via.placeholder.com/200?text=Logo'}" class="photo-circle">
-                    <span class="person-name">${c.info.name}</span>
-                </div>
-                <div class="actor-series-carousel">
-                    ${c.trabajos.map(t => `
-                        <div class="work-item" onclick="ampliarSerie(${t.id})">
-                            <img src="https://image.tmdb.org/t/p/w200${t.poster}">
-                            <div class="character-name">${t.serieNombre}</div>
-                        </div>
-                    `).join('')}
-                </div>
-            </div>
-        `).join('');
-    }
-} // <--- ESTA LLAVE CIERRA TODA LA FUNCIÓN
-// 5. UTILIDADES (MODAL, ELIMINAR, FILTROS)
 function ampliarSerie(id) {
     const s = coleccionSeries.find(x => x.id == id);
     if(!s) return;
@@ -205,120 +264,37 @@ function ampliarTemporada(serieId, tNum) {
     const s = coleccionSeries.find(x => x.id == serieId);
     const t = s.seasons.find(x => x.season_number == tNum);
     document.getElementById('img-ampliada').src = `https://image.tmdb.org/t/p/w500${t.poster_path || s.poster_path}`;
-    document.getElementById('modal-caption').innerHTML = `<h2>${t.name}</h2><p>${t.overview || 'Sin sinopsis disponible.'}</p>`;
+    document.getElementById('modal-caption').innerHTML = `<h2>${t.name}</h2><p>${t.overview || 'Sin sinopsis disponible para esta temporada.'}</p>`;
     document.getElementById('photo-modal').classList.remove('hidden');
 }
 
-document.getElementById('modalCloseBtn').onclick = () => document.getElementById('photo-modal').classList.add('hidden');
+// Función para cerrar el modal
+if (document.getElementById('modalCloseBtn')) {
+    document.getElementById('modalCloseBtn').onclick = () => {
+        document.getElementById('photo-modal').classList.add('hidden');
+    };
+}
 
 function eliminarSerie(id) {
-    if(confirm("¿Eliminar serie?")) {
+    if(confirm("¿Estás seguro de que quieres eliminar esta serie de tu colección?")) {
         coleccionSeries = coleccionSeries.filter(s => s.id !== id);
         localStorage.setItem('mis_series_data', JSON.stringify(coleccionSeries));
         renderizarTodo();
     }
 }
 
+// 9. FILTRADO (BUSCADOR INTERNO)
 function filtrarContenido(tipo) {
     const query = document.getElementById(`filter-${tipo}`).value.toLowerCase();
     if (tipo === 'series') {
         document.querySelectorAll('#series-grid .serie-group').forEach(el => {
-            el.style.display = el.querySelector('h4').innerText.toLowerCase().includes(query) ? 'block' : 'none';
+            const nombre = el.querySelector('h4').innerText.toLowerCase();
+            el.style.display = nombre.includes(query) ? 'block' : 'none';
         });
     } else {
-        const grid = tipo === 'actors' ? 'actors-grid' : 'directors-grid';
-        document.querySelectorAll(`#${grid} .actor-row`).forEach(row => {
+        const gridId = tipo === 'actors' ? 'actors-grid' : 'directors-grid';
+        document.querySelectorAll(`#${gridId} .actor-row`).forEach(row => {
             row.style.display = row.innerText.toLowerCase().includes(query) ? 'flex' : 'none';
         });
     }
-}
-
-function exportarDatos() {
-    const blob = new Blob([JSON.stringify(coleccionSeries)], {type: "application/json"});
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob); a.download = "mis_series.json"; a.click();
-}
-
-function importarDatos(e) {
-    const reader = new FileReader();
-    reader.onload = (event) => {
-        try {
-            coleccionSeries = JSON.parse(event.target.result);
-            localStorage.setItem('mis_series_data', JSON.stringify(coleccionSeries));
-            renderizarTodo();
-            alert("¡Importado!");
-        } catch(err) { alert("Error en el archivo."); }
-    };
-    reader.readAsText(e.target.files[0]);
-}
-
-function generarStats() {
-    const statsArea = document.getElementById('stats-area');
-    if (!statsArea) return;
-
-    if (coleccionSeries.length === 0) {
-        statsArea.innerHTML = "<p>Añade series para ver tus estadísticas.</p>";
-        return;
-    }
-
-    const generos = {};
-    let totalEpisodios = 0;
-
-    coleccionSeries.forEach(s => {
-        // Contar Géneros
-        s.genres?.forEach(g => {
-            generos[g.name] = (generos[g.name] || 0) + 1;
-        });
-        // Sumar capítulos totales
-        totalEpisodios += s.number_of_episodes || 0;
-    });
-
-    const sortGeneros = Object.entries(generos).sort((a, b) => b[1] - a[1]);
-
-    statsArea.innerHTML = `
-        <div class="stats-summary">
-            <div class="stat-card"><h3>${coleccionSeries.length}</h3><p>Series</p></div>
-            <div class="stat-card"><h3>${totalEpisodios}</h3><p>Episodios</p></div>
-        </div>
-        <h3>Tus Géneros Favoritos</h3>
-        <div class="genres-chart">
-            ${sortGeneros.map(([name, count]) => {
-                const porcentaje = (count / coleccionSeries.length) * 100;
-                return `
-                    <div class="genre-bar-container">
-                        <div class="genre-info"><span>${name}</span><span>${count}</span></div>
-                        <div class="genre-bar-bg"><div class="genre-bar-fill" style="width:${porcentaje}%"></div></div>
-                    </div>
-                `;
-            }).join('')}
-        </div>
-    `;
-}
-
-function generarCronologia() {
-    const timelineGrid = document.getElementById('sec-timeline-grid');
-    if (!timelineGrid) return;
-
-    if (coleccionSeries.length === 0) {
-        timelineGrid.innerHTML = "<p>No hay datos para mostrar la cronología.</p>";
-        return;
-    }
-
-    // Ordenar series por fecha de estreno
-    const seriesOrdenadas = [...coleccionSeries].sort((a, b) => {
-        return new Date(b.first_air_date) - new Date(a.first_air_date);
-    });
-
-    timelineGrid.innerHTML = seriesOrdenadas.map(s => `
-        <div class="timeline-item">
-            <div class="timeline-date">${s.first_air_date ? s.first_air_date.split('-')[0] : '???'}</div>
-            <div class="timeline-content" onclick="ampliarSerie(${s.id})">
-                <img src="https://image.tmdb.org/t/p/w200${s.poster_path}" alt="${s.name}">
-                <div>
-                    <h4>${s.name}</h4>
-                    <p>${s.genres?.map(g => g.name).slice(0, 2).join(', ')}</p>
-                </div>
-            </div>
-        </div>
-    `).join('');
 }
