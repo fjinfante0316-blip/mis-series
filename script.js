@@ -1,10 +1,14 @@
 const API_KEY = 'e8b61af0cf42a633e3aa581bb73127f8';
-
-// CONFIGURACIÓN INICIAL
 let coleccionSeries = JSON.parse(localStorage.getItem('mis_series_data')) || [];
 
-// 1. INICIO Y MENÚ (HAMBURGUESA)
-window.onload = () => {
+// --- 1. INICIALIZACIÓN DE BOTONES Y MENÚ ---
+document.addEventListener('DOMContentLoaded', () => {
+    console.log("DOM Cargado");
+    initMenu();
+    if (coleccionSeries.length > 0) renderizarTodo();
+});
+
+function initMenu() {
     const btn = document.getElementById('sidebarCollapse');
     const side = document.getElementById('sidebar');
 
@@ -12,23 +16,26 @@ window.onload = () => {
         btn.onclick = (e) => {
             e.stopPropagation();
             side.classList.toggle('active');
+            console.log("Menú activado");
         };
+
         document.onclick = (e) => {
-            if (side.classList.contains('active') && !side.contains(e.target) && e.target !== btn) {
+            if (side.classList.contains('active') && !side.contains(e.target)) {
                 side.classList.remove('active');
             }
         };
     }
-    if (coleccionSeries.length > 0) renderizarTodo();
-};
+}
 
-// 2. NAVEGACIÓN ENTRE SECCIONES
+// --- 2. NAVEGACIÓN ---
 function showSection(id) {
+    console.log("Cambiando a sección:", id);
     const welcome = document.getElementById('welcome-screen');
     const mainApp = document.getElementById('main-app');
     
+    // Ocultar todas las secciones
     document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
-
+    
     if (id === 'welcome') {
         welcome.classList.remove('hidden');
         mainApp.classList.add('hidden');
@@ -38,12 +45,8 @@ function showSection(id) {
         const target = document.getElementById(`sec-${id}`);
         if (target) target.classList.remove('hidden');
     }
-
-    if (id === 'stats') generarStats();
-    if (id === 'timeline') generarCronologia();
     document.getElementById('sidebar').classList.remove('active');
 }
-
 // 3. BÚSQUEDA Y PORTADA
 async function buscarSeries() {
     const query = document.getElementById('initialInput').value;
@@ -90,81 +93,65 @@ async function confirmarYVolver(id) {
 
 // 4. RENDERIZADO (SERIES, ACTORES, CREADORES)
 function renderizarTodo() {
-    // Render Series
+    // Render de Series
     const seriesGrid = document.getElementById('series-grid');
-    if(seriesGrid) {
+    if (seriesGrid) {
         seriesGrid.innerHTML = coleccionSeries.map(s => `
             <div class="serie-group">
-                <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div class="serie-header">
                     <h4>${s.name}</h4>
-                    <button onclick="eliminarSerie(${s.id})" style="background:none; border:none; color:gray; cursor:pointer;"><i class="fas fa-trash"></i></button>
+                    <button onclick="eliminarSerie(${s.id})"><i class="fas fa-trash"></i></button>
                 </div>
                 <div class="seasons-carousel">
-                    ${s.seasons.map(t => `<div class="season-card" onclick="ampliarTemporada(${s.id}, ${t.season_number})"><img src="https://image.tmdb.org/t/p/w200${t.poster_path || s.poster_path}"><p>${t.name}</p></div>`).join('')}
+                    ${s.seasons.map(t => `
+                        <div class="season-card" onclick="ampliarTemporada(${s.id}, ${t.season_number})">
+                            <img src="https://image.tmdb.org/t/p/w200${t.poster_path || s.poster_path}">
+                            <p>${t.name}</p>
+                        </div>
+                    `).join('')}
                 </div>
-            </div>`).join('');
+            </div>
+        `).join('');
     }
 
-    // Procesar Actores y Creadores
+    // Lógica de Actores: 5 por serie sin repetir
     const actoresData = {};
-    const creadoresData = {};
+    const idsActoresVistos = new Set();
 
-    // --- DENTRO DE RENDERIZAR TODO ---
-
-const actoresData = {};
-const actoresYaRegistrados = new Set(); // Para evitar duplicados absolutos en la lista de reparto
-
-coleccionSeries.forEach(s => {
-    // Intentamos sacar 5 actores representativos de la serie
-    // (TMDB mezcla los actores principales de todas las temporadas en credits.cast)
-    let seleccionadosDeEstaSerie = 0;
-
-    if (s.credits && s.credits.cast) {
-        for (let i = 0; i < s.credits.cast.length; i++) {
-            const a = s.credits.cast[i];
-            
-            // Si el actor no ha sido añadido antes y no hemos llegado a 5 para esta serie
-            if (!actoresYaRegistrados.has(a.id) && seleccionadosDeEstaSerie < 5) {
-                
-                if (!actoresData[a.id]) {
-                    actoresData[a.id] = { info: a, trabajos: [] };
+    coleccionSeries.forEach(s => {
+        if (s.credits && s.credits.cast) {
+            let count = 0;
+            s.credits.cast.forEach(actor => {
+                if (count < 5 && !idsActoresVistos.has(actor.id)) {
+                    idsActoresVistos.add(actor.id);
+                    actoresData[actor.id] = {
+                        info: actor,
+                        trabajo: { poster: s.poster_path, char: actor.character, id: s.id }
+                    };
+                    count++;
                 }
-                
-                actoresData[a.id].trabajos.push({ 
-                    poster: s.poster_path, 
-                    char: a.character, 
-                    id: s.id 
-                });
-
-                actoresYaRegistrados.add(a.id);
-                seleccionadosDeEstaSerie++;
-            }
+            });
         }
-    }
-});
-
-// El resto de la función renderFilas y las inserciones en el grid se mantienen igual
-        s.created_by?.forEach(c => {
-            if(!creadoresData[c.name]) creadoresData[c.name] = { info: c, trabajos: [] };
-            creadoresData[c.name].trabajos.push({ poster: s.poster_path, nombreSerie: s.name, id: s.id });
-        });
     });
 
-    const renderFilas = (data, esActor) => Object.values(data).sort((a,b) => b.trabajos.length - a.trabajos.length).map(p => `
-        <div class="actor-row">
-            <div class="actor-info-side">
-                <img src="${p.info.profile_path ? 'https://image.tmdb.org/t/p/w200'+p.info.profile_path : 'https://via.placeholder.com/200'}" class="photo-circle">
-                <span class="person-name">${p.info.name || p.info.info?.name}</span>
+    const actorsGrid = document.getElementById('actors-grid');
+    if (actorsGrid) {
+        actorsGrid.innerHTML = Object.values(actoresData).map(a => `
+            <div class="actor-row">
+                <div class="actor-info-side">
+                    <img src="${a.info.profile_path ? 'https://image.tmdb.org/t/p/w200'+a.info.profile_path : 'https://via.placeholder.com/200'}" class="photo-circle">
+                    <span class="person-name">${a.info.name}</span>
+                </div>
+                <div class="actor-series-carousel">
+                    <div class="work-item" onclick="ampliarSerie(${a.trabajo.id})">
+                        <img src="https://image.tmdb.org/t/p/w200${a.trabajo.poster}">
+                        <div class="character-name">${a.trabajo.char}</div>
+                    </div>
+                </div>
             </div>
-            <div class="actor-series-carousel">
-                ${p.trabajos.map(t => `<div class="work-item" onclick="ampliarSerie(${t.id})"><img src="https://image.tmdb.org/t/p/w200${t.poster}"><div class="character-name">${esActor ? t.char : t.nombreSerie}</div></div>`).join('')}
-            </div>
-        </div>`).join('');
-
-    if(document.getElementById('actors-grid')) document.getElementById('actors-grid').innerHTML = renderFilas(actoresData, true);
-    if(document.getElementById('directors-grid')) document.getElementById('directors-grid').innerHTML = renderFilas(creadoresData, false);
+        `).join('');
+    }
 }
-
 // 5. UTILIDADES (MODAL, ELIMINAR, FILTROS)
 function ampliarSerie(id) {
     const s = coleccionSeries.find(x => x.id == id);
