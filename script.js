@@ -251,3 +251,74 @@ function importarDatos(e) {
     };
     reader.readAsText(e.target.files[0]);
 }
+
+function generarStats() {
+    const statsArea = document.getElementById('stats-area');
+    if (!statsArea) return;
+
+    if (coleccionSeries.length === 0) {
+        statsArea.innerHTML = "<p>Añade series para ver tus estadísticas.</p>";
+        return;
+    }
+
+    const generos = {};
+    let totalEpisodios = 0;
+
+    coleccionSeries.forEach(s => {
+        // Contar Géneros
+        s.genres?.forEach(g => {
+            generos[g.name] = (generos[g.name] || 0) + 1;
+        });
+        // Sumar capítulos totales
+        totalEpisodios += s.number_of_episodes || 0;
+    });
+
+    const sortGeneros = Object.entries(generos).sort((a, b) => b[1] - a[1]);
+
+    statsArea.innerHTML = `
+        <div class="stats-summary">
+            <div class="stat-card"><h3>${coleccionSeries.length}</h3><p>Series</p></div>
+            <div class="stat-card"><h3>${totalEpisodios}</h3><p>Episodios</p></div>
+        </div>
+        <h3>Tus Géneros Favoritos</h3>
+        <div class="genres-chart">
+            ${sortGeneros.map(([name, count]) => {
+                const porcentaje = (count / coleccionSeries.length) * 100;
+                return `
+                    <div class="genre-bar-container">
+                        <div class="genre-info"><span>${name}</span><span>${count}</span></div>
+                        <div class="genre-bar-bg"><div class="genre-bar-fill" style="width:${porcentaje}%"></div></div>
+                    </div>
+                `;
+            }).join('')}
+        </div>
+    `;
+}
+
+function generarCronologia() {
+    const timelineGrid = document.getElementById('sec-timeline-grid');
+    if (!timelineGrid) return;
+
+    if (coleccionSeries.length === 0) {
+        timelineGrid.innerHTML = "<p>No hay datos para mostrar la cronología.</p>";
+        return;
+    }
+
+    // Ordenar series por fecha de estreno
+    const seriesOrdenadas = [...coleccionSeries].sort((a, b) => {
+        return new Date(b.first_air_date) - new Date(a.first_air_date);
+    });
+
+    timelineGrid.innerHTML = seriesOrdenadas.map(s => `
+        <div class="timeline-item">
+            <div class="timeline-date">${s.first_air_date ? s.first_air_date.split('-')[0] : '???'}</div>
+            <div class="timeline-content" onclick="ampliarSerie(${s.id})">
+                <img src="https://image.tmdb.org/t/p/w200${s.poster_path}" alt="${s.name}">
+                <div>
+                    <h4>${s.name}</h4>
+                    <p>${s.genres?.map(g => g.name).slice(0, 2).join(', ')}</p>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
