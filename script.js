@@ -93,7 +93,7 @@ async function confirmarYVolver(id) {
 
 // 4. RENDERIZADO (SERIES, ACTORES, CREADORES)
 function renderizarTodo() {
-    // Render de Series
+    // 1. RENDER DE SERIES (MI COLECCIÓN)
     const seriesGrid = document.getElementById('series-grid');
     if (seriesGrid) {
         seriesGrid.innerHTML = coleccionSeries.map(s => `
@@ -114,7 +114,7 @@ function renderizarTodo() {
         `).join('');
     }
 
-    // Lógica de Actores: 5 por serie sin repetir
+    // 2. LÓGICA DE ACTORES (5 POR SERIE SIN REPETIR)
     const actoresData = {};
     const idsActoresVistos = new Set();
 
@@ -151,7 +151,47 @@ function renderizarTodo() {
             </div>
         `).join('');
     }
-}
+
+    // 3. LÓGICA DE CREADORES
+    const creadoresData = {};
+
+    coleccionSeries.forEach(s => {
+        if (s.created_by && s.created_by.length > 0) {
+            s.created_by.forEach(c => {
+                if (!creadoresData[c.name]) {
+                    creadoresData[c.name] = { info: c, trabajos: [] };
+                }
+                if (!creadoresData[c.name].trabajos.some(t => t.id === s.id)) {
+                    creadoresData[c.name].trabajos.push({
+                        poster: s.poster_path,
+                        serieNombre: s.name,
+                        id: s.id
+                    });
+                }
+            });
+        }
+    });
+
+    const directorsGrid = document.getElementById('directors-grid');
+    if (directorsGrid) {
+        directorsGrid.innerHTML = Object.values(creadoresData).map(c => `
+            <div class="actor-row">
+                <div class="actor-info-side">
+                    <img src="${c.info.profile_path ? 'https://image.tmdb.org/t/p/w200' + c.info.profile_path : 'https://via.placeholder.com/200?text=Logo'}" class="photo-circle">
+                    <span class="person-name">${c.info.name}</span>
+                </div>
+                <div class="actor-series-carousel">
+                    ${c.trabajos.map(t => `
+                        <div class="work-item" onclick="ampliarSerie(${t.id})">
+                            <img src="https://image.tmdb.org/t/p/w200${t.poster}">
+                            <div class="character-name">${t.serieNombre}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `).join('');
+    }
+} // <--- ESTA LLAVE CIERRA TODA LA FUNCIÓN
 // 5. UTILIDADES (MODAL, ELIMINAR, FILTROS)
 function ampliarSerie(id) {
     const s = coleccionSeries.find(x => x.id == id);
