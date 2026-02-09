@@ -205,6 +205,7 @@ function generarCronologia() {
 async function buscarSeries() {
     const query = document.getElementById('initialInput').value;
     const resultsCont = document.getElementById('search-results-main');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     if (!query) return;
 
     try {
