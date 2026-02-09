@@ -470,11 +470,12 @@ body {
     text-overflow: ellipsis; /* Pone "..." si el nombre es muy largo */
 }
 
-#sidebar {
-    z-index: 9999 !important; /* Forzamos que esté por encima de los pósters */
-    background-color: #000 !important;
+.btn-menu {
+    z-index: 5000 !important; /* El valor más alto posible */
+    cursor: pointer;
+    pointer-events: auto !important;
 }
 
-.btn-menu {
-    z-index: 10000 !important; /* El botón siempre por encima del menú */
+#sidebar {
+    z-index: 4000 !important;
 }
