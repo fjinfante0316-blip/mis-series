@@ -10,27 +10,22 @@
 <body>
 
     <button type="button" id="sidebarCollapse" class="btn-menu">
-        <i class="fas fa-bars"></i>
-    </button>
+    <i class="fas fa-bars"></i>
+</button>
 
-    <nav id="sidebar">
-        <div class="sidebar-header">
-            <h3>BLIP <span>Series</span></h3>
-        </div>
-        <ul class="list-unstyled components">
-            <li onclick="showSection('welcome')"><i class="fas fa-search"></i> Buscar</li>
-            <li onclick="showSection('series')"><i class="fas fa-tv"></i> Mi Colección</li>
-            <li onclick="showSection('actors')"><i class="fas fa-users"></i> Reparto</li>
-            <li onclick="showSection('directors')"><i class="fas fa-clapperboard"></i> Creadores</li>
-            <li onclick="showSection('timeline')"><i class="fas fa-history"></i> Cronología</li>
-            <li onclick="showSection('stats')"><i class="fas fa-chart-pie"></i> Estadísticas</li>
-        </ul>
-        <div class="sidebar-footer">
-            <button onclick="exportarDatos()" class="btn-side"><i class="fas fa-download"></i> Guardar Backup</button>
-            <input type="file" id="importFile" style="display:none" onchange="importarDatos(event)">
-            <button onclick="document.getElementById('importFile').click()" class="btn-side"><i class="fas fa-upload"></i> Cargar Backup</button>
-        </div>
-    </nav>
+<nav id="sidebar">
+    <div class="sidebar-header">
+        <h3>BLIP<span>.</span></h3>
+    </div>
+    <ul class="list-unstyled components">
+        <li onclick="showSection('welcome')"><i class="fas fa-search"></i> Buscar</li>
+        <li onclick="showSection('series')"><i class="fas fa-tv"></i> Mi Colección</li>
+        <li onclick="showSection('actors')"><i class="fas fa-users"></i> Reparto</li>
+        <li onclick="showSection('directors')"><i class="fas fa-clapperboard"></i> Creadores</li>
+        <li onclick="showSection('timeline')"><i class="fas fa-history"></i> Cronología</li>
+        <li onclick="showSection('stats')"><i class="fas fa-chart-pie"></i> Estadísticas</li>
+    </ul>
+</nav>
 
     <main id="content">
         
