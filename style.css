@@ -149,31 +149,38 @@ body {
 /* --- CARRUSELES ANCHO TOTAL --- */
 /* Carruseles que ocupan el 100% de la pantalla */
 /* 1. Carrusel de posters: De izquierda a derecha siempre */
-.seasons-carousel, .actor-series-carousel {
+.seasons-carousel, .actor-series-carousel, .results-grid {
     display: flex !important;
-    flex-direction: row !important; /* Fuerza la línea horizontal */
-    overflow-x: auto !important;   /* Activa el scroll lateral */
+    flex-direction: row !important; /* Fuerza la línea */
+    overflow-x: auto !important;   /* Scroll lateral */
     gap: 15px;
-    width: 100%;
-    padding: 10px 0;
+    padding: 15px 20px;
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
+    box-sizing: border-box;
     -webkit-overflow-scrolling: touch;
 }
 
-/* Ocultar la barra de scroll para que se vea más limpio */
-.seasons-carousel::-webkit-scrollbar, 
-.actor-series-carousel::-webkit-scrollbar {
+/* Ocultar barra de scroll fea */
+.seasons-carousel::-webkit-scrollbar, .results-grid::-webkit-scrollbar {
     display: none;
 }
-.season-card {
-    min-width: 150px;
-    scroll-snap-align: center;
+
+/* Tarjetas individuales */
+.season-card, .search-card, .work-item {
+    min-width: 140px; /* Tamaño fijo para que no se aplasten */
+    flex-shrink: 0;   /* Evita que se encojan */
 }
 
-#main-app {
+.season-card img, .search-card img {
+    width: 100%;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+}
+
+#main-app, .app-section {
     width: 100%;
     overflow-x: hidden;
-    min-height: 100vh;
-    padding-top: 60px; /* Espacio para el botón hamburguesa */
 }
 
 .section {
@@ -194,26 +201,22 @@ body, html {
     overflow-x: hidden;
 }
 
-.hidden { 
-    display: none !important; 
-}
+.hidden { display: none !important; }
 
 .app-section {
     width: 100%;
     animation: fadeIn 0.4s ease;
 }
 
-/* 2. Filas de Actores: La foto a la izquierda, las series a la derecha */
+/* Filas de Actores horizontales */
 .actor-row {
     display: flex;
-    flex-direction: row; /* Alinea foto y carrusel en la misma línea */
+    flex-direction: row; /* Foto a la izquierda, carrusel a la derecha */
     align-items: center;
-    width: 100%;
-    background: var(--gris-oscuro);
-    margin-bottom: 10px;
+    background: #1a1a1a;
+    margin: 10px 0;
     padding: 10px;
-    border-radius: 12px;
-    overflow: hidden; /* Evita que el carrusel rompa la fila */
+    width: 100%;
 }
 
 /* 3. Contenedor de series en la colección */
