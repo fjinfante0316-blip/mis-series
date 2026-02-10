@@ -199,17 +199,32 @@ body {
 .actor-works-carousel::-webkit-scrollbar { display: none; }
 
 .work-card-mini {
-    min-width: 85px; 
-    flex-shrink: 0; /* Obliga a mantener el ancho y activar el scroll */
+    flex: 0 0 85px; /* Ancho fijo de 85px */
+    max-width: 85px;
+    text-align: center;
 }
 
 .work-card-mini img {
-    width: 100%;
-    border-radius: 8px;
+    width: 85px;      /* Ancho idéntico para todas */
+    height: 125px;    /* Alto idéntico para todas */
+    object-fit: cover; /* Recorta la imagen para que rellene el cuadro sin estirarse */
+    border-radius: 6px;
+    background-color: #222; /* Fondo gris por si una imagen falla */
     display: block;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.5);
 }
 
-.character-name { font-size: 0.6rem; color: var(--rojo); margin-top: 3px; }
+.character-name {
+    font-size: 0.6rem;
+    color: var(--rojo);
+    margin-top: 5px;
+    line-height: 1.1;
+    /* Evita que nombres de personajes muy largos rompan el diseño */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
 
 /* Ocultar scroll en móviles */
 .actor-works-carousel::-webkit-scrollbar {
