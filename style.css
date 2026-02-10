@@ -148,18 +148,22 @@ body {
 
 /* --- CARRUSELES ANCHO TOTAL --- */
 /* Carruseles que ocupan el 100% de la pantalla */
-.seasons-carousel {
-    display: flex;
-    overflow-x: auto;
+/* 1. Carrusel de posters: De izquierda a derecha siempre */
+.seasons-carousel, .actor-series-carousel {
+    display: flex !important;
+    flex-direction: row !important; /* Fuerza la línea horizontal */
+    overflow-x: auto !important;   /* Activa el scroll lateral */
     gap: 15px;
-    width: 100vw;
-    margin-left: calc(-50vw + 50%);
-    padding: 20px;
-    box-sizing: border-box;
+    width: 100%;
+    padding: 10px 0;
     -webkit-overflow-scrolling: touch;
 }
-.seasons-carousel::-webkit-scrollbar { display: none; }
 
+/* Ocultar la barra de scroll para que se vea más limpio */
+.seasons-carousel::-webkit-scrollbar, 
+.actor-series-carousel::-webkit-scrollbar {
+    display: none;
+}
 .season-card {
     min-width: 150px;
     scroll-snap-align: center;
@@ -197,4 +201,25 @@ body, html {
 .app-section {
     width: 100%;
     animation: fadeIn 0.4s ease;
+}
+
+/* 2. Filas de Actores: La foto a la izquierda, las series a la derecha */
+.actor-row {
+    display: flex;
+    flex-direction: row; /* Alinea foto y carrusel en la misma línea */
+    align-items: center;
+    width: 100%;
+    background: var(--gris-oscuro);
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 12px;
+    overflow: hidden; /* Evita que el carrusel rompa la fila */
+}
+
+/* 3. Contenedor de series en la colección */
+.serie-group {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-bottom: 30px;
 }
