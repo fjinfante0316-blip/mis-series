@@ -1,94 +1,92 @@
 :root {
     --rojo: #e50914;
-    --negro-puro: #000000;
-    --negro-suave: #141414;
-    --gris-card: #1f1f1f;
-    --glass: rgba(255, 255, 255, 0.05);
+    --negro: #0b0b0b;
+    --gris-oscuro: #141414;
+    --transparente: rgba(255, 255, 255, 0.05);
 }
 
 body {
-    background-color: var(--negro-puro);
+    background-color: var(--negro);
     color: white;
-    font-family: 'Inter', -apple-system, sans-serif;
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    overflow-x: hidden;
 }
 
-/* --- Botón Hamburguesa Estilizado --- */
+/* --- BOTÓN HAMBURGUESA --- */
 .btn-menu {
     position: fixed;
     top: 20px;
     left: 20px;
-    z-index: 10001; /* Siempre arriba */
+    z-index: 10000;
     background: var(--rojo);
     border: none;
     color: white;
     width: 45px;
     height: 45px;
-    border-radius: 12px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(229, 9, 20, 0.3);
     cursor: pointer;
-    box-shadow: 0 4px 15px rgba(229, 9, 20, 0.4);
-    transition: transform 0.2s;
 }
 
-.btn-menu:active { transform: scale(0.9); }
-
-/* --- Sidebar Moderno --- */
+/* --- SIDEBAR GLASSMORPHISM --- */
 #sidebar {
     position: fixed;
     left: -280px;
     top: 0;
     width: 260px;
     height: 100vh;
-    background: rgba(10, 10, 10, 0.95);
-    backdrop-filter: blur(10px); /* Efecto cristalizado */
-    z-index: 10000;
-    transition: all 0.4s cubic-bezier(0.17, 0.67, 0.83, 0.67);
-    border-right: 1px solid var(--glass);
+    background: rgba(0, 0, 0, 0.9);
+    backdrop-filter: blur(15px);
+    z-index: 9999;
+    transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border-right: 1px solid var(--transparente);
 }
 
 #sidebar.active { left: 0; }
 
+#sidebar ul { padding-top: 80px; list-style: none; }
+
 #sidebar ul li {
     padding: 15px 25px;
     font-size: 1.1rem;
-    color: #bbb;
-    cursor: pointer;
     transition: 0.3s;
+    cursor: pointer;
     display: flex;
     align-items: center;
     gap: 15px;
 }
 
-#sidebar ul li i { color: var(--rojo); width: 20px; }
+#sidebar ul li:hover { background: var(--transparente); color: var(--rojo); }
 
-#sidebar ul li:hover {
-    background: var(--glass);
-    color: white;
-    padding-left: 35px;
-}
-
-/* --- Carruseles de Ancho Completo --- */
-.seasons-carousel {
+/* --- CARRUSELES ANCHO COMPLETO --- */
+.full-width {
+    width: 100vw;
+    position: relative;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
     display: flex;
     overflow-x: auto;
     gap: 15px;
     padding: 20px;
-    width: 100vw;
     box-sizing: border-box;
-    scroll-behavior: smooth;
 }
 
-/* Ocultar scrollbar pero mantener funcionalidad */
-.seasons-carousel::-webkit-scrollbar { display: none; }
+.full-width::-webkit-scrollbar { display: none; }
 
 .season-card {
-    min-width: 140px;
+    min-width: 150px;
     transition: transform 0.3s ease;
 }
 
-.season-card:hover { transform: scale(1.05); z-index: 2; }
+.season-card:hover { transform: scale(1.08); z-index: 10; }
 
 .season-card img {
     width: 100%;
     border-radius: 8px;
-    box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
 }
+
+.serie-header { padding: 0 20px; margin-top: 30px; }
