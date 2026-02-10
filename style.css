@@ -109,3 +109,57 @@ body {
 }
 
 .stat-bubble h3 { color: var(--rojo); margin: 0; font-size: 1.8rem; }
+
+/* CARRUSEL DENTRO DE ACTORES/CREADORES */
+.actor-card-row {
+    background: rgba(255,255,255,0.03);
+    margin: 15px 0;
+    padding: 15px;
+    border-radius: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.actor-info-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding-left: 10px;
+}
+
+.actor-photo-small {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--rojo);
+}
+
+.actor-works-carousel {
+    display: flex;
+    flex-direction: row;
+    overflow-x: auto;
+    gap: 10px;
+    padding: 10px 0;
+}
+
+.actor-works-carousel::-webkit-scrollbar { display: none; }
+
+.work-item-card {
+    min-width: 80px;
+    flex-shrink: 0;
+}
+
+.work-item-card img {
+    width: 100%;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+
+.work-item-card p {
+    font-size: 0.6rem;
+    margin-top: 5px;
+    text-align: center;
+    color: #aaa;
+}
