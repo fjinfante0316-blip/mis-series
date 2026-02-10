@@ -90,3 +90,78 @@ body {
 }
 
 .serie-header { padding: 0 20px; margin-top: 30px; }
+
+/* --- PORTADA ESTILO HERO --- */
+.welcome-container {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle at center, #1a1a1a 0%, #000 100%);
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.hero-content {
+    width: 100%;
+    max-width: 800px;
+    text-align: center;
+}
+
+.logo-main {
+    font-size: 4rem;
+    font-weight: 900;
+    margin-bottom: 10px;
+    letter-spacing: -2px;
+}
+
+.logo-main span { color: var(--rojo); }
+
+.search-wrapper {
+    display: flex;
+    background: rgba(255,255,255,0.1);
+    padding: 8px;
+    border-radius: 50px;
+    border: 1px solid rgba(255,255,255,0.2);
+    margin-top: 30px;
+}
+
+.search-wrapper input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: white;
+    padding: 15px 25px;
+    font-size: 1.1rem;
+    outline: none;
+}
+
+.btn-search-main {
+    background: var(--rojo);
+    color: white;
+    border: none;
+    padding: 0 30px;
+    border-radius: 40px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+/* --- CARRUSELES ANCHO TOTAL --- */
+.seasons-carousel {
+    display: flex;
+    overflow-x: auto;
+    gap: 15px;
+    width: 100vw;
+    margin-left: calc(-50vw + 50%); /* Truco para centrar y expandir al 100% del viewport */
+    padding: 20px;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+}
+
+.seasons-carousel::-webkit-scrollbar { display: none; }
+
+.season-card {
+    min-width: 160px;
+    flex-shrink: 0;
+}
