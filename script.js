@@ -37,27 +37,35 @@ document.addEventListener('DOMContentLoaded', setupMenu);
 function showSection(id) {
     const welcome = document.getElementById('welcome-screen');
     const mainApp = document.getElementById('main-app');
-    const side = document.getElementById('sidebar');
-
-    // Ocultamos todo primero
-    welcome.classList.add('hidden');
-    mainApp.classList.add('hidden');
-    document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
-
+    
+    // 1. Resetear visibilidad de contenedores raíz
     if (id === 'welcome') {
         welcome.classList.remove('hidden');
+        mainApp.classList.add('hidden');
+        return; // Salimos porque no hay sub-secciones en la portada
     } else {
+        welcome.classList.add('hidden');
         mainApp.classList.remove('hidden');
-        const target = document.getElementById(`sec-${id}`);
-        if (target) target.classList.remove('hidden');
     }
 
-    // Actualizar datos si es necesario
+    // 2. Ocultar TODAS las sub-secciones dentro de main-app
+    document.querySelectorAll('#main-app .section').forEach(sec => {
+        sec.classList.add('hidden');
+    });
+
+    // 3. Mostrar solo la sección solicitada
+    const target = document.getElementById(`sec-${id}`);
+    if (target) {
+        target.classList.remove('hidden');
+        console.log("Mostrando sección:", id);
+    }
+
+    // 4. Ejecutar funciones de carga de datos
     if (id === 'stats') generarStats();
     if (id === 'timeline') generarCronologia();
-    
-    // Cerrar menú
-    if (side) side.classList.remove('active');
+
+    // 5. Cerrar el menú lateral
+    document.getElementById('sidebar').classList.remove('active');
 }
 
 function renderizarTodo() {
