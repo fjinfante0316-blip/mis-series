@@ -2,142 +2,32 @@
 const API_KEY = 'e8b61af0cf42a633e3aa581bb73127f8';
 let coleccionSeries = JSON.parse(localStorage.getItem('mis_series_data')) || [];
 
-document.addEventListener('DOMContentLoaded', () => {
+window.onload = () => {
     initMenu();
     if (coleccionSeries.length > 0) renderizarTodo();
-});
+};
 
 function initMenu() {
     const btn = document.getElementById('sidebarCollapse');
     const side = document.getElementById('sidebar');
-
-    if (btn && side) {
-        // Usamos addEventListener para mayor seguridad
-        btn.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            side.classList.toggle('active');
-            console.log("Menú activado");
-        });
-
-        // Cerrar si clicamos fuera
-        document.addEventListener('click', (e) => {
-            if (side.classList.contains('active') && !side.contains(e.target) && e.target !== btn) {
-                side.classList.remove('active');
-            }
-        });
+    if (btn) {
+        btn.onclick = () => side.classList.toggle('active');
     }
 }
-
-// IMPORTANTE: Llamar a la función cuando el DOM esté listo
-document.addEventListener('DOMContentLoaded', initMenu);
-
-// Ejecutar al cargar
-document.addEventListener('DOMContentLoaded', setupMenu);
 
 function showSection(id) {
-    const welcome = document.getElementById('welcome-screen');
-    const mainApp = document.getElementById('main-app');
-    
-    // 1. LIMPIEZA TOTAL: Ocultamos los dos bloques principales
-    welcome.classList.add('hidden');
-    mainApp.classList.add('hidden');
+    document.getElementById('welcome-screen').classList.add('hidden');
+    document.getElementById('main-app').classList.add('hidden');
+    document.querySelectorAll('.app-section').forEach(s => s.classList.add('hidden'));
 
-    // 2. Ocultamos todas las secciones internas de la app
-    document.querySelectorAll('.app-section').forEach(sec => {
-        sec.classList.add('hidden');
-    });
-
-    // 3. LOGICA DE ENCENDIDO
     if (id === 'welcome') {
-        welcome.classList.remove('hidden');
+        document.getElementById('welcome-screen').classList.remove('hidden');
     } else {
-        mainApp.classList.remove('hidden');
-        const target = document.getElementById(`sec-${id}`);
-        if (target) target.classList.remove('hidden');
+        document.getElementById('main-app').classList.remove('hidden');
+        document.getElementById(`sec-${id}`).classList.remove('hidden');
+        if (id === 'stats') generarStats();
     }
-
-    // Cerrar menú
     document.getElementById('sidebar').classList.remove('active');
-    window.scrollTo(0,0);
-}
-
-    // 4. Cargar datos específicos si es necesario
-    if (id === 'stats') generarStats();
-    if (id === 'timeline') generarCronologia();
-    
-    // 5. Cerrar el menú lateral
-    if (side) side.classList.remove('active');
-}
-
-function renderizarTodo() {
-    const seriesGrid = document.getElementById('series-grid');
-    if (!seriesGrid) return;
-
-    seriesGrid.innerHTML = coleccionSeries.map(s => `
-        <div class="serie-group">
-            <div class="serie-header">
-                <h4>${s.name}</h4>
-                <button onclick="eliminarSerie(${s.id})"><i class="fas fa-trash"></i></button>
-            </div>
-            <div class="seasons-carousel full-width">
-                ${s.seasons.map(t => `
-                    <div class="season-card" onclick="ampliarTemporada(${s.id}, ${t.season_number})">
-                        <img src="https://image.tmdb.org/t/p/w300${t.poster_path || s.poster_path}">
-                        <p>${t.name}</p>
-                    </div>
-                `).join('')}
-            </div>
-        </div>
-    `).join('');
-
-    // 2. Actores (5 por serie) y Creadores
-    const actoresData = {};
-    const idsVistos = new Set();
-    const creadoresData = {};
-
-    coleccionSeries.forEach(s => {
-        if (s.credits?.cast) {
-            let count = 0;
-            s.credits.cast.forEach(a => {
-                if (count < 5 && !idsVistos.has(a.id)) {
-                    idsVistos.add(a.id);
-                    actoresData[a.id] = { info: a, t: { p: s.poster_path, c: a.character, id: s.id } };
-                    count++;
-                }
-            });
-        }
-        s.created_by?.forEach(c => {
-            if (!creadoresData[c.name]) creadoresData[c.name] = { info: c, trabajos: [] };
-            creadoresData[c.name].trabajos.push({ p: s.poster_path, n: s.name, id: s.id });
-        });
-    });
-
-    // Inyectar Actores
-    const actGrid = document.getElementById('actors-grid');
-    if (actGrid) {
-        actGrid.innerHTML = Object.values(actoresData).map(a => `
-            <div class="actor-row">
-                <img src="${a.info.profile_path ? 'https://image.tmdb.org/t/p/w200'+a.info.profile_path : 'https://via.placeholder.com/200'}" class="photo-circle">
-                <div style="flex:1"><strong>${a.info.name}</strong></div>
-                <div class="actor-series-carousel">
-                    <div class="work-item" onclick="ampliarSerie(${a.t.id})"><img src="https://image.tmdb.org/t/p/w200${a.t.p}"><p style="font-size:0.6rem; margin:0;">${a.t.c}</p></div>
-                </div>
-            </div>`).join('');
-    }
-
-    // Inyectar Creadores
-    const dirGrid = document.getElementById('directors-grid');
-    if (dirGrid) {
-        dirGrid.innerHTML = Object.values(creadoresData).map(c => `
-            <div class="actor-row">
-                <img src="${c.info.profile_path ? 'https://image.tmdb.org/t/p/w200'+c.info.profile_path : 'https://via.placeholder.com/200?text=Logo'}" class="photo-circle">
-                <div style="flex:1"><strong>${c.info.name}</strong></div>
-                <div class="actor-series-carousel">
-                    ${c.trabajos.map(t => `<div class="work-item" onclick="ampliarSerie(${t.id})"><img src="https://image.tmdb.org/t/p/w200${t.p}"><p style="font-size:0.6rem; margin:0;">${t.n}</p></div>`).join('')}
-                </div>
-            </div>`).join('');
-    }
 }
 
 async function buscarSeries() {
@@ -147,84 +37,83 @@ async function buscarSeries() {
     const d = await r.json();
     window.ultimos = d.results;
     const resDiv = document.getElementById('search-results-main');
-    resDiv.innerHTML = d.results.slice(0, 8).map(s => `
-        <div class="search-card" onclick="verSinopsis(${s.id})" style="cursor:pointer">
-            <img src="https://image.tmdb.org/t/p/w200${s.poster_path}" style="width:100px; border-radius:5px;">
-            <p style="font-size:0.7rem;">${s.name}</p>
+    resDiv.innerHTML = d.results.map(s => `
+        <div class="search-card" onclick="confirmar(${s.id})">
+            <img src="https://image.tmdb.org/t/p/w200${s.poster_path}">
+            <p>${s.name}</p>
         </div>`).join('');
     resDiv.classList.remove('hidden');
 }
 
-function verSinopsis(id) {
-    const s = window.ultimos.find(x => x.id == id);
-    document.getElementById('img-ampliada').src = `https://image.tmdb.org/t/p/w500${s.poster_path}`;
-    document.getElementById('modal-caption').innerHTML = `<h3>${s.name}</h3><p>${s.overview}</p><button onclick="confirmar(${s.id})" style="background:red; color:white; border:none; padding:10px; border-radius:5px; width:100%;">Añadir</button>`;
-    document.getElementById('photo-modal').classList.remove('hidden');
+async function confirmar(id) {
+    const r = await fetch(`https://api.themoviedb.org/3/tv/${id}?api_key=${API_KEY}&language=es-ES&append_to_response=credits`);
+    const s = await r.json();
+    coleccionSeries.push(s);
+    localStorage.setItem('mis_series_data', JSON.stringify(coleccionSeries));
+    renderizarTodo();
+    showSection('series');
 }
 
-async function confirmar(id) {
-    // Evitar duplicados
-    if (coleccionSeries.some(s => s.id === id)) {
-        alert("Esta serie ya está en tu lista");
-        return;
-    }
+function renderizarTodo() {
+    // Render Series
+    document.getElementById('series-grid').innerHTML = coleccionSeries.map(s => `
+        <div class="serie-group">
+            <h4 style="margin-left:20px">${s.name}</h4>
+            <div class="seasons-carousel">
+                ${s.seasons.map(t => `<div class="season-card"><img src="https://image.tmdb.org/t/p/w200${t.poster_path || s.poster_path}"><p>${t.name}</p></div>`).join('')}
+            </div>
+        </div>`).join('');
 
-    try {
-        const r = await fetch(`https://api.themoviedb.org/3/tv/${id}?api_key=${API_KEY}&language=es-ES&append_to_response=credits`);
-        const serie = await r.json();
-        
-        coleccionSeries.push(serie);
-        localStorage.setItem('mis_series_data', JSON.stringify(coleccionSeries));
-        
-        // Limpiar buscador
-        document.getElementById('initialInput').value = "";
-        document.getElementById('search-results-main').classList.add('hidden');
-        document.getElementById('photo-modal').classList.add('hidden');
+    // Lógica Actores (5 únicos) y Creadores
+    const actData = {};
+    const seenAct = new Set();
+    const creData = {};
 
-        // Renderizar y saltar a la sección de series
-        renderizarTodo();
-        showSection('series');
-        
-    } catch (e) {
-        console.error("Error al añadir serie:", e);
-    }
+    coleccionSeries.forEach(s => {
+        let count = 0;
+        s.credits?.cast?.forEach(a => {
+            if (count < 5 && !seenAct.has(a.id)) {
+                seenAct.add(a.id);
+                actData[a.id] = { name: a.name, img: a.profile_path, char: a.character, sImg: s.poster_path };
+                count++;
+            }
+        });
+        s.created_by?.forEach(c => {
+            if (!creData[c.id]) creData[c.id] = { name: c.name, img: c.profile_path, shows: [] };
+            creData[c.id].shows.push(s.poster_path);
+        });
+    });
+
+    document.getElementById('actors-grid').innerHTML = Object.values(actData).map(a => `
+        <div class="actor-row" style="display:flex; align-items:center; padding:10px; gap:20px;">
+            <img src="https://image.tmdb.org/t/p/w200${a.img}" style="width:60px; height:60px; border-radius:50%; object-fit:cover;">
+            <div><strong>${a.name}</strong><br><small>${a.char}</small></div>
+        </div>`).join('');
 }
 
 function generarStats() {
-    const area = document.getElementById('stats-area');
+    let totalCaps = 0;
+    let totalHoras = 0;
     const generos = {};
-    coleccionSeries.forEach(s => s.genres?.forEach(g => generos[g.name] = (generos[g.name] || 0) + 1));
-    area.innerHTML = `<div class="stat-card"><h3>${coleccionSeries.length}</h3><p>Series</p></div>` + 
-        Object.entries(generos).map(([n, c]) => `<p>${n}: ${c}</p>`).join('');
-}
+    const años = {};
 
-function generarCronologia() {
-    const grid = document.getElementById('sec-timeline-grid');
-    const orden = [...coleccionSeries].sort((a,b) => new Date(b.first_air_date) - new Date(a.first_air_date));
-    grid.innerHTML = orden.map(s => `<div class="timeline-item"><strong>${s.first_air_date?.split('-')[0]}</strong> - ${s.name}</div>`).join('');
-}
+    coleccionSeries.forEach(s => {
+        totalCaps += s.number_of_episodes || 0;
+        totalHoras += (s.number_of_episodes * (s.episode_run_time[0] || 45)) / 60;
+        s.genres.forEach(g => generos[g.name] = (generos[g.name] || 0) + 1);
+        const año = s.first_air_date?.split('-')[0];
+        años[año] = (años[año] || 0) + 1;
+    });
 
-function eliminarSerie(id) {
-    if(confirm("¿Eliminar?")) {
-        coleccionSeries = coleccionSeries.filter(s => s.id !== id);
-        localStorage.setItem('mis_series_data', JSON.stringify(coleccionSeries));
-        renderizarTodo();
-    }
+    document.getElementById('stats-area').innerHTML = `
+        <div class="stats-grid">
+            <div class="stat-bubble"><h3>${totalCaps}</h3><p>Episodios</p></div>
+            <div class="stat-bubble"><h3>${Math.round(totalHoras)}</h3><p>Horas</p></div>
+            <div class="stat-bubble"><h3>${coleccionSeries.length}</h3><p>Series</p></div>
+        </div>
+        <div style="padding:20px">
+            <h4>Géneros Predominantes</h4>
+            ${Object.entries(generos).map(([n, v]) => `<p>${n}: ${v}</p>`).join('')}
+        </div>
+    `;
 }
-
-function ampliarTemporada(sId, tNum) {
-    const s = coleccionSeries.find(x => x.id == sId);
-    const t = s.seasons.find(x => x.season_number == tNum);
-    document.getElementById('img-ampliada').src = `https://image.tmdb.org/t/p/w500${t.poster_path || s.poster_path}`;
-    document.getElementById('modal-caption').innerHTML = `<h3>${t.name}</h3><p>${t.overview || 'Sin descripción'}</p>`;
-    document.getElementById('photo-modal').classList.remove('hidden');
-}
-
-function ampliarSerie(id) {
-    const s = coleccionSeries.find(x => x.id == id);
-    document.getElementById('img-ampliada').src = `https://image.tmdb.org/t/p/w500${s.poster_path}`;
-    document.getElementById('modal-caption').innerHTML = `<h3>${s.name}</h3><p>${s.overview}</p>`;
-    document.getElementById('photo-modal').classList.remove('hidden');
-}
-
-document.getElementById('modalCloseBtn').onclick = () => document.getElementById('photo-modal').classList.add('hidden');
