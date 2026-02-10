@@ -152,16 +152,31 @@ body {
     display: flex;
     overflow-x: auto;
     gap: 15px;
-    width: 100vw;
-    margin-left: calc(-50vw + 50%); /* Truco para centrar y expandir al 100% del viewport */
+    width: 100vw; /* Ancho de la ventana */
+    margin-left: calc(-50vw + 50%); /* Centra el carrusel expandido */
     padding: 20px;
-    scroll-behavior: smooth;
+    scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
 }
 
 .seasons-carousel::-webkit-scrollbar { display: none; }
 
 .season-card {
-    min-width: 160px;
-    flex-shrink: 0;
+    min-width: 150px;
+    scroll-snap-align: center;
+}
+
+#main-app {
+    width: 100%;
+    overflow-x: hidden;
+}
+
+.section {
+    width: 100%;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
