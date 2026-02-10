@@ -16,6 +16,36 @@ function initMenu() {
     }
 }
 
+// Función para blindar el menú
+function setupMenu() {
+    const btn = document.getElementById('sidebarCollapse');
+    const side = document.getElementById('sidebar');
+
+    if (btn && side) {
+        // Quitamos cualquier evento previo para no duplicar
+        btn.onclick = null; 
+        
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            side.classList.toggle('active');
+            console.log("Menú toggle");
+        });
+
+        // Cerrar al tocar fuera (muy importante en móvil)
+        document.addEventListener('click', (e) => {
+            if (side.classList.contains('active') && !side.contains(e.target) && e.target !== btn) {
+                side.classList.remove('active');
+            }
+        });
+    } else {
+        // Si no lo encuentra, reintenta en 500ms
+        setTimeout(setupMenu, 500);
+    }
+}
+
+// Ejecutar al cargar
+document.addEventListener('DOMContentLoaded', setupMenu);
+
 function showSection(id) {
     document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
     document.getElementById('welcome-screen').classList.add('hidden');
