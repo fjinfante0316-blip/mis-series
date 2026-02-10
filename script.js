@@ -35,30 +35,25 @@ function initMenu() {
 document.addEventListener('DOMContentLoaded', setupMenu);
 
 function showSection(id) {
-    const welcome = document.getElementById('welcome-screen');
-    const mainApp = document.getElementById('main-app');
-    const side = document.getElementById('sidebar');
+    // 1. Ocultar TODO
+    document.getElementById('welcome-screen').classList.add('hidden');
+    document.getElementById('main-app').classList.add('hidden');
     
-    // 1. Decidir si mostramos la Portada o la App
-    if (id === 'welcome') {
-        welcome.classList.remove('hidden');
-        mainApp.classList.add('hidden');
-    } else {
-        welcome.classList.add('hidden');
-        mainApp.classList.remove('hidden');
-        
-        // 2. Ocultar TODAS las sub-secciones internas de la app
-        document.querySelectorAll('.app-section').forEach(sec => {
-            sec.classList.add('hidden');
-        });
+    // Ocultar todas las sub-secciones
+    document.querySelectorAll('.app-section').forEach(s => s.classList.add('hidden'));
 
-        // 3. Mostrar solo la sección que pedimos
+    // 2. Mostrar solo lo que queremos
+    if (id === 'welcome') {
+        document.getElementById('welcome-screen').classList.remove('hidden');
+    } else {
+        document.getElementById('main-app').classList.remove('hidden');
         const target = document.getElementById(`sec-${id}`);
-        if (target) {
-            target.classList.remove('hidden');
-            window.scrollTo(0, 0); // Volver arriba al cambiar
-        }
+        if (target) target.classList.remove('hidden');
     }
+    
+    // Cerrar menú
+    document.getElementById('sidebar').classList.remove('active');
+}
 
     // 4. Cargar datos específicos si es necesario
     if (id === 'stats') generarStats();
