@@ -12,17 +12,15 @@ function initMenu() {
     const side = document.getElementById('sidebar');
 
     if (btn && side) {
-        btn.onclick = (e) => {
+        // Usamos addEventListener para mayor seguridad
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
             e.stopPropagation();
             side.classList.toggle('active');
-        };
-
-        // Cerrar al hacer clic en cualquier opción del menú
-        document.querySelectorAll('#sidebar li').forEach(li => {
-            li.addEventListener('click', () => side.classList.remove('active'));
+            console.log("Menú activado");
         });
 
-        // Cerrar al hacer clic fuera
+        // Cerrar si clicamos fuera
         document.addEventListener('click', (e) => {
             if (side.classList.contains('active') && !side.contains(e.target) && e.target !== btn) {
                 side.classList.remove('active');
@@ -30,6 +28,9 @@ function initMenu() {
         });
     }
 }
+
+// IMPORTANTE: Llamar a la función cuando el DOM esté listo
+document.addEventListener('DOMContentLoaded', initMenu);
 
 // Ejecutar al cargar
 document.addEventListener('DOMContentLoaded', setupMenu);
