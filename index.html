@@ -14,20 +14,19 @@
     </button>
 
     <nav id="sidebar">
-        <div class="sidebar-header">
-            <h3>BLIP<span>.</span></h3>
-        </div>
-        <ul class="list-unstyled components">
+        <div class="sidebar-header"><h3>BLIP<span>.</span></h3></div>
+        <ul class="list-unstyled">
             <li onclick="showSection('welcome')"><i class="fas fa-search"></i> Buscar</li>
             <li onclick="showSection('series')"><i class="fas fa-tv"></i> Mi Colección</li>
-            <li onclick="showSection('actors')"><i class="fas fa-users"></i> Actores</li>
+            <li onclick="showSection('actors')"><i class="fas fa-users"></i> Actores (Todos)</li>
             <li onclick="showSection('directors')"><i class="fas fa-clapperboard"></i> Creadores</li>
             <li onclick="showSection('stats')"><i class="fas fa-chart-pie"></i> Estadísticas</li>
         </ul>
     </nav>
-
-    <section id="welcome-screen" class="section">
+    
+    <section id="welcome-screen" class="section-content">
         <div class="welcome-container">
+            <div class="top-spacer"></div> 
             <h1 class="logo-main">BLIP<span>.</span></h1>
             <div class="search-box-integrated">
                 <i class="fas fa-search search-icon"></i>
@@ -45,24 +44,23 @@
         </section>
 
         <section id="sec-actors" class="section-content hidden">
-            <h2 class="title-sec">Reparto</h2>
-            <div id="actors-grid" class="vertical-list"></div>
+            <h2 class="title-sec">Reparto Completo</h2>
+            <div id="actors-grid"></div>
         </section>
 
         <section id="sec-directors" class="section-content hidden">
             <h2 class="title-sec">Creadores</h2>
-            <div id="directors-grid" class="vertical-list"></div>
+            <div id="directors-grid"></div>
         </section>
 
         <section id="sec-stats" class="section-content hidden">
             <h2 class="title-sec">Estadísticas</h2>
-            <div id="stats-area" class="stats-container"></div>
+            <div id="stats-area"></div>
         </section>
     </main>
 
     <div id="info-modal" class="modal hidden" onclick="this.classList.add('hidden')">
         <div class="modal-content" onclick="event.stopPropagation()">
-            <span class="close-modal" onclick="document.getElementById('info-modal').classList.add('hidden')">&times;</span>
             <div id="modal-body"></div>
         </div>
     </div>
