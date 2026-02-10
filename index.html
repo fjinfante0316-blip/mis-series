@@ -65,6 +65,27 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <div class="backup-zone" style="padding: 20px; border-top: 1px solid #333;">
+        <button onclick="exportarDatos()" class="btn-backup"><i class="fas fa-download"></i> Exportar</button>
+        <input type="file" id="importFile" hidden onchange="importarDatos(event)">
+        <button onclick="document.getElementById('importFile').click()" class="btn-backup"><i class="fas fa-upload"></i> Importar</button>
+    </div>
+
+    <section id="sec-stats" class="section-content hidden">
+        <h2 class="title-sec">Estadísticas</h2>
+        <div id="stats-area"></div>
+        <div class="charts-container">
+            <div class="chart-box">
+                <canvas id="chartGeneros"></canvas>
+            </div>
+            <div class="chart-box">
+                <canvas id="chartAnios"></canvas>
+            </div>
+        </div>
+    </section>
+
     <script src="script.js"></script>
 </body>
 </html>
