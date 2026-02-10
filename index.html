@@ -34,7 +34,7 @@
         <h1 class="logo-main">BLIP<span>.</span></h1>
         <div class="search-wrapper">
             <input type="text" id="initialInput" placeholder="Busca una serie..." onkeyup="if(event.key==='Enter') buscarSeries()">
-            <button onclick="buscarSeries()"><i class="fas fa-plus"></i></button>
+            <button onclick="buscarSeries()"><i class="fas fa-search"></i></button>
         </div>
         <div id="search-results-main" class="results-grid hidden"></div>
     </div>
@@ -47,7 +47,7 @@
     </section>
 
     <section id="sec-actors" class="app-section hidden">
-        <h2 class="section-title">Reparto</h2>
+        <h2 class="section-title">Actores</h2>
         <div id="actors-grid"></div>
     </section>
 
@@ -60,12 +60,7 @@
         <h2 class="section-title">Estadísticas</h2>
         <div id="stats-area"></div>
     </section>
-
-            <section id="sec-timeline" class="section hidden">
-                <h2 class="section-title">Línea del Tiempo</h2>
-                <div id="sec-timeline-grid" class="timeline-container"></div>
-            </section>
-    </main>
+</main>
 
     <div id="photo-modal" class="modal hidden">
         <span id="modalCloseBtn" class="close">&times;</span>
