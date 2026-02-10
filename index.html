@@ -2,69 +2,63 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BLIP | Series Tracker</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BLIP | Mis Series</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <button type="button" id="sidebarCollapse" class="btn-menu">
-    <i class="fas fa-bars"></i>
-</button>
+        <i class="fas fa-bars"></i>
+    </button>
 
-<nav id="sidebar">
-    <div class="sidebar-header"><h3>BLIP<span>.</span></h3></div>
-    <ul class="list-unstyled">
-        <li onclick="showSection('welcome')"><i class="fas fa-search"></i> Buscar Nueva</li>
-        <li onclick="showSection('series')"><i class="fas fa-tv"></i> Mi Colección</li>
-        <li onclick="showSection('actors')"><i class="fas fa-users"></i> Reparto Galería</li>
-        <li onclick="showSection('directors')"><i class="fas fa-clapperboard"></i> Creadores</li>
-        <li onclick="showSection('stats')"><i class="fas fa-chart-line"></i> Estadísticas</li>
-    </ul>
-</nav>
-
-<section id="welcome-screen">
-    <div class="welcome-container">
-        <h1 class="logo-main">BLIP<span>.</span></h1>
-        <div class="search-integrated">
-            <i class="fas fa-search lupa-icon"></i>
-            <input type="text" id="initialInput" placeholder="Añadir nueva serie..." onkeyup="if(event.key==='Enter') buscarSeries()">
-            <button onclick="buscarSeries()" id="btnAdd">Añadir</button>
+    <nav id="sidebar">
+        <div class="sidebar-header">
+            <h3>BLIP<span>.</span></h3>
         </div>
-        <div id="search-results-main" class="results-horizontal hidden"></div>
-    </div>
-</section>
+        <ul class="list-unstyled components">
+            <li onclick="showSection('welcome')"><i class="fas fa-search"></i> Buscar</li>
+            <li onclick="showSection('series')"><i class="fas fa-tv"></i> Mi Colección</li>
+            <li onclick="showSection('actors')"><i class="fas fa-users"></i> Actores</li>
+            <li onclick="showSection('directors')"><i class="fas fa-clapperboard"></i> Creadores</li>
+            <li onclick="showSection('stats')"><i class="fas fa-chart-pie"></i> Estadísticas</li>
+        </ul>
+    </nav>
 
-<main id="main-app" class="hidden">
-    <section id="sec-series" class="app-section hidden">
-        <h2 class="section-title">Mi Colección</h2>
-        <div id="series-grid"></div>
-    </section>
-
-    <section id="sec-actors" class="app-section hidden">
-        <h2 class="section-title">Actores y sus Series</h2>
-        <div id="actors-grid" class="vertical-scroll-container"></div>
-    </section>
-
-    <section id="sec-directors" class="app-section hidden">
-        <h2 class="section-title">Creadores de Éxito</h2>
-        <div id="directors-grid" class="vertical-scroll-container"></div>
-    </section>
-
-    <section id="sec-stats" class="app-section hidden">
-        <h2 class="section-title">Estadísticas Detalladas</h2>
-        <div id="stats-area"></div>
-    </section>
-</main>
-
-    <div id="photo-modal" class="modal hidden">
-        <span id="modalCloseBtn" class="close">&times;</span>
-        <div class="modal-content-wrapper">
-            <img class="modal-content" id="img-ampliada">
-            <div id="modal-caption" class="modal-caption"></div>
+    <section id="welcome-screen" class="section">
+        <div class="welcome-container">
+            <h1 class="logo-main">BLIP<span>.</span></h1>
+            <div class="search-box-integrated">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="initialInput" placeholder="Busca una serie..." onkeyup="if(event.key==='Enter') buscarSeries()">
+                <button onclick="buscarSeries()" class="btn-search">Añadir</button>
+            </div>
+            <div id="search-results-main" class="results-carousel hidden"></div>
         </div>
-    </div>
+    </section>
+
+    <main id="main-app" class="hidden">
+        <section id="sec-series" class="section-content hidden">
+            <h2 class="title-sec">Mi Colección</h2>
+            <div id="series-grid"></div>
+        </section>
+
+        <section id="sec-actors" class="section-content hidden">
+            <h2 class="title-sec">Reparto</h2>
+            <div id="actors-grid" class="vertical-list"></div>
+        </section>
+
+        <section id="sec-directors" class="section-content hidden">
+            <h2 class="title-sec">Creadores</h2>
+            <div id="directors-grid" class="vertical-list"></div>
+        </section>
+
+        <section id="sec-stats" class="section-content hidden">
+            <h2 class="title-sec">Estadísticas</h2>
+            <div id="stats-area" class="stats-container"></div>
+        </section>
+    </main>
 
     <script src="script.js"></script>
 </body>
