@@ -29,19 +29,15 @@
 
     <main id="content">
         
-        <section id="welcome-screen" class="section">
-    <div class="welcome-container">
-        <div class="hero-content">
-            <h1 class="logo-main">BLIP<span>.</span></h1>
-            <p>Descubre y organiza tus series favoritas</p>
-            <div class="search-wrapper">
-                <input type="text" id="initialInput" placeholder="Busca una serie para añadir..." onkeyup="if(event.key==='Enter') buscarSeries()">
-                <button onclick="buscarSeries()" class="btn-search-main"><i class="fas fa-plus"></i> Añadir</button>
+        <section id="welcome-screen" class="section-container">
+            <div class="welcome-content">
+                <div class="search-wrapper">
+                    <input type="text" id="initialInput" placeholder="Busca una serie..." onkeyup="if(event.key==='Enter') buscarSeries()">
+                    <button onclick="buscarSeries()">Añadir</button>
+                </div>
+                <div id="search-results-main" class="results-grid hidden"></div>
             </div>
-            <div id="search-results-main" class="results-grid hidden"></div>
-        </div>
-    </div>
-</section>
+        </section>
 
         <div id="main-app" class="hidden">
             
