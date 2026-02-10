@@ -35,21 +35,29 @@ function initMenu() {
 document.addEventListener('DOMContentLoaded', setupMenu);
 
 function showSection(id) {
-    // Ocultar bienvenida y todas las secciones
-    document.getElementById('welcome-screen').classList.add('hidden');
-    document.getElementById('main-app').classList.remove('hidden');
+    const welcome = document.getElementById('welcome-screen');
+    const mainApp = document.getElementById('main-app');
+    const side = document.getElementById('sidebar');
+
+    // Ocultamos todo primero
+    welcome.classList.add('hidden');
+    mainApp.classList.add('hidden');
     document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
 
     if (id === 'welcome') {
-        document.getElementById('welcome-screen').classList.remove('hidden');
-        document.getElementById('main-app').classList.add('hidden');
+        welcome.classList.remove('hidden');
     } else {
+        mainApp.classList.remove('hidden');
         const target = document.getElementById(`sec-${id}`);
         if (target) target.classList.remove('hidden');
     }
 
+    // Actualizar datos si es necesario
     if (id === 'stats') generarStats();
     if (id === 'timeline') generarCronologia();
+    
+    // Cerrar menú
+    if (side) side.classList.remove('active');
 }
 
 function renderizarTodo() {
@@ -145,13 +153,31 @@ function verSinopsis(id) {
 }
 
 async function confirmar(id) {
-    const r = await fetch(`https://api.themoviedb.org/3/tv/${id}?api_key=${API_KEY}&language=es-ES&append_to_response=credits`);
-    const serie = await r.json();
-    coleccionSeries.push(serie);
-    localStorage.setItem('mis_series_data', JSON.stringify(coleccionSeries));
-    document.getElementById('photo-modal').classList.add('hidden');
-    renderizarTodo();
-    showSection('series');
+    // Evitar duplicados
+    if (coleccionSeries.some(s => s.id === id)) {
+        alert("Esta serie ya está en tu lista");
+        return;
+    }
+
+    try {
+        const r = await fetch(`https://api.themoviedb.org/3/tv/${id}?api_key=${API_KEY}&language=es-ES&append_to_response=credits`);
+        const serie = await r.json();
+        
+        coleccionSeries.push(serie);
+        localStorage.setItem('mis_series_data', JSON.stringify(coleccionSeries));
+        
+        // Limpiar buscador
+        document.getElementById('initialInput').value = "";
+        document.getElementById('search-results-main').classList.add('hidden');
+        document.getElementById('photo-modal').classList.add('hidden');
+
+        // Renderizar y saltar a la sección de series
+        renderizarTodo();
+        showSection('series');
+        
+    } catch (e) {
+        console.error("Error al añadir serie:", e);
+    }
 }
 
 function generarStats() {
