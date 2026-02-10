@@ -134,7 +134,7 @@ body {
 
 /* Evitar choque con la hamburguesa */
 .section-content {
-    padding-top: 80px; /* Espacio suficiente para el botón superior */
+    padding-top: 20px; /* Ya no choca gracias al spacer o este padding */
     padding-bottom: 50px;
 }
 
@@ -145,64 +145,52 @@ body {
     padding-left: 15px;
 }
 
-/* Fila de Actor: Foto a la izquierda, Carrusel a la derecha */
+/* --- DISEÑO DE FILA DE ACTOR / CREADOR --- */
 .actor-row-container {
     display: flex;
     align-items: center;
-    background: #111;
-    margin: 15px;
-    padding: 10px;
+    background: #0f0f0f;
+    margin: 10px 15px;
+    padding: 12px;
     border-radius: 15px;
-    overflow: hidden; /* Corta el carrusel para que no salga del div */
+    border: 1px solid #222;
 }
 
 .actor-profile {
-    min-width: 80px;
+    flex: 0 0 100px; /* Tamaño fijo para que no se pise con el carrusel */
     text-align: center;
-    margin-right: 15px;
+    border-right: 1px solid #333;
+    padding-right: 10px;
 }
 
 .actor-photo {
-    width: 65px;
-    height: 65px;
+    width: 60px;
+    height: 60px;
     border-radius: 50%;
     object-fit: cover;
-    border: 2px solid var(--rojo);
+    margin-bottom: 5px;
 }
 
-.actor-name-label {
-    font-size: 0.8rem;
-    font-weight: bold;
-    margin-top: 5px;
-}
+.actor-name-label { font-size: 0.75rem; font-weight: bold; color: #fff; }
 
-/* Carrusel de trabajos al lado del actor */
+/* --- CARRUSEL LATERAL (SIN PISAR AL ACTOR) --- */
 .actor-works-carousel {
+    flex: 1; /* Toma el espacio restante */
     display: flex;
     overflow-x: auto;
     gap: 12px;
-    padding: 10px 0;
-    flex: 1; /* Ocupa todo el espacio restante */
+    padding-left: 15px;
 }
 
 .actor-works-carousel::-webkit-scrollbar { display: none; }
 
 .work-card-mini {
-    min-width: 90px;
+    min-width: 80px;
     text-align: center;
 }
 
-.work-card-mini img {
-    width: 100%;
-    border-radius: 8px;
-}
-
-.character-name {
-    font-size: 0.65rem;
-    color: var(--rojo);
-    margin-top: 4px;
-    font-style: italic;
-}
+.work-card-mini img { width: 100%; border-radius: 8px; }
+.character-name { font-size: 0.6rem; color: var(--rojo); margin-top: 3px; }
 
 /* Modal Estilo Cinema */
 .modal {
@@ -212,9 +200,18 @@ body {
     background: rgba(0,0,0,0.9);
     display: flex; align-items: center; justify-content: center;
 }
+
 .modal-content {
     background: #1a1a1a;
     width: 90%; max-width: 500px;
     padding: 20px; border-radius: 20px;
     position: relative;
+}
+
+/* --- FIX DE COLISIONES --- */
+.top-spacer { height: 80px; width: 100%; }
+
+.logo-main {
+    margin-top: 0; 
+    padding-top: 40px; /* Baja el logo para que no lo tape la hamburguesa */
 }
