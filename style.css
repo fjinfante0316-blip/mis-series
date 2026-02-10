@@ -223,3 +223,12 @@ body, html {
     width: 100%;
     margin-bottom: 30px;
 }
+
+.search-results-horizontal {
+    display: flex;
+    flex-direction: row;
+    overflow-x: auto;
+    gap: 20px;
+    padding: 20px;
+    width: 100%;
+}
