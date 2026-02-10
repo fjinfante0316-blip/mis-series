@@ -35,24 +35,30 @@ function initMenu() {
 document.addEventListener('DOMContentLoaded', setupMenu);
 
 function showSection(id) {
-    // 1. Ocultar TODO
-    document.getElementById('welcome-screen').classList.add('hidden');
-    document.getElementById('main-app').classList.add('hidden');
+    const welcome = document.getElementById('welcome-screen');
+    const mainApp = document.getElementById('main-app');
     
-    // Ocultar todas las sub-secciones
-    document.querySelectorAll('.app-section').forEach(s => s.classList.add('hidden'));
+    // 1. LIMPIEZA TOTAL: Ocultamos los dos bloques principales
+    welcome.classList.add('hidden');
+    mainApp.classList.add('hidden');
 
-    // 2. Mostrar solo lo que queremos
+    // 2. Ocultamos todas las secciones internas de la app
+    document.querySelectorAll('.app-section').forEach(sec => {
+        sec.classList.add('hidden');
+    });
+
+    // 3. LOGICA DE ENCENDIDO
     if (id === 'welcome') {
-        document.getElementById('welcome-screen').classList.remove('hidden');
+        welcome.classList.remove('hidden');
     } else {
-        document.getElementById('main-app').classList.remove('hidden');
+        mainApp.classList.remove('hidden');
         const target = document.getElementById(`sec-${id}`);
         if (target) target.classList.remove('hidden');
     }
-    
+
     // Cerrar menú
     document.getElementById('sidebar').classList.remove('active');
+    window.scrollTo(0,0);
 }
 
     // 4. Cargar datos específicos si es necesario
