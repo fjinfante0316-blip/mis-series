@@ -13,20 +13,22 @@ body {
     overflow-x: hidden;
 }
 
-/* --- BOTÓN HAMBURGUESA --- */
+/* --- BOTÓN HAMBURGUESA (FIJADO) --- */
 .btn-menu {
     position: fixed;
     top: 20px;
     left: 20px;
-    z-index: 10000;
+    z-index: 10001; /* Elevado para que nada lo tape */
     background: var(--rojo);
-    border: none;
     color: white;
+    border: none;
     width: 45px;
     height: 45px;
-    border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(229, 9, 20, 0.3);
+    border-radius: 12px;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 /* --- SIDEBAR GLASSMORPHISM --- */
@@ -234,4 +236,58 @@ body, html {
     gap: 20px;
     padding: 20px;
     width: 100%;
+}
+
+.results-grid-horizontal {
+    display: flex !important;
+    flex-direction: row !important;
+    overflow-x: auto;
+    gap: 15px;
+    padding: 20px;
+    width: 100%;
+}
+
+/* --- BARRA DE BÚSQUEDA INTEGRADA --- */
+.search-container-integrated {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50px;
+    padding: 5px 10px;
+    max-width: 500px;
+    width: 90%;
+    margin: 20px auto;
+}
+.search-icon-inside {
+    color: rgba(255, 255, 255, 0.5);
+    margin-left: 15px;
+    font-size: 1.1rem;
+}
+
+.search-container-integrated input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: white;
+    padding: 12px 15px;
+    font-size: 1rem;
+    outline: none;
+}
+
+.btn-add-inside {
+    background: var(--rojo);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 40px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-add-inside:hover {
+    background: #ff1f1f;
+    transform: scale(1.05);
 }
