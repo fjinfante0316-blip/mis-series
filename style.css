@@ -1,165 +1,133 @@
 :root {
     --rojo: #e50914;
-    --negro: #080808;
-    --gris-card: #121212;
-    --glass: rgba(255, 255, 255, 0.05);
+    --negro: #000000;
+    --gris: #141414;
+    --texto: #ffffff;
 }
 
 body {
     margin: 0;
-    background: var(--negro);
-    color: white;
-    font-family: 'Inter', sans-serif;
+    background-color: var(--negro);
+    color: var(--texto);
+    font-family: 'Segoe UI', sans-serif;
     overflow-x: hidden;
 }
 
 .hidden { display: none !important; }
 
-/* BOTÓN HAMBURGUESA BLINDADO */
+/* Botón Hamburguesa */
 .btn-menu {
     position: fixed;
     top: 20px;
     left: 20px;
-    z-index: 99999;
+    z-index: 10000;
     background: var(--rojo);
     color: white;
     border: none;
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
+    padding: 12px;
+    border-radius: 8px;
     cursor: pointer;
-    box-shadow: 0 4px 20px rgba(229, 9, 20, 0.4);
 }
 
-/* BUSCADOR INTEGRADO */
-.search-integrated {
-    position: relative;
+/* Sidebar Estilo Mi-Cine */
+#sidebar {
+    position: fixed;
+    left: -260px;
+    top: 0;
+    width: 250px;
+    height: 100vh;
+    background: #000;
+    z-index: 9999;
+    transition: 0.3s;
+    padding-top: 80px;
+    border-right: 1px solid #222;
+}
+
+#sidebar.active { left: 0; }
+
+#sidebar ul li {
+    padding: 15px 25px;
+    cursor: pointer;
+    font-size: 1.1rem;
+}
+
+#sidebar ul li:hover { background: var(--rojo); }
+
+/* Buscador Integrado */
+.search-box-integrated {
     display: flex;
     align-items: center;
-    background: var(--glass);
-    border: 1px solid rgba(255,255,255,0.1);
+    background: #1f1f1f;
     border-radius: 50px;
+    padding: 5px 15px;
     width: 90%;
-    max-width: 600px;
-    margin: 40px auto;
-    backdrop-filter: blur(10px);
+    max-width: 500px;
+    margin: 30px auto;
 }
 
-.lupa-icon { margin-left: 20px; color: #666; }
+.search-icon { color: #666; }
 
-.search-integrated input {
+.search-box-integrated input {
     flex: 1;
     background: transparent;
     border: none;
     color: white;
-    padding: 15px;
-    font-size: 1rem;
+    padding: 12px;
     outline: none;
 }
 
-#btnAdd {
+.btn-search {
     background: var(--rojo);
-    border: none;
     color: white;
-    padding: 10px 25px;
+    border: none;
+    padding: 8px 20px;
     border-radius: 40px;
-    margin: 5px;
-    font-weight: bold;
     cursor: pointer;
 }
 
-/* CARRUSELES HORIZONTALES */
-.results-horizontal, .seasons-carousel, .actor-series-carousel {
-    display: flex !important;
-    flex-direction: row !important;
+/* Carruseles Horizontales (Igual que Mi-Cine) */
+.results-carousel, .seasons-carousel, .actor-works-carousel {
+    display: flex;
     overflow-x: auto;
     gap: 15px;
     padding: 20px;
     width: 100vw;
     margin-left: calc(-50vw + 50%);
-    box-sizing: border-box;
+    scroll-behavior: smooth;
 }
 
-.results-horizontal::-webkit-scrollbar, .seasons-carousel::-webkit-scrollbar { display: none; }
+.results-carousel::-webkit-scrollbar, .seasons-carousel::-webkit-scrollbar { display: none; }
 
-.season-card, .search-card {
-    min-width: 150px;
+.card {
+    min-width: 140px;
     flex-shrink: 0;
-    transition: transform 0.3s;
-}
-
-.season-card:hover { transform: scale(1.05); }
-
-.season-card img { width: 100%; border-radius: 8px; }
-
-/* STATS CARDS */
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 15px;
-    padding: 20px;
-}
-
-.stat-bubble {
-    background: var(--gris-card);
-    padding: 20px;
-    border-radius: 20px;
     text-align: center;
-    border: 1px solid var(--glass);
 }
 
-.stat-bubble h3 { color: var(--rojo); margin: 0; font-size: 1.8rem; }
+.card img {
+    width: 100%;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+}
 
-/* CARRUSEL DENTRO DE ACTORES/CREADORES */
-.actor-card-row {
-    background: rgba(255,255,255,0.03);
-    margin: 15px 0;
+/* Actores y Creadores */
+.row-item {
+    background: #111;
+    margin: 15px;
     padding: 15px;
     border-radius: 15px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
 }
 
-.actor-info-header {
+.row-header {
     display: flex;
     align-items: center;
     gap: 15px;
-    padding-left: 10px;
 }
 
-.actor-photo-small {
-    width: 50px;
-    height: 50px;
+.photo-circle {
+    width: 55px;
+    height: 55px;
     border-radius: 50%;
     object-fit: cover;
     border: 2px solid var(--rojo);
-}
-
-.actor-works-carousel {
-    display: flex;
-    flex-direction: row;
-    overflow-x: auto;
-    gap: 10px;
-    padding: 10px 0;
-}
-
-.actor-works-carousel::-webkit-scrollbar { display: none; }
-
-.work-item-card {
-    min-width: 80px;
-    flex-shrink: 0;
-}
-
-.work-item-card img {
-    width: 100%;
-    border-radius: 5px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-}
-
-.work-item-card p {
-    font-size: 0.6rem;
-    margin-top: 5px;
-    text-align: center;
-    color: #aaa;
 }
