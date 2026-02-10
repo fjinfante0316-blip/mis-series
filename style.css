@@ -91,15 +91,14 @@ body {
 
 .serie-header { padding: 0 20px; margin-top: 30px; }
 
-/* --- PORTADA ESTILO HERO --- */
+/* Evitar que el buscador empuje la pantalla */
 .welcome-container {
-    height: 100vh;
+    min-height: 100vh;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    background: radial-gradient(circle at center, #1a1a1a 0%, #000 100%);
     padding: 20px;
-    box-sizing: border-box;
 }
 
 .hero-content {
@@ -148,17 +147,16 @@ body {
 }
 
 /* --- CARRUSELES ANCHO TOTAL --- */
+/* Carruseles que ocupan el 100% de la pantalla */
 .seasons-carousel {
     display: flex;
     overflow-x: auto;
     gap: 15px;
-    width: 100vw; /* Ancho de la ventana */
-    margin-left: calc(-50vw + 50%); /* Centra el carrusel expandido */
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
     padding: 20px;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
+    box-sizing: border-box;
 }
-
 .seasons-carousel::-webkit-scrollbar { display: none; }
 
 .season-card {
@@ -180,3 +178,13 @@ body {
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
 }
+
+/* Reset general para que nada se salga */
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    overflow-x: hidden;
+}
+
+.hidden { display: none !important; }
