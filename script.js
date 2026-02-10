@@ -109,7 +109,6 @@ function renderizarTodo() {
     // 2. REPARTO COMPLETO (Sin límites)
     const actorsMap = new Map();
     coleccionSeries.forEach(s => {
-        // Quitamos el slice para que salgan todos los actores registrados
         s.credits?.cast?.forEach(a => {
             if (!actorsMap.has(a.id)) actorsMap.set(a.id, { name: a.name, img: a.profile_path, works: [] });
             actorsMap.get(a.id).works.push({ title: s.name, poster: s.poster_path, char: a.character });
@@ -117,7 +116,7 @@ function renderizarTodo() {
     });
 
     document.getElementById('actors-grid').innerHTML = Array.from(actorsMap.values())
-        .filter(a => a.img) // Solo actores con foto para mantener la estética
+        .filter(a => a.img) 
         .map(a => `
         <div class="actor-row-container">
             <div class="actor-profile">
@@ -133,7 +132,7 @@ function renderizarTodo() {
             </div>
         </div>`).join('');
 
-    // 3. CREADORES (Añadido)
+    // RENDER CREADORES (Misma estructura para evitar solapamiento)
     const creatorMap = new Map();
     coleccionSeries.forEach(s => {
         s.created_by?.forEach(c => {
