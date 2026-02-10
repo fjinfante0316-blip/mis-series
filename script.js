@@ -10,36 +10,24 @@ document.addEventListener('DOMContentLoaded', () => {
 function initMenu() {
     const btn = document.getElementById('sidebarCollapse');
     const side = document.getElementById('sidebar');
-    if (btn && side) {
-        btn.onclick = (e) => { e.stopPropagation(); side.classList.toggle('active'); };
-        document.onclick = (e) => { if (side.classList.contains('active') && !side.contains(e.target)) side.classList.remove('active'); };
-    }
-}
-
-// Función para blindar el menú
-function setupMenu() {
-    const btn = document.getElementById('sidebarCollapse');
-    const side = document.getElementById('sidebar');
 
     if (btn && side) {
-        // Quitamos cualquier evento previo para no duplicar
-        btn.onclick = null; 
-        
-        btn.addEventListener('click', (e) => {
+        btn.onclick = (e) => {
             e.stopPropagation();
             side.classList.toggle('active');
-            console.log("Menú toggle");
+        };
+
+        // Cerrar al hacer clic en cualquier opción del menú
+        document.querySelectorAll('#sidebar li').forEach(li => {
+            li.addEventListener('click', () => side.classList.remove('active'));
         });
 
-        // Cerrar al tocar fuera (muy importante en móvil)
+        // Cerrar al hacer clic fuera
         document.addEventListener('click', (e) => {
             if (side.classList.contains('active') && !side.contains(e.target) && e.target !== btn) {
                 side.classList.remove('active');
             }
         });
-    } else {
-        // Si no lo encuentra, reintenta en 500ms
-        setTimeout(setupMenu, 500);
     }
 }
 
@@ -47,39 +35,43 @@ function setupMenu() {
 document.addEventListener('DOMContentLoaded', setupMenu);
 
 function showSection(id) {
-    document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
+    // Ocultar bienvenida y todas las secciones
     document.getElementById('welcome-screen').classList.add('hidden');
     document.getElementById('main-app').classList.remove('hidden');
-    
-    const target = document.getElementById(`sec-${id}`);
-    if (target) target.classList.remove('hidden');
-    else if (id === 'welcome') document.getElementById('welcome-screen').classList.remove('hidden');
+    document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
+
+    if (id === 'welcome') {
+        document.getElementById('welcome-screen').classList.remove('hidden');
+        document.getElementById('main-app').classList.add('hidden');
+    } else {
+        const target = document.getElementById(`sec-${id}`);
+        if (target) target.classList.remove('hidden');
+    }
 
     if (id === 'stats') generarStats();
     if (id === 'timeline') generarCronologia();
-    document.getElementById('sidebar').classList.remove('active');
 }
 
 function renderizarTodo() {
-    // 1. Series
     const seriesGrid = document.getElementById('series-grid');
-    if (seriesGrid) {
-        seriesGrid.innerHTML = coleccionSeries.map(s => `
-    <div class="serie-group" style="width: 100%; margin-bottom: 30px;">
-        <div class="serie-header" style="padding: 0 20px; display:flex; justify-content:space-between;">
-            <h4>${s.name}</h4>
-            <button onclick="eliminarSerie(${s.id})"><i class="fas fa-trash"></i></button>
+    if (!seriesGrid) return;
+
+    seriesGrid.innerHTML = coleccionSeries.map(s => `
+        <div class="serie-group">
+            <div class="serie-header">
+                <h4>${s.name}</h4>
+                <button onclick="eliminarSerie(${s.id})"><i class="fas fa-trash"></i></button>
+            </div>
+            <div class="seasons-carousel full-width">
+                ${s.seasons.map(t => `
+                    <div class="season-card" onclick="ampliarTemporada(${s.id}, ${t.season_number})">
+                        <img src="https://image.tmdb.org/t/p/w300${t.poster_path || s.poster_path}">
+                        <p>${t.name}</p>
+                    </div>
+                `).join('')}
+            </div>
         </div>
-        <div class="seasons-carousel">
-            ${s.seasons.map(t => `
-                <div class="season-card">
-                    <img src="https://image.tmdb.org/t/p/w200${t.poster_path || s.poster_path}" onclick="ampliarTemporada(${s.id}, ${t.season_number})">
-                    <p>${t.name}</p>
-                </div>
-            `).join('')}
-        </div>
-        </div>
-`).join('');
+    `).join('');
 
     // 2. Actores (5 por serie) y Creadores
     const actoresData = {};
