@@ -55,40 +55,92 @@ async function confirmar(id) {
 }
 
 function renderizarTodo() {
-    // Render Series
-    document.getElementById('series-grid').innerHTML = coleccionSeries.map(s => `
+    // 1. RENDER SERIES (Colección)
+    const seriesGrid = document.getElementById('series-grid');
+    seriesGrid.innerHTML = coleccionSeries.map(s => `
         <div class="serie-group">
-            <h4 style="margin-left:20px">${s.name}</h4>
+            <h4 style="margin: 20px">${s.name}</h4>
             <div class="seasons-carousel">
-                ${s.seasons.map(t => `<div class="season-card"><img src="https://image.tmdb.org/t/p/w200${t.poster_path || s.poster_path}"><p>${t.name}</p></div>`).join('')}
+                ${s.seasons.map(t => `
+                    <div class="season-card">
+                        <img src="https://image.tmdb.org/t/p/w200${t.poster_path || s.poster_path}">
+                        <p>${t.name}</p>
+                    </div>
+                `).join('')}
             </div>
-        </div>`).join('');
+        </div>
+    `).join('');
 
-    // Lógica Actores (5 únicos) y Creadores
-    const actData = {};
-    const seenAct = new Set();
-    const creData = {};
-
-    coleccionSeries.forEach(s => {
-        let count = 0;
-        s.credits?.cast?.forEach(a => {
-            if (count < 5 && !seenAct.has(a.id)) {
-                seenAct.add(a.id);
-                actData[a.id] = { name: a.name, img: a.profile_path, char: a.character, sImg: s.poster_path };
-                count++;
+    // 2. LÓGICA DE ACTORES CON CARRUSEL DE SERIES
+    const actorsMap = new Map();
+    coleccionSeries.forEach(serie => {
+        serie.credits?.cast?.slice(0, 5).forEach(actor => {
+            if (!actorsMap.has(actor.id)) {
+                actorsMap.set(actor.id, {
+                    name: actor.name,
+                    photo: actor.profile_path,
+                    works: []
+                });
             }
-        });
-        s.created_by?.forEach(c => {
-            if (!creData[c.id]) creData[c.id] = { name: c.name, img: c.profile_path, shows: [] };
-            creData[c.id].shows.push(s.poster_path);
+            actorsMap.get(actor.id).works.push({
+                title: serie.name,
+                poster: serie.poster_path,
+                character: actor.character
+            });
         });
     });
 
-    document.getElementById('actors-grid').innerHTML = Object.values(actData).map(a => `
-        <div class="actor-row" style="display:flex; align-items:center; padding:10px; gap:20px;">
-            <img src="https://image.tmdb.org/t/p/w200${a.img}" style="width:60px; height:60px; border-radius:50%; object-fit:cover;">
-            <div><strong>${a.name}</strong><br><small>${a.char}</small></div>
-        </div>`).join('');
+    document.getElementById('actors-grid').innerHTML = Array.from(actorsMap.values()).map(actor => `
+        <div class="actor-card-row">
+            <div class="actor-info-header">
+                <img src="https://image.tmdb.org/t/p/w200${actor.photo}" class="actor-photo-small" onerror="this.src='https://via.placeholder.com/50'">
+                <div><strong>${actor.name}</strong></div>
+            </div>
+            <div class="actor-works-carousel">
+                ${actor.works.map(w => `
+                    <div class="work-item-card">
+                        <img src="https://image.tmdb.org/t/p/w200${w.poster}">
+                        <p>${w.title}</p>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `).join('');
+
+    // 3. LÓGICA DE CREADORES
+    const creatorsMap = new Map();
+    coleccionSeries.forEach(serie => {
+        serie.created_by?.forEach(creator => {
+            if (!creatorsMap.has(creator.id)) {
+                creatorsMap.set(creator.id, {
+                    name: creator.name,
+                    photo: creator.profile_path,
+                    works: []
+                });
+            }
+            creatorsMap.get(creator.id).works.push({
+                title: serie.name,
+                poster: serie.poster_path
+            });
+        });
+    });
+
+    document.getElementById('directors-grid').innerHTML = Array.from(creatorsMap.values()).map(c => `
+        <div class="actor-card-row">
+            <div class="actor-info-header">
+                <img src="https://image.tmdb.org/t/p/w200${c.photo}" class="actor-photo-small" onerror="this.src='https://via.placeholder.com/50'">
+                <div><strong>${c.name}</strong></div>
+            </div>
+            <div class="actor-works-carousel">
+                ${c.works.map(w => `
+                    <div class="work-item-card">
+                        <img src="https://image.tmdb.org/t/p/w200${w.poster}">
+                        <p>${w.title}</p>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `).join('');
 }
 
 function generarStats() {
