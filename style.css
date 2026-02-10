@@ -215,3 +215,42 @@ body {
     margin-top: 0; 
     padding-top: 40px; /* Baja el logo para que no lo tape la hamburguesa */
 }
+
+/* Gráficos responsivos */
+.charts-container {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.chart-box {
+    background: #111;
+    padding: 15px;
+    border-radius: 15px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Botones de Backup */
+.btn-backup {
+    background: #222;
+    color: white;
+    border: 1px solid #444;
+    padding: 10px;
+    width: 100%;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+/* Fix para móvil: evitar que el carrusel ensanche la pantalla */
+body {
+    max-width: 100vw;
+    overflow-x: hidden;
+}
+
+.actor-row-container {
+    flex-wrap: nowrap; /* Mantiene la foto y el carrusel en línea */
+}
