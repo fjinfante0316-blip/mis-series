@@ -29,16 +29,19 @@
 
     <main id="content">
         
-        <section id="welcome-screen">
-    <div class="welcome-container">
-        <h1 class="logo-main">BLIP<span>.</span></h1>
-        <div class="search-wrapper">
-            <input type="text" id="initialInput" placeholder="Busca una serie..." onkeyup="if(event.key==='Enter') buscarSeries()">
-            <button onclick="buscarSeries()"><i class="fas fa-search"></i></button>
+    <section id="welcome-screen">
+        <div class="welcome-container">
+            <h1 class="logo-main">BLIP<span>.</span></h1>
+        
+            <div class="search-container-integrated">
+                <i class="fas fa-search search-icon-inside"></i>
+                <input type="text" id="initialInput" placeholder="Busca una serie..." onkeyup="if(event.key==='Enter') buscarSeries()">
+                <button onclick="buscarSeries()" class="btn-add-inside">Añadir</button>
+            </div>
+
+            <div id="search-results-main" class="results-grid-horizontal hidden"></div>
         </div>
-        <div id="search-results-main" class="search-results-horizontal hidden"></div>
-    </div>
-</section>
+    </section>
 
 <main id="main-app" class="hidden">
     <section id="sec-series" class="app-section hidden">
