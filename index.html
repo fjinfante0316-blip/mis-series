@@ -3,67 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Blip - Mi Colección de Series</title>
+    <title>BLIP | Series Tracker</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <button type="button" id="sidebarCollapse" class="btn-menu">
-    <i class="fas fa-bars"></i>
-</button>
+        <i class="fas fa-bars"></i>
+    </button>
 
-<nav id="sidebar">
-    <div class="sidebar-header">
-        <h3>BLIP<span>.</span></h3>
-    </div>
-    <ul class="list-unstyled components">
-        <li onclick="showSection('welcome')"><i class="fas fa-search"></i> Buscar</li>
-        <li onclick="showSection('series')"><i class="fas fa-tv"></i> Mi Colección</li>
-        <li onclick="showSection('actors')"><i class="fas fa-users"></i> Reparto</li>
-        <li onclick="showSection('directors')"><i class="fas fa-clapperboard"></i> Creadores</li>
-        <li onclick="showSection('timeline')"><i class="fas fa-history"></i> Cronología</li>
-        <li onclick="showSection('stats')"><i class="fas fa-chart-pie"></i> Estadísticas</li>
-    </ul>
-</nav>
+    <nav id="sidebar">
+        <div class="sidebar-header"><h3>BLIP<span>.</span></h3></div>
+        <ul class="list-unstyled">
+            <li onclick="showSection('welcome')"><i class="fas fa-search"></i> Buscar</li>
+            <li onclick="showSection('series')"><i class="fas fa-play"></i> Mi Colección</li>
+            <li onclick="showSection('actors')"><i class="fas fa-users"></i> Reparto</li>
+            <li onclick="showSection('directors')"><i class="fas fa-clapperboard"></i> Creadores</li>
+            <li onclick="showSection('stats')"><i class="fas fa-chart-simple"></i> Estadísticas</li>
+        </ul>
+    </nav>
 
-    <main id="content">
-        
     <section id="welcome-screen">
         <div class="welcome-container">
             <h1 class="logo-main">BLIP<span>.</span></h1>
-        
-            <div class="search-container-integrated">
-                <i class="fas fa-search search-icon-inside"></i>
+            <div class="search-integrated">
+                <i class="fas fa-search lupa-icon"></i>
                 <input type="text" id="initialInput" placeholder="Busca una serie..." onkeyup="if(event.key==='Enter') buscarSeries()">
-                <button onclick="buscarSeries()" class="btn-add-inside">Añadir</button>
+                <button onclick="buscarSeries()" id="btnAdd">Añadir</button>
             </div>
-
-            <div id="search-results-main" class="results-grid-horizontal hidden"></div>
+            <div id="search-results-main" class="results-horizontal hidden"></div>
         </div>
     </section>
 
-<main id="main-app" class="hidden">
-    <section id="sec-series" class="app-section hidden">
-        <h2 class="section-title">Mi Colección</h2>
-        <div id="series-grid"></div>
-    </section>
+    <main id="main-app" class="hidden">
+        <section id="sec-series" class="app-section hidden">
+            <h2 class="section-title">Mi Colección</h2>
+            <div id="series-grid"></div>
+        </section>
 
-    <section id="sec-actors" class="app-section hidden">
-        <h2 class="section-title">Actores</h2>
-        <div id="actors-grid"></div>
-    </section>
+        <section id="sec-actors" class="app-section hidden">
+            <h2 class="section-title">Actores Estrella</h2>
+            <div id="actors-grid"></div>
+        </section>
 
-    <section id="sec-directors" class="app-section hidden">
-        <h2 class="section-title">Creadores</h2>
-        <div id="directors-grid"></div>
-    </section>
+        <section id="sec-directors" class="app-section hidden">
+            <h2 class="section-title">Creadores</h2>
+            <div id="directors-grid"></div>
+        </section>
 
-    <section id="sec-stats" class="app-section hidden">
-        <h2 class="section-title">Estadísticas</h2>
-        <div id="stats-area"></div>
-    </section>
-</main>
+        <section id="sec-stats" class="app-section hidden">
+            <h2 class="section-title">Análisis de Visionado</h2>
+            <div id="stats-area"></div>
+        </section>
+    </main>
 
     <div id="photo-modal" class="modal hidden">
         <span id="modalCloseBtn" class="close">&times;</span>
