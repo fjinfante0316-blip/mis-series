@@ -49,57 +49,68 @@ async function confirmar(id) {
 }
 
 function renderizarTodo() {
-    // 1. RENDER COLECCIÓN
+    // 1. RENDER SERIES
     document.getElementById('series-grid').innerHTML = coleccionSeries.map(s => `
         <div class="row-item">
-            <h4 style="margin-left:10px">${s.name}</h4>
+            <h4 style="margin-left:15px">${s.name}</h4>
             <div class="seasons-carousel">
                 ${s.seasons.map(t => `
                     <div class="card" onclick="verSinopsis(${s.id}, ${t.season_number})">
                         <img src="https://image.tmdb.org/t/p/w200${t.poster_path || s.poster_path}">
                         <p>${t.name}</p>
-                    </div>
-                `).join('')}
+                    </div>`).join('')}
             </div>
-        </div>
-    `).join('');
+        </div>`).join('');
 
-    // 2. REPARTO (5 personajes por serie/temporada sin repetir actor)
+    // 2. REPARTO COMPLETO (Sin límites)
     const actorsMap = new Map();
-    coleccionSeries.forEach(serie => {
-        // Obtenemos los 5 principales de la serie
-        serie.credits?.cast?.slice(0, 5).forEach(act => {
-            if (!actorsMap.has(act.id)) {
-                actorsMap.set(act.id, {
-                    name: act.name,
-                    img: act.profile_path,
-                    works: []
-                });
-            }
-            actorsMap.get(act.id).works.push({
-                serie: serie.name,
-                poster: serie.poster_path,
-                character: act.character
-            });
+    coleccionSeries.forEach(s => {
+        // Quitamos el slice para que salgan todos los actores registrados
+        s.credits?.cast?.forEach(a => {
+            if (!actorsMap.has(a.id)) actorsMap.set(a.id, { name: a.name, img: a.profile_path, works: [] });
+            actorsMap.get(a.id).works.push({ title: s.name, poster: s.poster_path, char: a.character });
         });
     });
 
-    document.getElementById('actors-grid').innerHTML = Array.from(actorsMap.values()).map(a => `
+    document.getElementById('actors-grid').innerHTML = Array.from(actorsMap.values())
+        .filter(a => a.img) // Solo actores con foto para mantener la estética
+        .map(a => `
         <div class="actor-row-container">
             <div class="actor-profile">
-                <img class="actor-photo" src="https://image.tmdb.org/t/p/w200${a.img}" onerror="this.src='https://via.placeholder.com/65'">
+                <img class="actor-photo" src="https://image.tmdb.org/t/p/w200${a.img}">
                 <div class="actor-name-label">${a.name}</div>
             </div>
             <div class="actor-works-carousel">
                 ${a.works.map(w => `
                     <div class="work-card-mini">
                         <img src="https://image.tmdb.org/t/p/w200${w.poster}">
-                        <div class="character-name">${w.character}</div>
-                    </div>
-                `).join('')}
+                        <div class="character-name">${w.char || 'Recurrente'}</div>
+                    </div>`).join('')}
             </div>
-        </div>
-    `).join('');
+        </div>`).join('');
+
+    // 3. CREADORES (Añadido)
+    const creatorMap = new Map();
+    coleccionSeries.forEach(s => {
+        s.created_by?.forEach(c => {
+            if (!creatorMap.has(c.id)) creatorMap.set(c.id, { name: c.name, img: c.profile_path, works: [] });
+            creatorMap.get(c.id).works.push({ title: s.name, poster: s.poster_path });
+        });
+    });
+
+    document.getElementById('directors-grid').innerHTML = Array.from(creatorMap.values()).map(c => `
+        <div class="actor-row-container">
+            <div class="actor-profile">
+                <img class="actor-photo" src="https://image.tmdb.org/t/p/w200${c.img || ''}" onerror="this.src='https://via.placeholder.com/60'">
+                <div class="actor-name-label">${c.name}</div>
+            </div>
+            <div class="actor-works-carousel">
+                ${c.works.map(w => `
+                    <div class="work-card-mini">
+                        <img src="https://image.tmdb.org/t/p/w200${w.poster}">
+                    </div>`).join('')}
+            </div>
+        </div>`).join('');
 }
 
 // Función para ver Sinopsis al clicar portada
@@ -125,22 +136,29 @@ async function verSinopsis(serieId, seasonNum) {
 }
 
 function generarStats() {
-    let tCaps = 0, tHoras = 0;
-    const gens = {};
+    let totalMinutos = 0;
+    const generos = {};
+
     coleccionSeries.forEach(s => {
-        tCaps += s.number_of_episodes || 0;
-        tHoras += (s.number_of_episodes * (s.episode_run_time[0] || 45)) / 60;
-        s.genres.forEach(g => gens[g.name] = (gens[g.name] || 0) + 1);
+        // Multiplicamos capítulos por la duración media de cada uno
+        const duracionMedia = s.episode_run_time[0] || 45; 
+        totalMinutos += (s.number_of_episodes * duracionMedia);
+        
+        s.genres.forEach(g => generos[g.name] = (generos[g.name] || 0) + 1);
     });
+
+    const horasTotales = Math.floor(totalMinutos / 60);
+    const minutosRestantes = totalMinutos % 60;
 
     document.getElementById('stats-area').innerHTML = `
         <div class="row-item">
             <div style="display:flex; justify-content:space-around; text-align:center;">
-                <div><h3>${tCaps}</h3><p>Capítulos</p></div>
-                <div><h3>${Math.round(tHoras)}</h3><p>Horas Totales</p></div>
+                <div><h3>${horasTotales}h ${minutosRestantes}m</h3><p>Tiempo Total</p></div>
+                <div><h3>${coleccionSeries.length}</h3><p>Series</p></div>
             </div>
-            <hr style="border:0.5px solid #333">
-            <h4>Géneros</h4>
-            ${Object.entries(gens).map(([n,v]) => `<p>${n}: ${v}</p>`).join('')}
-        </div>`;
+            <div style="padding:15px; color:#888;">
+                <p>Has invertido un total de ${totalMinutos.toLocaleString()} minutos viendo series.</p>
+            </div>
+        </div>
+    `;
 }
