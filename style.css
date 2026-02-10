@@ -156,6 +156,7 @@ body {
     margin-left: calc(-50vw + 50%);
     padding: 20px;
     box-sizing: border-box;
+    -webkit-overflow-scrolling: touch;
 }
 .seasons-carousel::-webkit-scrollbar { display: none; }
 
@@ -167,6 +168,8 @@ body {
 #main-app {
     width: 100%;
     overflow-x: hidden;
+    min-height: 100vh;
+    padding-top: 60px; /* Espacio para el botón hamburguesa */
 }
 
 .section {
@@ -187,4 +190,11 @@ body, html {
     overflow-x: hidden;
 }
 
-.hidden { display: none !important; }
+.hidden { 
+    display: none !important; 
+}
+
+.app-section {
+    width: 100%;
+    animation: fadeIn 0.4s ease;
+}
