@@ -49,53 +49,79 @@ async function confirmar(id) {
 }
 
 function renderizarTodo() {
-    // Mi Colección
+    // 1. RENDER COLECCIÓN
     document.getElementById('series-grid').innerHTML = coleccionSeries.map(s => `
         <div class="row-item">
-            <h4>${s.name}</h4>
+            <h4 style="margin-left:10px">${s.name}</h4>
             <div class="seasons-carousel">
-                ${s.seasons.map(t => `<div class="card"><img src="https://image.tmdb.org/t/p/w200${t.poster_path || s.poster_path}"><p>${t.name}</p></div>`).join('')}
+                ${s.seasons.map(t => `
+                    <div class="card" onclick="verSinopsis(${s.id}, ${t.season_number})">
+                        <img src="https://image.tmdb.org/t/p/w200${t.poster_path || s.poster_path}">
+                        <p>${t.name}</p>
+                    </div>
+                `).join('')}
             </div>
-        </div>`).join('');
+        </div>
+    `).join('');
 
-    // Reparto (5 actores únicos por serie)
+    // 2. REPARTO (5 personajes por serie/temporada sin repetir actor)
     const actorsMap = new Map();
-    coleccionSeries.forEach(s => {
-        s.credits?.cast?.slice(0, 5).forEach(a => {
-            if (!actorsMap.has(a.id)) actorsMap.set(a.id, { name: a.name, img: a.profile_path, works: [] });
-            actorsMap.get(a.id).works.push({ title: s.name, poster: s.poster_path });
+    coleccionSeries.forEach(serie => {
+        // Obtenemos los 5 principales de la serie
+        serie.credits?.cast?.slice(0, 5).forEach(act => {
+            if (!actorsMap.has(act.id)) {
+                actorsMap.set(act.id, {
+                    name: act.name,
+                    img: act.profile_path,
+                    works: []
+                });
+            }
+            actorsMap.get(act.id).works.push({
+                serie: serie.name,
+                poster: serie.poster_path,
+                character: act.character
+            });
         });
     });
 
     document.getElementById('actors-grid').innerHTML = Array.from(actorsMap.values()).map(a => `
-        <div class="row-item">
-            <div class="row-header">
-                <img class="photo-circle" src="https://image.tmdb.org/t/p/w200${a.img}">
-                <strong>${a.name}</strong>
+        <div class="actor-row-container">
+            <div class="actor-profile">
+                <img class="actor-photo" src="https://image.tmdb.org/t/p/w200${a.img}" onerror="this.src='https://via.placeholder.com/65'">
+                <div class="actor-name-label">${a.name}</div>
             </div>
             <div class="actor-works-carousel">
-                ${a.works.map(w => `<div class="card" style="min-width:80px"><img src="https://image.tmdb.org/t/p/w200${w.poster}"></div>`).join('')}
+                ${a.works.map(w => `
+                    <div class="work-card-mini">
+                        <img src="https://image.tmdb.org/t/p/w200${w.poster}">
+                        <div class="character-name">${w.character}</div>
+                    </div>
+                `).join('')}
             </div>
-        </div>`).join('');
+        </div>
+    `).join('');
+}
 
-    // Creadores (Igual que actores)
-    const creatorMap = new Map();
-    coleccionSeries.forEach(s => {
-        s.created_by?.forEach(c => {
-            if (!creatorMap.has(c.id)) creatorMap.set(c.id, { name: c.name, img: c.profile_path, works: [] });
-            creatorMap.get(c.id).works.push({ title: s.name, poster: s.poster_path });
-        });
-    });
-    document.getElementById('directors-grid').innerHTML = Array.from(creatorMap.values()).map(c => `
-        <div class="row-item">
-            <div class="row-header">
-                <img class="photo-circle" src="https://image.tmdb.org/t/p/w200${c.img || ''}" onerror="this.src='https://via.placeholder.com/50'">
-                <strong>${c.name}</strong>
+// Función para ver Sinopsis al clicar portada
+async function verSinopsis(serieId, seasonNum) {
+    const serie = coleccionSeries.find(s => s.id === serieId);
+    const temporada = serie.seasons.find(t => t.season_number === seasonNum);
+    
+    // Si queremos sinopsis detallada de la temporada, TMDB requiere otra llamada, 
+    // pero por ahora usamos la que tenemos:
+    const modalBody = document.getElementById('modal-body');
+    modalBody.innerHTML = `
+        <div style="text-align:center">
+            <img src="https://image.tmdb.org/t/p/w300${temporada.poster_path || serie.poster_path}" style="width:150px; border-radius:10px; margin-bottom:15px">
+            <h2 style="color:var(--rojo)">${serie.name}</h2>
+            <h3>${temporada.name}</h3>
+            <p style="color:#ccc; line-height:1.5; font-size:0.9rem;">${temporada.overview || "Sin sinopsis disponible para esta temporada."}</p>
+            <div style="margin-top:15px; font-size:0.8rem; color:var(--rojo)">
+                Episodios: ${temporada.episode_count}
             </div>
-            <div class="actor-works-carousel">
-                ${c.works.map(w => `<div class="card" style="min-width:80px"><img src="https://image.tmdb.org/t/p/w200${w.poster}"></div>`).join('')}
-            </div>
-        </div>`).join('');
+        </div>
+    `;
+    document.getElementById('info-modal').classList.remove('hidden');
 }
 
 function generarStats() {
