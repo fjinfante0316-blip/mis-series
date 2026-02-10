@@ -38,33 +38,29 @@ function showSection(id) {
     const welcome = document.getElementById('welcome-screen');
     const mainApp = document.getElementById('main-app');
     
-    // 1. Resetear visibilidad de contenedores raíz
+    // 1. Decidir si mostramos Portada o App
     if (id === 'welcome') {
         welcome.classList.remove('hidden');
         mainApp.classList.add('hidden');
-        return; // Salimos porque no hay sub-secciones en la portada
     } else {
         welcome.classList.add('hidden');
         mainApp.classList.remove('hidden');
+        
+        // 2. Ocultar TODAS las sub-secciones internas de la app
+        document.querySelectorAll('.app-section').forEach(sec => {
+            sec.classList.add('hidden');
+        });
+
+        // 3. Mostrar solo la que hemos pulsado
+        const target = document.getElementById(`sec-${id}`);
+        if (target) target.classList.remove('hidden');
     }
 
-    // 2. Ocultar TODAS las sub-secciones dentro de main-app
-    document.querySelectorAll('#main-app .section').forEach(sec => {
-        sec.classList.add('hidden');
-    });
-
-    // 3. Mostrar solo la sección solicitada
-    const target = document.getElementById(`sec-${id}`);
-    if (target) {
-        target.classList.remove('hidden');
-        console.log("Mostrando sección:", id);
-    }
-
-    // 4. Ejecutar funciones de carga de datos
+    // 4. Cargar datos específicos
     if (id === 'stats') generarStats();
     if (id === 'timeline') generarCronologia();
-
-    // 5. Cerrar el menú lateral
+    
+    // 5. Cerrar menú lateral
     document.getElementById('sidebar').classList.remove('active');
 }
 
