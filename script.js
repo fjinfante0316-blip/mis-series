@@ -3,27 +3,27 @@ const API_KEY = 'e8b61af0cf42a633e3aa581bb73127f8';
 let coleccionSeries = JSON.parse(localStorage.getItem('mis_series_data')) || [];
 
 window.onload = () => {
-    initMenu();
-    if (coleccionSeries.length > 0) renderizarTodo();
-};
-
-function initMenu() {
     const btn = document.getElementById('sidebarCollapse');
     const side = document.getElementById('sidebar');
-    if (btn) {
-        btn.onclick = () => side.classList.toggle('active');
-    }
-}
+    if(btn) btn.onclick = () => side.classList.toggle('active');
+    if(coleccionSeries.length > 0) renderizarTodo();
+};
 
 function showSection(id) {
-    document.getElementById('welcome-screen').classList.add('hidden');
-    document.getElementById('main-app').classList.add('hidden');
+    const welcome = document.getElementById('welcome-screen');
+    const mainApp = document.getElementById('main-app');
+    
+    // Ocultar bloques principales
+    welcome.classList.add('hidden');
+    mainApp.classList.add('hidden');
+    
+    // Ocultar sub-secciones
     document.querySelectorAll('.app-section').forEach(s => s.classList.add('hidden'));
 
     if (id === 'welcome') {
-        document.getElementById('welcome-screen').classList.remove('hidden');
+        welcome.classList.remove('hidden');
     } else {
-        document.getElementById('main-app').classList.remove('hidden');
+        mainApp.classList.remove('hidden');
         document.getElementById(`sec-${id}`).classList.remove('hidden');
         if (id === 'stats') generarStats();
     }
@@ -38,7 +38,7 @@ async function buscarSeries() {
     window.ultimos = d.results;
     const resDiv = document.getElementById('search-results-main');
     resDiv.innerHTML = d.results.map(s => `
-        <div class="search-card" onclick="confirmar(${s.id})">
+        <div class="work-card" onclick="confirmar(${s.id})">
             <img src="https://image.tmdb.org/t/p/w200${s.poster_path}">
             <p>${s.name}</p>
         </div>`).join('');
@@ -55,117 +55,47 @@ async function confirmar(id) {
 }
 
 function renderizarTodo() {
-    // 1. RENDER SERIES (Colección)
-    const seriesGrid = document.getElementById('series-grid');
-    seriesGrid.innerHTML = coleccionSeries.map(s => `
+    // 1. Series
+    document.getElementById('series-grid').innerHTML = coleccionSeries.map(s => `
         <div class="serie-group">
-            <h4 style="margin: 20px">${s.name}</h4>
+            <h4 style="padding:0 20px">${s.name}</h4>
             <div class="seasons-carousel">
-                ${s.seasons.map(t => `
-                    <div class="season-card">
-                        <img src="https://image.tmdb.org/t/p/w200${t.poster_path || s.poster_path}">
-                        <p>${t.name}</p>
-                    </div>
-                `).join('')}
+                ${s.seasons.map(t => `<div class="work-card"><img src="https://image.tmdb.org/t/p/w200${t.poster_path || s.poster_path}"><p>${t.name}</p></div>`).join('')}
             </div>
-        </div>
-    `).join('');
+        </div>`).join('');
 
-    // 2. LÓGICA DE ACTORES CON CARRUSEL DE SERIES
+    // 2. Actores con carrusel de series
     const actorsMap = new Map();
     coleccionSeries.forEach(serie => {
-        serie.credits?.cast?.slice(0, 5).forEach(actor => {
-            if (!actorsMap.has(actor.id)) {
-                actorsMap.set(actor.id, {
-                    name: actor.name,
-                    photo: actor.profile_path,
-                    works: []
-                });
-            }
-            actorsMap.get(actor.id).works.push({
-                title: serie.name,
-                poster: serie.poster_path,
-                character: actor.character
-            });
+        serie.credits?.cast?.slice(0, 5).forEach(act => {
+            if (!actorsMap.has(act.id)) actorsMap.set(act.id, { name: act.name, img: act.profile_path, works: [] });
+            actorsMap.get(act.id).works.push({ title: serie.name, poster: serie.poster_path });
         });
     });
 
-    document.getElementById('actors-grid').innerHTML = Array.from(actorsMap.values()).map(actor => `
+    document.getElementById('actors-grid').innerHTML = Array.from(actorsMap.values()).map(a => `
         <div class="actor-card-row">
-            <div class="actor-info-header">
-                <img src="https://image.tmdb.org/t/p/w200${actor.photo}" class="actor-photo-small" onerror="this.src='https://via.placeholder.com/50'">
-                <div><strong>${actor.name}</strong></div>
+            <div class="actor-info">
+                <img class="actor-photo" src="https://image.tmdb.org/t/p/w200${a.img}" onerror="this.src='https://via.placeholder.com/50'">
+                <strong>${a.name}</strong>
             </div>
             <div class="actor-works-carousel">
-                ${actor.works.map(w => `
-                    <div class="work-item-card">
-                        <img src="https://image.tmdb.org/t/p/w200${w.poster}">
-                        <p>${w.title}</p>
-                    </div>
-                `).join('')}
+                ${a.works.map(w => `<div class="work-card"><img src="https://image.tmdb.org/t/p/w200${w.poster}"><p>${w.title}</p></div>`).join('')}
             </div>
-        </div>
-    `).join('');
-
-    // 3. LÓGICA DE CREADORES
-    const creatorsMap = new Map();
-    coleccionSeries.forEach(serie => {
-        serie.created_by?.forEach(creator => {
-            if (!creatorsMap.has(creator.id)) {
-                creatorsMap.set(creator.id, {
-                    name: creator.name,
-                    photo: creator.profile_path,
-                    works: []
-                });
-            }
-            creatorsMap.get(creator.id).works.push({
-                title: serie.name,
-                poster: serie.poster_path
-            });
-        });
-    });
-
-    document.getElementById('directors-grid').innerHTML = Array.from(creatorsMap.values()).map(c => `
-        <div class="actor-card-row">
-            <div class="actor-info-header">
-                <img src="https://image.tmdb.org/t/p/w200${c.photo}" class="actor-photo-small" onerror="this.src='https://via.placeholder.com/50'">
-                <div><strong>${c.name}</strong></div>
-            </div>
-            <div class="actor-works-carousel">
-                ${c.works.map(w => `
-                    <div class="work-item-card">
-                        <img src="https://image.tmdb.org/t/p/w200${w.poster}">
-                        <p>${w.title}</p>
-                    </div>
-                `).join('')}
-            </div>
-        </div>
-    `).join('');
+        </div>`).join('');
 }
 
 function generarStats() {
-    let totalCaps = 0;
-    let totalHoras = 0;
-    const generos = {};
-    const años = {};
-
+    let tCaps = 0, tHoras = 0;
+    const gens = {};
     coleccionSeries.forEach(s => {
-        totalCaps += s.number_of_episodes || 0;
-        totalHoras += (s.number_of_episodes * (s.episode_run_time[0] || 45)) / 60;
-        s.genres.forEach(g => generos[g.name] = (generos[g.name] || 0) + 1);
-        const año = s.first_air_date?.split('-')[0];
-        años[año] = (años[año] || 0) + 1;
+        tCaps += s.number_of_episodes || 0;
+        tHoras += (s.number_of_episodes * (s.episode_run_time[0] || 45)) / 60;
+        s.genres.forEach(g => gens[g.name] = (gens[g.name] || 0) + 1);
     });
-
     document.getElementById('stats-area').innerHTML = `
-        <div class="stats-grid">
-            <div class="stat-bubble"><h3>${totalCaps}</h3><p>Episodios</p></div>
-            <div class="stat-bubble"><h3>${Math.round(totalHoras)}</h3><p>Horas</p></div>
-            <div class="stat-bubble"><h3>${coleccionSeries.length}</h3><p>Series</p></div>
-        </div>
-        <div style="padding:20px">
-            <h4>Géneros Predominantes</h4>
-            ${Object.entries(generos).map(([n, v]) => `<p>${n}: ${v}</p>`).join('')}
-        </div>
-    `;
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; padding:20px;">
+            <div class="actor-card-row"><h3>${tCaps}</h3><p>Capítulos</p></div>
+            <div class="actor-card-row"><h3>${Math.round(tHoras)}</h3><p>Horas</p></div>
+        </div>`;
 }
