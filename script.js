@@ -37,8 +37,9 @@ document.addEventListener('DOMContentLoaded', setupMenu);
 function showSection(id) {
     const welcome = document.getElementById('welcome-screen');
     const mainApp = document.getElementById('main-app');
+    const side = document.getElementById('sidebar');
     
-    // 1. Decidir si mostramos Portada o App
+    // 1. Decidir si mostramos la Portada o la App
     if (id === 'welcome') {
         welcome.classList.remove('hidden');
         mainApp.classList.add('hidden');
@@ -51,17 +52,20 @@ function showSection(id) {
             sec.classList.add('hidden');
         });
 
-        // 3. Mostrar solo la que hemos pulsado
+        // 3. Mostrar solo la sección que pedimos
         const target = document.getElementById(`sec-${id}`);
-        if (target) target.classList.remove('hidden');
+        if (target) {
+            target.classList.remove('hidden');
+            window.scrollTo(0, 0); // Volver arriba al cambiar
+        }
     }
 
-    // 4. Cargar datos específicos
+    // 4. Cargar datos específicos si es necesario
     if (id === 'stats') generarStats();
     if (id === 'timeline') generarCronologia();
     
-    // 5. Cerrar menú lateral
-    document.getElementById('sidebar').classList.remove('active');
+    // 5. Cerrar el menú lateral
+    if (side) side.classList.remove('active');
 }
 
 function renderizarTodo() {
