@@ -39,14 +39,58 @@ async function buscarSeries() {
     resDiv.classList.remove('hidden');
 }
 
+// 1. PREVENCIÓN DE DUPLICADOS Y FLUJO DE PORTADA
 async function confirmar(id) {
+    // Comprobar si ya existe
+    const existe = coleccionSeries.some(s => s.id === id);
+    if (existe) {
+        alert("Esta serie ya está en tu colección.");
+        return;
+    }
+
     const r = await fetch(`https://api.themoviedb.org/3/tv/${id}?api_key=${API_KEY}&language=es-ES&append_to_response=credits`);
     const s = await r.json();
+    
     coleccionSeries.push(s);
     localStorage.setItem('mis_series_data', JSON.stringify(coleccionSeries));
-    renderizarTodo();
-    showSection('series');
+    
+    // Feedback visual sin cambiar de sección
+    alert(`${s.name} añadida correctamente.`);
+    renderizarTodo(); 
 }
+
+// 2. EXPORTAR E IMPORTAR
+function exportarDatos() {
+    const dataStr = JSON.stringify(coleccionSeries);
+    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+    const exportFileDefaultName = 'mis_series_backup.json';
+
+    let linkElement = document.createElement('a');
+    linkElement.setAttribute('href', dataUri);
+    linkElement.setAttribute('download', exportFileDefaultName);
+    linkElement.click();
+}
+
+function importarDatos(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        try {
+            const json = JSON.parse(e.target.result);
+            coleccionSeries = json;
+            localStorage.setItem('mis_series_data', JSON.stringify(coleccionSeries));
+            renderizarTodo();
+            alert("Datos importados con éxito");
+        } catch (err) {
+            alert("Error al leer el archivo");
+        }
+    };
+    reader.readAsText(file);
+}
+
+// 3. GRÁFICAS (CHART.JS)
+let chartGen, chartAn; // Variables para destruir gráficas viejas al actualizar
 
 function renderizarTodo() {
     // 1. RENDER SERIES
@@ -136,29 +180,56 @@ async function verSinopsis(serieId, seasonNum) {
 }
 
 function generarStats() {
-    let totalMinutos = 0;
-    const generos = {};
+    // Lógica de tiempo (Minutos a Horas)
+    let totalMin = 0;
+    const gens = {};
+    const anios = {};
 
     coleccionSeries.forEach(s => {
-        // Multiplicamos capítulos por la duración media de cada uno
-        const duracionMedia = s.episode_run_time[0] || 45; 
-        totalMinutos += (s.number_of_episodes * duracionMedia);
-        
-        s.genres.forEach(g => generos[g.name] = (generos[g.name] || 0) + 1);
+        totalMin += (s.number_of_episodes * (s.episode_run_time[0] || 45));
+        s.genres.forEach(g => gens[g.name] = (gens[g.name] || 0) + 1);
+        const anio = s.first_air_date ? s.first_air_date.split('-')[0] : "N/A";
+        anios[anio] = (anios[anio] || 0) + 1;
     });
 
-    const horasTotales = Math.floor(totalMinutos / 60);
-    const minutosRestantes = totalMinutos % 60;
+    const h = Math.floor(totalMin / 60);
+    const m = totalMin % 60;
+    document.getElementById('stats-area').innerHTML = `<h3 style="text-align:center">${h}h ${m}m de visionado total</h3>`;
 
-    document.getElementById('stats-area').innerHTML = `
-        <div class="row-item">
-            <div style="display:flex; justify-content:space-around; text-align:center;">
-                <div><h3>${horasTotales}h ${minutosRestantes}m</h3><p>Tiempo Total</p></div>
-                <div><h3>${coleccionSeries.length}</h3><p>Series</p></div>
-            </div>
-            <div style="padding:15px; color:#888;">
-                <p>Has invertido un total de ${totalMinutos.toLocaleString()} minutos viendo series.</p>
-            </div>
-        </div>
-    `;
+    // Gráfico Circular (Géneros)
+    const ctxGen = document.getElementById('chartGeneros').getContext('2d');
+    if(chartGen) chartGen.destroy();
+    chartGen = new Chart(ctxGen, {
+        type: 'pie',
+        data: {
+            labels: Object.keys(gens),
+            datasets: [{
+                data: Object.values(gens),
+                backgroundColor: ['#e50914', '#564d4d', '#b9090b', '#f5f5f1', '#333']
+            }]
+        },
+        options: { responsive: true, plugins: { legend: { position: 'bottom', labels: { color: '#fff' } } } }
+    });
+
+    // Gráfico de Barras (Años)
+    const ctxAn = document.getElementById('chartAnios').getContext('2d');
+    if(chartAn) chartAn.destroy();
+    chartAn = new Chart(ctxAn, {
+        type: 'bar',
+        data: {
+            labels: Object.keys(anios).sort(),
+            datasets: [{
+                label: 'Series por año',
+                data: Object.keys(anios).sort().map(k => anios[k]),
+                backgroundColor: '#e50914'
+            }]
+        },
+        options: { 
+            scales: { 
+                y: { ticks: { color: '#fff' } },
+                x: { ticks: { color: '#fff' } }
+            },
+            plugins: { legend: { display: false } }
+        }
+    });
 }
