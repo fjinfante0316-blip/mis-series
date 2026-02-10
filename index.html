@@ -60,6 +60,13 @@
         </section>
     </main>
 
+    <div id="info-modal" class="modal hidden" onclick="this.classList.add('hidden')">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <span class="close-modal" onclick="document.getElementById('info-modal').classList.add('hidden')">&times;</span>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>
