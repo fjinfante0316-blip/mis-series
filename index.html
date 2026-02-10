@@ -29,53 +29,42 @@
 
     <main id="content">
         
-        <section id="welcome-screen" class="section-container">
-            <div class="welcome-content">
-                <div class="search-wrapper">
-                    <input type="text" id="initialInput" placeholder="Busca una serie..." onkeyup="if(event.key==='Enter') buscarSeries()">
-                    <button onclick="buscarSeries()">Añadir</button>
-                </div>
-                <div id="search-results-main" class="results-grid hidden"></div>
-            </div>
-        </section>
+        <section id="welcome-screen">
+    <div class="welcome-container">
+        <h1 class="logo-main">BLIP<span>.</span></h1>
+        <div class="search-wrapper">
+            <input type="text" id="initialInput" placeholder="Busca una serie..." onkeyup="if(event.key==='Enter') buscarSeries()">
+            <button onclick="buscarSeries()"><i class="fas fa-plus"></i></button>
+        </div>
+        <div id="search-results-main" class="results-grid hidden"></div>
+    </div>
+</section>
 
-        <div id="main-app" class="hidden">
-            
-            <section id="sec-series" class="section hidden">
-                <div class="section-header-flex">
-                    <h2 class="section-title">Mi Colección</h2>
-                    <input type="text" id="filter-series" class="filter-input" placeholder="Filtrar series..." onkeyup="filtrarContenido('series')">
-                </div>
-                <div id="series-grid"></div>
-            </section>
+<main id="main-app" class="hidden">
+    <section id="sec-series" class="app-section hidden">
+        <h2 class="section-title">Mi Colección</h2>
+        <div id="series-grid"></div>
+    </section>
 
-            <section id="sec-actors" class="section hidden">
-                <div class="section-header-flex">
-                    <h2 class="section-title">Actores Principales</h2>
-                    <input type="text" id="filter-actors" class="filter-input" placeholder="Buscar actor o personaje..." onkeyup="filtrarContenido('actors')">
-                </div>
-                <div id="actors-grid"></div>
-            </section>
+    <section id="sec-actors" class="app-section hidden">
+        <h2 class="section-title">Reparto</h2>
+        <div id="actors-grid"></div>
+    </section>
 
-            <section id="sec-directors" class="section hidden">
-                <div class="section-header-flex">
-                    <h2 class="section-title">Creadores y Directores</h2>
-                    <input type="text" id="filter-directors" class="filter-input" placeholder="Buscar creador..." onkeyup="filtrarContenido('directors')">
-                </div>
-                <div id="directors-grid"></div>
-            </section>
+    <section id="sec-directors" class="app-section hidden">
+        <h2 class="section-title">Creadores</h2>
+        <div id="directors-grid"></div>
+    </section>
+
+    <section id="sec-stats" class="app-section hidden">
+        <h2 class="section-title">Estadísticas</h2>
+        <div id="stats-area"></div>
+    </section>
 
             <section id="sec-timeline" class="section hidden">
                 <h2 class="section-title">Línea del Tiempo</h2>
                 <div id="sec-timeline-grid" class="timeline-container"></div>
             </section>
-
-            <section id="sec-stats" class="section hidden">
-                <h2 class="section-title">Mis Estadísticas</h2>
-                <div id="stats-area"></div>
-            </section>
-
-        </div>
     </main>
 
     <div id="photo-modal" class="modal hidden">
