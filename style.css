@@ -157,10 +157,9 @@ body {
     overflow: hidden; /* Evita desbordamientos */
 }
 
-/* --- COLUMNA DEL ACTOR (IZQUIERDA - FIJA) --- */
+/* --- COLUMNA DEL ACTOR (IZQUIERDA) --- */
 .actor-profile {
-    flex: 0 0 100px; /* IMPORTANTE: No crece ni se encoge de 100px */
-    width: 100px;
+    flex: 0 0 110px; /* Ancho fijo un poco más amplio para que quepan bien los nombres */
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -168,7 +167,6 @@ body {
     border-right: 1px solid #333;
     padding-right: 10px;
     text-align: center;
-    box-sizing: border-box;
 }
 
 .actor-photo {
@@ -181,12 +179,14 @@ body {
 }
 
 .actor-name-label {
-    font-size: 0.7rem;
+    font-size: 0.75rem;
     font-weight: bold;
     color: #fff;
-    line-height: 1.2;
+    line-height: 1.1;
+    margin-top: 5px;
     width: 100%;
-    word-wrap: break-word; /* Rompe el nombre si es muy largo para que no invada el carrusel */
+    /* Esto ayuda a que si hay varias palabras, se repartan en líneas */
+    display: block; 
 }
 
 /* --- CARRUSEL DE PORTADAS (DERECHA - FLEXIBLE) --- */
@@ -206,10 +206,12 @@ body {
     display: none;
 }
 
-/* Forzar que las portadas no se aplasten */
+/* Asegurar que las tarjetas mini no se muevan */
 .work-card-mini {
-    flex: 0 0 85px; /* Ancho fijo de 85px para cada póster */
-    width: 85px;
+    flex: 0 0 85px;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centra la portada y el texto del personaje */
 }
 
 .work-card-mini img {
@@ -220,16 +222,17 @@ body {
     display: block;
 }
 
+/* --- PERSONAJE DEBAJO DE PORTADA --- */
 .character-name {
-    font-size: 0.6rem;
+    font-size: 0.65rem;
     color: var(--rojo);
-    margin-top: 5px;
+    margin-top: 6px;
+    text-align: center; /* Centra el nombre del personaje */
     line-height: 1.1;
-    /* Evita que nombres de personajes muy largos rompan el diseño */
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+    display: block;
+    width: 100%;
+    /* Evita que se amontone si es muy largo */
+    overflow-wrap: break-word;
 }
 
 /* Ocultar scroll en móviles */
