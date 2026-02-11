@@ -15,18 +15,12 @@ body {
 
 .hidden { display: none !important; }
 
-/* Botón Hamburguesa */
+/* FIX HAMBURGUESA */
 .btn-menu {
-    position: fixed;
-    top: 20px;
-    left: 20px;
-    z-index: 10000;
-    background: var(--rojo);
-    color: white;
-    border: none;
-    padding: 12px;
-    border-radius: 8px;
-    cursor: pointer;
+    position: fixed; top: 20px; left: 20px;
+    z-index: 99999; /* Por encima de todo */
+    background: var(--rojo); color: white;
+    border: none; padding: 12px; border-radius: 8px; cursor: pointer;
 }
 
 /* Sidebar Estilo Mi-Cine */
