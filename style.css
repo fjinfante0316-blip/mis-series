@@ -15,21 +15,19 @@ body {
 
 .hidden { display: none !important; }
 
-/* FIX HAMBURGUESA */
-/* BUSCA ESTA PARTE Y REEMPLÁZALA */
+/* 1. Liberar la Hamburguesa */
 .btn-menu {
     position: fixed; 
     top: 20px; 
     left: 20px;
-    z-index: 999999; /* Aumentamos a un nivel casi máximo */
+    z-index: 999999 !important; /* Prioridad máxima absoluta */
     background: var(--rojo); 
     color: white;
     border: none; 
     padding: 12px; 
     border-radius: 8px; 
     cursor: pointer;
-    display: block !important;
-    pointer-events: auto; /* Fuerza que acepte clics */
+    pointer-events: auto; /* Asegura que detecte el clic */
 }
 
 /* Sidebar Estilo Mi-Cine */
@@ -319,4 +317,27 @@ body {
 .search-box-integrated {
     position: relative;
     z-index: 20; /* Asegura que el buscador esté por encima de fondos decorativos */
+}
+
+/* 2. Evitar que la sección de bienvenida bloquee los clics */
+#welcome-screen {
+    position: relative;
+    z-index: 100;
+    pointer-events: none; /* Los clics pasan a través del contenedor vacío... */
+}
+
+/* 3. Pero permitir clics en los elementos internos (buscador y botones) */
+.welcome-container, .search-box-integrated, .btn-search, #sidebar {
+    pointer-events: auto; /* ...pero se detienen en los elementos reales */
+}
+
+/* 4. Ajustar el Sidebar para que no quede debajo de la portada */
+#sidebar {
+    z-index: 999998;
+}
+
+/* 5. Asegurar que el buscador esté por encima de cualquier otro elemento de la portada */
+.search-box-integrated {
+    position: relative;
+    z-index: 1000;
 }
