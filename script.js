@@ -5,13 +5,22 @@ let coleccionSeries = JSON.parse(localStorage.getItem('mis_series_data')) || [];
 document.addEventListener('DOMContentLoaded', () => {
     const btn = document.getElementById('sidebarCollapse');
     const side = document.getElementById('sidebar');
-    
+
     if (btn && side) {
-        btn.onclick = (e) => {
-            e.stopPropagation(); // Evita que el clic se propague a otros elementos
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
             side.classList.toggle('active');
-        };
+            console.log("Menu clickeado"); // Verificamos en consola
+        });
     }
+
+    // Cerrar sidebar al hacer clic fuera (opcional, para móvil)
+    document.addEventListener('click', (e) => {
+        if (side.classList.contains('active') && !side.contains(e.target) && e.target !== btn) {
+            side.classList.remove('active');
+        }
+    });
 });
 
 function showSection(id) {
