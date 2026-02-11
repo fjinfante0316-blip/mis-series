@@ -16,11 +16,20 @@ body {
 .hidden { display: none !important; }
 
 /* FIX HAMBURGUESA */
+/* BUSCA ESTA PARTE Y REEMPLÁZALA */
 .btn-menu {
-    position: fixed; top: 20px; left: 20px;
-    z-index: 99999; /* Por encima de todo */
-    background: var(--rojo); color: white;
-    border: none; padding: 12px; border-radius: 8px; cursor: pointer;
+    position: fixed; 
+    top: 20px; 
+    left: 20px;
+    z-index: 999999; /* Aumentamos a un nivel casi máximo */
+    background: var(--rojo); 
+    color: white;
+    border: none; 
+    padding: 12px; 
+    border-radius: 8px; 
+    cursor: pointer;
+    display: block !important;
+    pointer-events: auto; /* Fuerza que acepte clics */
 }
 
 /* Sidebar Estilo Mi-Cine */
@@ -31,7 +40,7 @@ body {
     width: 250px;
     height: 100vh;
     background: #000;
-    z-index: 9999;
+    z-index: 999998;
     transition: 0.3s;
     padding-top: 80px;
     border-right: 1px solid #222;
@@ -293,6 +302,21 @@ body {
     overflow-x: hidden;
 }
 
+/* Añade o modifica estas reglas */
+.welcome-container {
+    position: relative;
+    z-index: 10;
+    pointer-events: none; /* El contenedor no bloquea... */
+}
 .actor-row-container {
     flex-wrap: nowrap; /* Mantiene la foto y el carrusel en línea */
+}
+
+.logo-main, .search-box-integrated, .results-carousel {
+    pointer-events: auto; /* ...pero sus hijos sí reciben clics */
+}
+
+.search-box-integrated {
+    position: relative;
+    z-index: 20; /* Asegura que el buscador esté por encima de fondos decorativos */
 }
