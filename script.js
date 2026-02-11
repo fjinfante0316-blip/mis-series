@@ -110,18 +110,31 @@ function renderizarTodo() {
     const actorsMap = new Map();
     coleccionSeries.forEach(s => {
         s.credits?.cast?.forEach(a => {
-            if (!actorsMap.has(a.id)) actorsMap.set(a.id, { name: a.name, img: a.profile_path, works: [] });
-            actorsMap.get(a.id).works.push({ title: s.name, poster: s.poster_path, char: a.character });
+            if (!actorsMap.has(a.id)) {
+                actorsMap.set(a.id, { 
+                    name: a.name, 
+                    img: a.profile_path, 
+                    works: [], 
+                    count: 0 // Contador de apariciones
+                });
+            }
+            const actorData = actorsMap.get(a.id);
+            actorData.count++; 
+            actorData.works.push({ title: s.name, poster: s.poster_path, char: a.character });
         });
     });
 
-    document.getElementById('actors-grid').innerHTML = Array.from(actorsMap.values())
-        .filter(a => a.img) 
-        .map(a => `
+    // Convertimos a array y ordenamos de mayor a menor 'count'
+    const sortedActors = Array.from(actorsMap.values())
+        .filter(a => a.img) // Solo los que tienen foto
+        .sort((a, b) => b.count - a.count);
+
+    document.getElementById('actors-grid').innerHTML = sortedActors.map(a => `
         <div class="actor-row-container">
             <div class="actor-profile">
                 <img class="actor-photo" src="https://image.tmdb.org/t/p/w200${a.img}">
                 <div class="actor-name-label">${a.name}</div>
+                <div style="font-size:0.6rem; color:var(--rojo); margin-top:2px;">${a.count} series</div>
             </div>
             <div class="actor-works-carousel">
                 ${a.works.map(w => `
@@ -132,25 +145,40 @@ function renderizarTodo() {
             </div>
         </div>`).join('');
 
-    // RENDER CREADORES (Misma estructura para evitar solapamiento)
+
+    // --- 3. LÓGICA DE CREADORES ORDENADOS POR FRECUENCIA ---
     const creatorMap = new Map();
     coleccionSeries.forEach(s => {
         s.created_by?.forEach(c => {
-            if (!creatorMap.has(c.id)) creatorMap.set(c.id, { name: c.name, img: c.profile_path, works: [] });
-            creatorMap.get(c.id).works.push({ title: s.name, poster: s.poster_path });
+            if (!creatorMap.has(c.id)) {
+                creatorMap.set(c.id, { 
+                    name: c.name, 
+                    img: c.profile_path, 
+                    works: [], 
+                    count: 0 
+                });
+            }
+            const creatorData = creatorMap.get(c.id);
+            creatorData.count++;
+            creatorData.works.push({ title: s.name, poster: s.poster_path });
         });
     });
 
-    document.getElementById('directors-grid').innerHTML = Array.from(creatorMap.values()).map(c => `
+    const sortedCreators = Array.from(creatorMap.values())
+        .sort((a, b) => b.count - a.count);
+
+    document.getElementById('directors-grid').innerHTML = sortedCreators.map(c => `
         <div class="actor-row-container">
             <div class="actor-profile">
                 <img class="actor-photo" src="https://image.tmdb.org/t/p/w200${c.img || ''}" onerror="this.src='https://via.placeholder.com/60'">
                 <div class="actor-name-label">${c.name}</div>
+                <div style="font-size:0.6rem; color:var(--rojo); margin-top:2px;">${c.count} series</div>
             </div>
             <div class="actor-works-carousel">
                 ${c.works.map(w => `
                     <div class="work-card-mini">
                         <img src="https://image.tmdb.org/t/p/w200${w.poster}">
+                        <div class="character-name">Creador</div>
                     </div>`).join('')}
             </div>
         </div>`).join('');
