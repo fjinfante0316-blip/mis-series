@@ -129,21 +129,26 @@ function renderizarTodo() {
         .filter(a => a.img) // Solo los que tienen foto
         .sort((a, b) => b.count - a.count);
 
-    document.getElementById('actors-grid').innerHTML = sortedActors.map(a => `
-        <div class="actor-row-container">
-            <div class="actor-profile">
-                <img class="actor-photo" src="https://image.tmdb.org/t/p/w200${a.img}">
-                <div class="actor-name-label">${a.name}</div>
-                <div style="font-size:0.6rem; color:var(--rojo); margin-top:2px;">${a.count} series</div>
-            </div>
-            <div class="actor-works-carousel">
-                ${a.works.map(w => `
-                    <div class="work-card-mini">
-                        <img src="https://image.tmdb.org/t/p/w200${w.poster}">
-                        <div class="character-name">${w.char || 'Recurrente'}</div>
-                    </div>`).join('')}
-            </div>
-        </div>`).join('');
+    document.getElementById('actors-grid').innerHTML = sortedActors.map(a => {
+    // Dividimos el nombre por espacios y los unimos con un salto de línea para centrar uno sobre otro
+    const nombreFormateado = a.name.split(' ').join('<br>');
+
+    return `
+    <div class="actor-row-container">
+        <div class="actor-profile">
+            <img class="actor-photo" src="https://image.tmdb.org/t/p/w200${a.img}">
+            <div class="actor-name-label">${nombreFormateado}</div>
+            <div style="font-size:0.55rem; color:#888; margin-top:4px;">${a.count} series</div>
+        </div>
+        <div class="actor-works-carousel">
+            ${a.works.map(w => `
+                <div class="work-card-mini">
+                    <img src="https://image.tmdb.org/t/p/w200${w.poster}">
+                    <div class="character-name">${w.char || 'Recurrente'}</div>
+                </div>`).join('')}
+        </div>
+    </div>`;
+}).join('');
 
 
     // --- 3. LÓGICA DE CREADORES ORDENADOS POR FRECUENCIA ---
@@ -167,22 +172,24 @@ function renderizarTodo() {
     const sortedCreators = Array.from(creatorMap.values())
         .sort((a, b) => b.count - a.count);
 
-    document.getElementById('directors-grid').innerHTML = sortedCreators.map(c => `
-        <div class="actor-row-container">
-            <div class="actor-profile">
-                <img class="actor-photo" src="https://image.tmdb.org/t/p/w200${c.img || ''}" onerror="this.src='https://via.placeholder.com/60'">
-                <div class="actor-name-label">${c.name}</div>
-                <div style="font-size:0.6rem; color:var(--rojo); margin-top:2px;">${c.count} series</div>
-            </div>
-            <div class="actor-works-carousel">
-                ${c.works.map(w => `
-                    <div class="work-card-mini">
-                        <img src="https://image.tmdb.org/t/p/w200${w.poster}">
-                        <div class="character-name">Creador</div>
-                    </div>`).join('')}
-            </div>
-        </div>`).join('');
-}
+    document.getElementById('directors-grid').innerHTML = sortedCreators.map(c => {
+    const nombreCreador = c.name.split(' ').join('<br>');
+    return `
+    <div class="actor-row-container">
+        <div class="actor-profile">
+            <img class="actor-photo" src="https://image.tmdb.org/t/p/w200${c.img || ''}" onerror="this.src='https://via.placeholder.com/60'">
+            <div class="actor-name-label">${nombreCreador}</div>
+            <div style="font-size:0.55rem; color:#888; margin-top:4px;">${c.count} series</div>
+        </div>
+        <div class="actor-works-carousel">
+            ${c.works.map(w => `
+                <div class="work-card-mini">
+                    <img src="https://image.tmdb.org/t/p/w200${w.poster}">
+                    <div class="character-name">Creador</div>
+                </div>`).join('')}
+        </div>
+    </div>`;
+}).join('');
 
 // Función para ver Sinopsis al clicar portada
 async function verSinopsis(serieId, seasonNum) {
