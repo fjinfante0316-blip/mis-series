@@ -5,8 +5,13 @@ let coleccionSeries = JSON.parse(localStorage.getItem('mis_series_data')) || [];
 document.addEventListener('DOMContentLoaded', () => {
     const btn = document.getElementById('sidebarCollapse');
     const side = document.getElementById('sidebar');
-    btn.onclick = () => side.classList.toggle('active');
-    if (coleccionSeries.length > 0) renderizarTodo();
+    
+    if (btn && side) {
+        btn.onclick = (e) => {
+            e.stopPropagation(); // Evita que el clic se propague a otros elementos
+            side.classList.toggle('active');
+        };
+    }
 });
 
 function showSection(id) {
