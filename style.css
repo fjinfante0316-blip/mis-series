@@ -145,27 +145,30 @@ body {
     padding-left: 15px;
 }
 
-/* --- DISEÑO DE FILA DE ACTOR / CREADOR --- */
+/* --- CONTENEDOR DE FILA (ACTOR/CREADOR) --- */
 .actor-row-container {
     display: flex;
-    align-items: center; /* Alinea verticalmente al centro */
-    background: #111;
-    margin: 15px;
+    align-items: center; /* Alineación vertical perfecta */
+    background: #0f0f0f;
+    margin: 10px 15px;
     padding: 15px;
     border-radius: 15px;
-    overflow: hidden; /* Evita que el carrusel se salga del borde */
     border: 1px solid #222;
+    overflow: hidden; /* Evita desbordamientos */
 }
 
+/* --- COLUMNA DEL ACTOR (IZQUIERDA - FIJA) --- */
 .actor-profile {
-    flex: 0 0 100px; /* NO se encoge, NO crece, mide exactamente 100px */
+    flex: 0 0 100px; /* IMPORTANTE: No crece ni se encoge de 100px */
+    width: 100px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     border-right: 1px solid #333;
-    padding-right: 15px;
+    padding-right: 10px;
     text-align: center;
+    box-sizing: border-box;
 }
 
 .actor-photo {
@@ -174,44 +177,47 @@ body {
     border-radius: 50%;
     object-fit: cover;
     border: 2px solid var(--rojo);
-    margin-bottom: 8px;
+    margin-bottom: 5px;
 }
 
 .actor-name-label {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     font-weight: bold;
     color: #fff;
     line-height: 1.2;
-    word-wrap: break-word; /* Si el nombre es largo, salta de línea */
+    width: 100%;
+    word-wrap: break-word; /* Rompe el nombre si es muy largo para que no invada el carrusel */
 }
 
-/* --- CARRUSEL LATERAL (SIN PISAR AL ACTOR) --- */
+/* --- CARRUSEL DE PORTADAS (DERECHA - FLEXIBLE) --- */
 .actor-works-carousel {
-    flex: 1; /* Ocupa todo el espacio que sobra a la derecha */
+    flex: 1; /* Ocupa todo el espacio restante */
     display: flex;
     flex-direction: row;
-    overflow-x: auto;
+    overflow-x: auto; /* Habilita el scroll horizontal */
     gap: 12px;
-    padding-left: 15px; /* Separación para que las portadas no rocen el nombre */
+    padding-left: 15px;
     align-items: center;
+    -webkit-overflow-scrolling: touch;
 }
 
-.actor-works-carousel::-webkit-scrollbar { display: none; }
+/* Ocultar barra de scroll para estética limpia */
+.actor-works-carousel::-webkit-scrollbar {
+    display: none;
+}
 
+/* Forzar que las portadas no se aplasten */
 .work-card-mini {
-    flex: 0 0 85px; /* Ancho fijo de 85px */
-    max-width: 85px;
-    text-align: center;
+    flex: 0 0 85px; /* Ancho fijo de 85px para cada póster */
+    width: 85px;
 }
 
 .work-card-mini img {
-    width: 85px;      /* Ancho idéntico para todas */
-    height: 125px;    /* Alto idéntico para todas */
-    object-fit: cover; /* Recorta la imagen para que rellene el cuadro sin estirarse */
+    width: 85px;
+    height: 125px; /* Alto uniforme */
+    object-fit: cover;
     border-radius: 6px;
-    background-color: #222; /* Fondo gris por si una imagen falla */
     display: block;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.5);
 }
 
 .character-name {
