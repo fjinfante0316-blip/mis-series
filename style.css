@@ -341,3 +341,35 @@ body {
     position: relative;
     z-index: 1000;
 }
+
+/* Carrusel de series en Mi Colección */
+#series-grid .seasons-carousel {
+    display: flex;
+    overflow-x: auto;
+    gap: 10px; /* Espacio más pequeño entre portadas */
+    padding: 10px 15px;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Tarjetas de temporada más pequeñas */
+#series-grid .card {
+    min-width: 90px; /* Tamaño reducido para que quepan más */
+    max-width: 90px;
+    flex-shrink: 0;
+}
+
+#series-grid .card img {
+    width: 90px;
+    height: 135px; /* Mantiene la proporción 2:3 */
+    object-fit: cover;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+
+#series-grid .card p {
+    font-size: 0.65rem; /* Texto más pequeño para el nombre de la temporada */
+    margin-top: 5px;
+    line-height: 1.1;
+    color: #bbb;
+}
