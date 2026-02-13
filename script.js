@@ -109,16 +109,18 @@ let chartGen, chartAn; // Variables para destruir gráficas viejas al actualizar
 function renderizarTodo() {
     // 1. RENDER SERIES
     document.getElementById('series-grid').innerHTML = coleccionSeries.map(s => `
-        <div class="row-item">
-            <h4 style="margin-left:15px">${s.name}</h4>
-            <div class="seasons-carousel">
-                ${s.seasons.map(t => `
-                    <div class="card" onclick="verSinopsis(${s.id}, ${t.season_number})">
-                        <img src="https://image.tmdb.org/t/p/w200${t.poster_path || s.poster_path}">
-                        <p>${t.name}</p>
-                    </div>`).join('')}
-            </div>
-        </div>`).join('');
+    <div class="row-item" style="padding: 10px 0;">
+        <h4 style="margin-left: 15px; font-size: 1rem; margin-bottom: 5px;">${s.name}</h4>
+        <div class="seasons-carousel">
+            ${s.seasons.map(t => `
+                <div class="card" onclick="verSinopsis(${s.id}, ${t.season_number})">
+                    <img src="https://image.tmdb.org/t/p/w200${t.poster_path || s.poster_path}">
+                    <p>${t.name}</p>
+                </div>
+            `).join('')}
+        </div>
+    </div>
+`).join('');
 
     // 2. REPARTO COMPLETO (Sin límites)
     const actorsMap = new Map();
