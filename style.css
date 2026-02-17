@@ -20,15 +20,9 @@ body {
     position: fixed !important;
     top: 20px !important;
     left: 20px !important;
-    z-index: 999999 !important; /* Prioridad máxima sobre cualquier sección */
-    background: var(--rojo);
-    color: white;
-    border: none;
-    padding: 12px;
-    border-radius: 8px;
-    cursor: pointer;
-    display: block;
-    pointer-events: auto !important; /* Asegura que el ratón lo detecte */
+    z-index: 999999 !important;
+    pointer-events: auto !important;
+    display: block !important;
 }
 
 /* Sidebar Estilo Mi-Cine */
@@ -322,19 +316,23 @@ body {
 
 /* 2. Evitar que la sección de bienvenida bloquee los clics */
 #welcome-screen {
+    pointer-events: none; /* Los clics atraviesan el fondo */
     position: relative;
     z-index: 100;
-    pointer-events: none; /* Los clics pasan a través del contenedor vacío... */
 }
-
 /* 3. Pero permitir clics en los elementos internos (buscador y botones) */
-.welcome-container, .search-box-integrated, .btn-search, #sidebar {
-    pointer-events: auto; /* ...pero se detienen en los elementos reales */
+.welcome-container, 
+.search-box-integrated, 
+.btn-search, 
+#sidebar, 
+.card, 
+.work-card-mini {
+    pointer-events: auto !important;
 }
 
 /* 4. Ajustar el Sidebar para que no quede debajo de la portada */
 #sidebar {
-    z-index: 999998;
+    z-index: 999998 !important;
 }
 
 /* 5. Asegurar que el buscador esté por encima de cualquier otro elemento de la portada */
