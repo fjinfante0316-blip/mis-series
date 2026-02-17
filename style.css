@@ -361,7 +361,7 @@ body {
 
 #series-grid .card img {
     width: 90px;
-    height: 135px; /* Mantiene la proporción 2:3 */
+    height: 130px; /* Mantiene la proporción 2:3 */
     object-fit: cover;
     border-radius: 6px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.4);
