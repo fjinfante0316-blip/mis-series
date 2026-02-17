@@ -24,6 +24,8 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function showSection(id) {
+    const side = document.getElementById('sidebar');
+    if(side) side.classList.remove('active');
     document.getElementById('welcome-screen').classList.add('hidden');
     document.getElementById('main-app').classList.add('hidden');
     document.querySelectorAll('.section-content').forEach(s => s.classList.add('hidden'));
@@ -283,3 +285,24 @@ function generarStats() {
         }
     });
 }
+
+    // Asegurar que el menú funcione
+function initMenu() {
+    const btn = document.getElementById('sidebarCollapse');
+    const side = document.getElementById('sidebar');
+    
+    if (btn && side) {
+        btn.onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            side.classList.toggle('active');
+            console.log("Menú clickeado");
+        };
+    }
+}
+
+// Ejecutar al cargar
+window.onload = () => {
+    initMenu();
+    if (coleccionSeries.length > 0) renderizarTodo();
+};
