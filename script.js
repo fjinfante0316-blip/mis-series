@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
         console.error("No se encontró el botón sidebarCollapse o el elemento sidebar");
     }
+    if (coleccionSeries.length > 0) renderizarTodo();
 });
 
     // Cerrar sidebar al hacer clic fuera (opcional, para móvil)
@@ -49,16 +50,17 @@ function showSection(id) {
 async function buscarSeries() {
     const q = document.getElementById('initialInput').value;
     if (!q) return;
-    const r = await fetch(`https://api.themoviedb.org/3/search/tv?api_key=${API_KEY}&query=${encodeURIComponent(q)}&language=es-ES`);
-    const d = await r.json();
-    window.ultimos = d.results;
-    const resDiv = document.getElementById('search-results-main');
-    resDiv.innerHTML = d.results.map(s => `
-        <div class="card" onclick="confirmar(${s.id})">
-            <img src="https://image.tmdb.org/t/p/w200${s.poster_path}">
-            <p style="font-size:0.7rem;">${s.name}</p>
-        </div>`).join('');
-    resDiv.classList.remove('hidden');
+    try {
+        const r = await fetch(`https://api.themoviedb.org/3/search/tv?api_key=${API_KEY}&query=${encodeURIComponent(q)}&language=es-ES`);
+        const d = await r.json();
+        const resDiv = document.getElementById('search-results-main');
+        resDiv.innerHTML = d.results.map(s => `
+            <div class="work-card-mini" onclick="confirmar(${s.id})">
+                <img src="https://image.tmdb.org/t/p/w200${s.poster_path}" onerror="this.src='https://via.placeholder.com/85x125'">
+                <p style="font-size:0.6rem">${s.name}</p>
+            </div>`).join('');
+        resDiv.classList.remove('hidden');
+    } catch (e) { console.error("Error buscando:", e); }
 }
 
 // 1. PREVENCIÓN DE DUPLICADOS Y FLUJO DE PORTADA
@@ -148,8 +150,8 @@ function renderizarTodo() {
     document.getElementById('actors-grid').innerHTML = sortedActors.map(a => {
         // PROTECCIÓN: Si el nombre no existe o no es string, evitamos el error del split
         const nombreFormateado = (a.name && typeof a.name === 'string') 
-            ? a.name.split(' ').join('<br>') 
-            : a.name;
+            const partes = a.name ? a.name.split(' ') : ["Sin", "Nombre"];
+            const nombreYapellido = partes.length > 1 ? `${partes[0]}<br>${partes.slice(1).join(' ')}` : a.name;
 
         return `
         <div class="actor-row-container">
