@@ -134,45 +134,39 @@ function renderizarTodo() {
     const actorsMap = new Map();
     coleccionSeries.forEach(s => {
         s.credits?.cast?.forEach(a => {
-            if (!actorsMap.has(a.id)) {
-                actorsMap.set(a.id, { 
-                    name: a.name, 
-                    img: a.profile_path, 
-                    works: [], 
-                    count: 0 // Contador de apariciones
-                });
-            }
-            const actorData = actorsMap.get(a.id);
-            actorData.count++; 
-            actorData.works.push({ title: s.name, poster: s.poster_path, char: a.character });
+            if (!actorsMap.has(a.id)) actorsMap.set(a.id, { name: a.name || "Sin nombre", img: a.profile_path, works: [], count: 0 });
+            const act = actorsMap.get(a.id);
+            act.count++;
+            act.works.push({ poster: s.poster_path, char: a.character });
         });
     });
 
-    // Convertimos a array y ordenamos de mayor a menor 'count'
     const sortedActors = Array.from(actorsMap.values())
-        .filter(a => a.img) // Solo los que tienen foto
+        .filter(a => a.img)
         .sort((a, b) => b.count - a.count);
 
     document.getElementById('actors-grid').innerHTML = sortedActors.map(a => {
-    // Dividimos el nombre por espacios y los unimos con un salto de línea para centrar uno sobre otro
-    const nombreFormateado = a.name.split(' ').join('<br>');
+        // PROTECCIÓN: Si el nombre no existe o no es string, evitamos el error del split
+        const nombreFormateado = (a.name && typeof a.name === 'string') 
+            ? a.name.split(' ').join('<br>') 
+            : a.name;
 
-    return `
-    <div class="actor-row-container">
-        <div class="actor-profile">
-            <img class="actor-photo" src="https://image.tmdb.org/t/p/w200${a.img}">
-            <div class="actor-name-label">${nombreFormateado}</div>
-            <div style="font-size:0.55rem; color:#888; margin-top:4px;">${a.count} series</div>
-        </div>
-        <div class="actor-works-carousel">
-            ${a.works.map(w => `
-                <div class="work-card-mini">
-                    <img src="https://image.tmdb.org/t/p/w200${w.poster}">
-                    <div class="character-name">${w.char || 'Recurrente'}</div>
-                </div>`).join('')}
-        </div>
-    </div>`;
-}).join('');
+        return `
+        <div class="actor-row-container">
+            <div class="actor-profile">
+                <img class="actor-photo" src="https://image.tmdb.org/t/p/w200${a.img}">
+                <div class="actor-name-label">${nombreFormateado}</div>
+                <div style="font-size:0.55rem; color:#888; margin-top:4px;">${a.count} series</div>
+            </div>
+            <div class="actor-works-carousel">
+                ${a.works.map(w => `
+                    <div class="work-card-mini">
+                        <img src="https://image.tmdb.org/t/p/w200${w.poster}">
+                        <div class="character-name">${w.char || 'Recurrente'}</div>
+                    </div>`).join('')}
+            </div>
+        </div>`;
+    }).join('');
 
 
     // --- 3. LÓGICA DE CREADORES ORDENADOS POR FRECUENCIA ---
