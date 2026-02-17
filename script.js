@@ -3,6 +3,8 @@ const API_KEY = 'e8b61af0cf42a633e3aa581bb73127f8';
 let coleccionSeries = JSON.parse(localStorage.getItem('mis_series_data')) || [];
 
 document.addEventListener('DOMContentLoaded', () => {
+    console.log("App cargada correctamente");
+    
     const btn = document.getElementById('sidebarCollapse');
     const side = document.getElementById('sidebar');
 
@@ -11,9 +13,12 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             e.stopPropagation();
             side.classList.toggle('active');
-            console.log("Menu clickeado"); // Verificamos en consola
+            console.log("Menu clickeado - Estado active:", side.classList.contains('active'));); // Verificamos en consola
         });
+    } else {
+        console.error("No se encontró el botón sidebarCollapse o el elemento sidebar");
     }
+});
 
     // Cerrar sidebar al hacer clic fuera (opcional, para móvil)
     document.addEventListener('click', (e) => {
@@ -26,6 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
 function showSection(id) {
     const side = document.getElementById('sidebar');
     if(side) side.classList.remove('active');
+    
     document.getElementById('welcome-screen').classList.add('hidden');
     document.getElementById('main-app').classList.add('hidden');
     document.querySelectorAll('.section-content').forEach(s => s.classList.add('hidden'));
@@ -34,10 +40,10 @@ function showSection(id) {
         document.getElementById('welcome-screen').classList.remove('hidden');
     } else {
         document.getElementById('main-app').classList.remove('hidden');
-        document.getElementById(`sec-${id}`).classList.remove('hidden');
+        const sec = document.getElementById(`sec-${id}`);       
+        if (sec) sec.classList.remove('hidden');
         if (id === 'stats') generarStats();
     }
-    document.getElementById('sidebar').classList.remove('active');
 }
 
 async function buscarSeries() {
