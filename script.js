@@ -196,3 +196,70 @@ if (directorsGrid) {
     }).join('');
 }
 }
+
+let chartG, chartA; // Variables globales para los gráficos
+
+function generarStats() {
+    if (coleccionSeries.length === 0) return;
+
+    // 1. Resumen rápido
+    const totalSeries = coleccionSeries.length;
+    const totalTemporadas = coleccionSeries.reduce((acc, s) => acc + (s.number_of_seasons || 0), 0);
+    
+    document.getElementById('stats-summary').innerHTML = `
+        <div class="stat-card"><strong>${totalSeries}</strong><br><small>Series</small></div>
+        <div class="stat-card"><strong>${totalTemporadas}</strong><br><small>Temporadas</small></div>
+    `;
+
+    // 2. Procesar Géneros
+    const generosContador = {};
+    coleccionSeries.forEach(s => {
+        s.genres?.forEach(g => {
+            generosContador[g.name] = (generosContador[g.name] || 0) + 1;
+        });
+    });
+
+    // 3. Procesar Años
+    const aniosContador = {};
+    coleccionSeries.forEach(s => {
+        const año = s.first_air_date ? s.first_air_date.split('-')[0] : 'N/A';
+        aniosContador[año] = (aniosContador[año] || 0) + 1;
+    });
+
+    // 4. Dibujar Gráfico de Géneros (Tipo Dona)
+    const ctxG = document.getElementById('chartGeneros').getContext('2d');
+    if (chartG) chartG.destroy(); // Limpiar si ya existía
+    chartG = new Chart(ctxG, {
+        type: 'doughnut',
+        data: {
+            labels: Object.keys(generosContador),
+            datasets: [{
+                data: Object.values(generosContador),
+                backgroundColor: ['#e50914', '#b20710', '#f5f5f1', '#564d4d', '#ff3d3d', '#831010']
+            }]
+        },
+        options: { plugins: { legend: { position: 'bottom', labels: { color: '#fff' } } } }
+    });
+
+    // 5. Dibujar Gráfico de Años (Tipo Barras)
+    const ctxA = document.getElementById('chartAnios').getContext('2d');
+    if (chartA) chartA.destroy();
+    chartA = new Chart(ctxA, {
+        type: 'bar',
+        data: {
+            labels: Object.keys(aniosContador).sort(),
+            datasets: [{
+                label: 'Series por año',
+                data: Object.keys(aniosContador).sort().map(a => aniosContador[a]),
+                backgroundColor: '#e50914'
+            }]
+        },
+        options: {
+            scales: {
+                y: { ticks: { color: '#fff' }, grid: { color: '#333' } },
+                x: { ticks: { color: '#fff' }, grid: { color: '#333' } }
+            },
+            plugins: { legend: { display: false } }
+        }
+    });
+}
