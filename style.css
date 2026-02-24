@@ -386,3 +386,56 @@ body {
     line-height: 1.1;
     color: #bbb;
 }
+
+/* Contenedor principal para PC */
+@media (min-width: 1024px) {
+    #main-app, #welcome-screen {
+        max-width: 900px; /* Tamaño más chico en PC */
+        margin: 0 auto;   /* Centrado horizontal */
+    }
+
+    .charts-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr; /* Gráficas una al lado de la otra en PC */
+        gap: 20px;
+    }
+}
+
+/* Ajustes para Móviles */
+@media (max-width: 768px) {
+    .charts-container {
+        display: flex;
+        flex-direction: column; /* Una debajo de otra */
+        padding: 10px;
+    }
+
+    .chart-box {
+        width: 100%;
+        min-height: 200px; /* Un poco más bajas en móvil */
+    }
+
+    .stat-card {
+        font-size: 0.8rem; /* Texto más pequeño para que quepan */
+        padding: 10px;
+    }
+}
+
+.work-card-mini {
+    flex: 0 0 80px; /* Ancho fijo pequeño */
+}
+
+.work-card-mini img {
+    width: 80px;
+    height: 120px;
+    border-radius: 4px;
+}
+
+@media (min-width: 1024px) {
+    .work-card-mini {
+        flex: 0 0 100px; /* Un pelín más grandes en PC */
+    }
+    .work-card-mini img {
+        width: 100px;
+        height: 150px;
+    }
+}
