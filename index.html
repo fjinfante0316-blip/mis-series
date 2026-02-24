@@ -19,10 +19,15 @@
         <ul class="list-unstyled">
             <li onclick="showSection('welcome')"><i class="fas fa-search"></i> Buscar</li>
             <li onclick="showSection('series')"><i class="fas fa-tv"></i> Mi Colección</li>
-            <li onclick="showSection('actors')"><i class="fas fa-users"></i> Actores (Todos)</li>
+            <li onclick="showSection('actors')"><i class="fas fa-users"></i> Actores</li>
             <li onclick="showSection('directors')"><i class="fas fa-clapperboard"></i> Creadores</li>
             <li onclick="showSection('stats')"><i class="fas fa-chart-pie"></i> Estadísticas</li>
         </ul>
+        <div class="backup-zone" style="padding: 20px; border-top: 1px solid #333; margin-top: 20px;">
+            <button onclick="exportarDatos()" class="btn-backup"><i class="fas fa-download"></i> Exportar</button>
+            <input type="file" id="importFile" hidden onchange="importarDatos(event)">
+            <button onclick="document.getElementById('importFile').click()" class="btn-backup"><i class="fas fa-upload"></i> Importar</button>
+        </div>
     </nav>
     
     <section id="welcome-screen" class="section-content">
@@ -39,6 +44,7 @@
     </section>
 
     <main id="main-app" class="hidden">
+        
         <section id="sec-series" class="section-content hidden">
             <h2 class="title-sec">Mi Colección</h2>
             <div id="series-grid"></div>
@@ -56,8 +62,17 @@
 
         <section id="sec-stats" class="section-content hidden">
             <h2 class="title-sec">Estadísticas</h2>
-            <div id="stats-area"></div>
+            <div id="stats-summary" class="stats-summary"></div>
+            <div class="charts-container">
+                <div class="chart-box">
+                    <canvas id="chartGeneros"></canvas>
+                </div>
+                <div class="chart-box">
+                    <canvas id="chartAnios"></canvas>
+                </div>
+            </div>
         </section>
+
     </main>
 
     <div id="info-modal" class="modal hidden" onclick="this.classList.add('hidden')">
@@ -66,30 +81,6 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <div class="backup-zone" style="padding: 20px; border-top: 1px solid #333;">
-        <button onclick="exportarDatos()" class="btn-backup"><i class="fas fa-download"></i> Exportar</button>
-        <input type="file" id="importFile" hidden onchange="importarDatos(event)">
-        <button onclick="document.getElementById('importFile').click()" class="btn-backup"><i class="fas fa-upload"></i> Importar</button>
-    </div>
-
-    <section id="sec-stats" class="section-content hidden">
-        <h2 class="title-sec">Estadísticas</h2>
-        <div id="stats-area"></div>
-        <div class="charts-container">
-            <div class="chart-box">
-                <canvas id="chartGeneros"></canvas>
-            </div>
-            <div class="chart-box">
-                <canvas id="chartAnios"></canvas>
-            </div>
-        </div>
-    </section>
-    
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-        <link rel="stylesheet" href="style.css">
-
-        <script src="script.js"></script>
-    </body>
+    <script src="script.js"></script>
+</body>
 </html>
