@@ -15,15 +15,28 @@ body {
 
 .hidden { display: none !important; }
 
-/* 1. Liberar la Hamburguesa */
+/* ELIMINAR BLOQUEOS DE CLIC */
 .btn-menu {
     position: fixed !important;
     top: 20px !important;
     left: 20px !important;
-    z-index: 999999 !important;
+    z-index: 999999 !important; /* Por encima de todo */
     pointer-events: auto !important;
-    background: var(--rojo);
-    cursor: pointer;
+    cursor: pointer !important;
+}
+
+#welcome-screen {
+    pointer-events: none; /* Deja pasar los clics al botón de atrás si fuera necesario */
+}
+
+.welcome-container, .search-box-integrated, .btn-search, #sidebar, .work-card-mini, .card {
+    pointer-events: auto !important; /* Pero estos elementos sí reaccionan */
+}
+
+/* Temporadas en Mi Colección */
+.seasons-carousel .card {
+    min-width: 90px !important;
+    max-width: 90px !important;
 }
 
 /* Sidebar Estilo Mi-Cine */
