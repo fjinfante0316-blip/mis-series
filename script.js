@@ -1,171 +1,197 @@
-// 1. CONFIGURACIÓN Y VARIABLES GLOBALES
+/**
+ * BLIP - Gestión de Series y Estadísticas
+ * Optimizado para rendimiento y limpieza de código
+ */
+
 const API_KEY = 'e8b61af0cf42a633e3aa581bb73127f8';
-He vuelto a revisar tu enlace. El problema principal es que tu archivo script.js tiene errores de sintaxis (le faltan llaves de cierre } y tiene funciones duplicadas) lo que hace que el navegador "aborte" la ejecución y ningún botón responda.
+const BASE_URL = 'https://api.themoviedb.org/3';
+const IMG_URL = 'https://image.tmdb.org/t/p/w200';
 
-Aquí tienes la versión final corregida. Por favor, borra todo tu script.js y pega este. He integrado todo: el menú, los creadores y las estadísticas con el diseño centrado que pediste.
-
-1. JavaScript Totalmente Corregido (script.js)
-JavaScript
-const API_KEY = 'TU_API_KEY_AQUI'; // Asegúrate de que esta sea tu clave real de TMDB
 let coleccionSeries = JSON.parse(localStorage.getItem('mis_series_data')) || [];
-let chartG, chartA;
+let chartG;
 
 // --- INICIALIZACIÓN ---
 document.addEventListener('DOMContentLoaded', () => {
     const btnMenu = document.getElementById('sidebarCollapse');
     const side = document.getElementById('sidebar');
     
-    if (btnMenu && side) {
-        btnMenu.onclick = (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            side.classList.toggle('active');
-        };
-    }
+    // Toggle Menu con Delegación de Eventos
+    btnMenu?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        side.classList.toggle('active');
+    });
+
+    // Cerrar sidebar al hacer clic fuera
+    document.addEventListener('click', () => side?.classList.remove('active'));
 
     if (coleccionSeries.length > 0) renderizarTodo();
 });
 
 // --- NAVEGACIÓN ---
 function showSection(id) {
-    const side = document.getElementById('sidebar');
-    if (side) side.classList.remove('active');
-
-    document.getElementById('welcome-screen').classList.add('hidden');
-    document.getElementById('main-app').classList.add('hidden');
-    document.querySelectorAll('.section-content').forEach(s => s.classList.add('hidden'));
+    // Ocultar todo y resetear estados
+    document.querySelectorAll('.section-content, #welcome-screen, #main-app')
+            .forEach(el => el.classList.add('hidden'));
 
     if (id === 'welcome') {
         document.getElementById('welcome-screen').classList.remove('hidden');
     } else {
         document.getElementById('main-app').classList.remove('hidden');
-        const sec = document.getElementById(`sec-${id}`);
-        if (sec) sec.classList.remove('hidden');
-        if (id === 'stats') setTimeout(generarStats, 100);
+        document.getElementById(`sec-${id}`)?.classList.remove('hidden');
+        if (id === 'stats') setTimeout(generarStats, 150);
     }
 }
 
-// --- BUSCADOR Y AÑADIR ---
+// --- API Y DATOS ---
 async function buscarSeries() {
-    const input = document.getElementById('initialInput');
-    const query = input.value;
+    const query = document.getElementById('initialInput').value.trim();
     if (!query) return;
 
     try {
-        const resp = await fetch(`https://api.themoviedb.org/3/search/tv?api_key=${API_KEY}&query=${encodeURIComponent(query)}&language=es-ES`);
-        const data = await resp.json();
-        const resultsDiv = document.getElementById('search-results-main');
+        const url = `${BASE_URL}/search/tv?api_key=${API_KEY}&query=${encodeURIComponent(query)}&language=es-ES`;
+        const resp = await fetch(url);
+        const { results } = await resp.json();
         
-        resultsDiv.innerHTML = data.results.map(s => `
+        const resultsDiv = document.getElementById('search-results-main');
+        resultsDiv.innerHTML = results.map(s => `
             <div class="work-card-mini" onclick="confirmar(${s.id})">
-                <img src="https://image.tmdb.org/t/p/w200${s.poster_path}" onerror="this.src='https://via.placeholder.com/85x125'">
-                <p style="font-size:0.6rem; margin-top:5px;">${s.name}</p>
+                <img src="${s.poster_path ? IMG_URL + s.poster_path : 'https://via.placeholder.com/85x125'}" alt="${s.name}">
+                <p>${s.name}</p>
             </div>
         `).join('');
         resultsDiv.classList.remove('hidden');
-    } catch (err) { console.error(err); }
+    } catch (err) {
+        console.error("Error buscando series:", err);
+    }
 }
 
 async function confirmar(id) {
-    if (coleccionSeries.some(s => s.id === id)) return alert("Ya la tienes");
-    const resp = await fetch(`https://api.themoviedb.org/3/tv/${id}?api_key=${API_KEY}&language=es-ES&append_to_response=credits`);
-    const serie = await resp.json();
-    coleccionSeries.push(serie);
-    localStorage.setItem('mis_series_data', JSON.stringify(coleccionSeries));
-    alert(serie.name + " añadida");
-    renderizarTodo();
+    if (coleccionSeries.find(s => s.id === id)) return alert("Esta serie ya está en tu colección");
+
+    try {
+        const url = `${BASE_URL}/tv/${id}?api_key=${API_KEY}&language=es-ES&append_to_response=credits`;
+        const serie = await fetch(url).then(r => r.json());
+        
+        coleccionSeries.push(serie);
+        saveData();
+        alert(`${serie.name} añadida con éxito`);
+        renderizarTodo();
+    } catch (err) {
+        console.error("Error al añadir serie:", err);
+    }
 }
+
+const saveData = () => localStorage.setItem('mis_series_data', JSON.stringify(coleccionSeries));
 
 // --- ESTADÍSTICAS ---
 function generarStats() {
     const summary = document.getElementById('stats-summary');
-    if (coleccionSeries.length === 0) {
-        summary.innerHTML = "<p>Añade series para ver datos.</p>";
-        return;
-    }
+    if (!coleccionSeries.length) return summary.innerHTML = "<p>No hay datos suficientes.</p>";
 
-    const generos = {};
-    const anios = {};
-    coleccionSeries.forEach(s => {
-        s.genres?.forEach(g => generos[g.name] = (generos[g.name] || 0) + 1);
-        const año = s.first_air_date ? s.first_air_date.split('-')[0] : 'N/A';
-        anios[año] = (anios[año] || 0) + 1;
-    });
+    const dataSet = coleccionSeries.reduce((acc, s) => {
+        s.genres?.forEach(g => acc.gen[g.name] = (acc.gen[g.name] || 0) + 1);
+        const anio = s.first_air_date?.split('-')[0] || 'N/A';
+        acc.ani[anio] = (acc.ani[anio] || 0) + 1;
+        return acc;
+    }, { gen: {}, ani: {} });
 
-    // Diseño centrado pedido
     summary.innerHTML = `
-        <div class="stats-dashboard" style="display:flex; justify-content:center; gap:15px; padding:10px;">
-            <div class="stat-pill" style="background:#0f0f0f; border:1px solid #222; padding:15px; border-radius:12px; text-align:center; flex:1; max-width:140px;">
-                <span style="color:#e50914; font-size:2rem; font-weight:bold; display:block;">${coleccionSeries.length}</span>
-                <span style="color:#888; font-size:0.65rem; text-transform:uppercase;">Series</span>
+        <div class="stats-dashboard">
+            <div class="stat-pill">
+                <span class="stat-number">${coleccionSeries.length}</span>
+                <span class="stat-label">Series</span>
             </div>
-            <div class="stat-pill" style="background:#0f0f0f; border:1px solid #222; padding:15px; border-radius:12px; text-align:center; flex:1; max-width:140px;">
-                <span style="color:#e50914; font-size:2rem; font-weight:bold; display:block;">${Object.keys(generos).length}</span>
-                <span style="color:#888; font-size:0.65rem; text-transform:uppercase;">Géneros</span>
+            <div class="stat-pill">
+                <span class="stat-number">${Object.keys(dataSet.gen).length}</span>
+                <span class="stat-label">Géneros</span>
             </div>
         </div>
     `;
 
-    const ctxG = document.getElementById('chartGeneros').getContext('2d');
+    renderChart(dataSet.gen);
+}
+
+function renderChart(generos) {
+    const ctx = document.getElementById('chartGeneros')?.getContext('2d');
+    if (!ctx) return;
     if (chartG) chartG.destroy();
-    chartG = new Chart(ctxG, {
+    
+    chartG = new Chart(ctx, {
         type: 'doughnut',
         data: {
             labels: Object.keys(generos),
-            datasets: [{ data: Object.values(generos), backgroundColor: ['#e50914', '#564d4d', '#111', '#831010', '#ff3d3d'] }]
+            datasets: [{ 
+                data: Object.values(generos), 
+                backgroundColor: ['#e50914', '#564d4d', '#111', '#831010', '#ff3d3d'],
+                borderWidth: 0
+            }]
         },
-        options: { responsive: true, plugins: { legend: { labels: { color: '#fff' } } } }
+        options: { 
+            responsive: true, 
+            maintainAspectRatio: false,
+            plugins: { legend: { labels: { color: '#fff', font: { size: 10 } } } } 
+        }
     });
 }
 
-// --- RENDERIZADO GENERAL ---
+// --- RENDERIZADO DE GRIDS ---
 function renderizarTodo() {
-    // 1. MI COLECCIÓN
+    // 1. Mi Colección
     document.getElementById('series-grid').innerHTML = coleccionSeries.map(s => `
         <div class="row-item">
-            <h4 style="margin-left:15px">${s.name}</h4>
+            <h4>${s.name}</h4>
             <div class="seasons-carousel">
-                ${s.seasons.map(t => `<div class="card"><img src="https://image.tmdb.org/t/p/w200${t.poster_path || s.poster_path}"><p>${t.name}</p></div>`).join('')}
+                ${s.seasons.map(t => `
+                    <div class="card">
+                        <img src="${t.poster_path ? IMG_URL + t.poster_path : IMG_URL + s.poster_path}" alt="${t.name}">
+                        <p>${t.name}</p>
+                    </div>`).join('')}
             </div>
         </div>`).join('');
 
-    // 2. ACTORES
+    // 2. Mapeo de Personas (Actores y Creadores)
     const actorsMap = new Map();
-    coleccionSeries.forEach(s => {
-        s.credits?.cast?.forEach(a => {
-            if (!actorsMap.has(a.id)) actorsMap.set(a.id, { name: a.name, img: a.profile_path, works: [], count: 0 });
-            const act = actorsMap.get(a.id);
-            act.count++;
-            act.works.push({ poster: s.poster_path });
-        });
-    });
-    dibujarGrid('actors-grid', actorsMap);
-
-    // 3. CREADORES (Arreglado)
     const creatorsMap = new Map();
+
     coleccionSeries.forEach(s => {
-        s.created_by?.forEach(c => {
-            if (!creatorsMap.has(c.id)) creatorsMap.set(c.id, { name: c.name, img: c.profile_path, works: [], count: 0 });
-            const cre = creatorsMap.get(c.id);
-            cre.count++;
-            cre.works.push({ poster: s.poster_path });
-        });
+        s.credits?.cast?.forEach(a => processPerson(actorsMap, a, s.poster_path));
+        s.created_by?.forEach(c => processPerson(creatorsMap, c, s.poster_path));
     });
+
+    dibujarGrid('actors-grid', actorsMap);
     dibujarGrid('directors-grid', creatorsMap);
 }
 
-function dibujarGrid(id, mapa) {
-    const grid = document.getElementById(id);
+function processPerson(map, person, poster) {
+    if (!map.has(person.id)) {
+        map.set(person.id, { 
+            name: person.name, 
+            img: person.profile_path, 
+            works: [], 
+            count: 0 
+        });
+    }
+    const ref = map.get(person.id);
+    ref.count++;
+    if (ref.works.length < 10) ref.works.push(poster);
+}
+
+function dibujarGrid(containerId, dataMap) {
+    const grid = document.getElementById(containerId);
     if (!grid) return;
-    const sorted = Array.from(mapa.values()).sort((a,b) => b.count - a.count).filter(x => x.img);
-    grid.innerHTML = sorted.map(i => `
+
+    const sorted = [...dataMap.values()]
+        .sort((a, b) => b.count - a.count)
+        .filter(p => p.img);
+
+    grid.innerHTML = sorted.map(p => `
         <div class="actor-row-container">
             <div class="actor-profile">
-                <img class="actor-photo" src="https://image.tmdb.org/t/p/w200${i.img}">
-                <div class="actor-name-label">${i.name.replace(' ', '<br>')}</div>
+                <img class="actor-photo" src="${IMG_URL + p.img}" alt="${p.name}">
+                <div class="actor-name-label">${p.name.replace(' ', '<br>')}</div>
             </div>
             <div class="actor-works-carousel">
-                ${i.works.map(w => `<div class="work-card-mini"><img src="https://image.tmdb.org/t/p/w200${w.poster}"></div>`).join('')}
+                ${p.works.map(w => `<div class="work-card-mini"><img src="${IMG_URL + w}"></div>`).join('')}
             </div>
         </div>`).join('');
 }
