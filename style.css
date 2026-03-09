@@ -471,3 +471,34 @@ body {
     text-transform: uppercase;
     letter-spacing: 1px;
 }
+
+/* 1. Asegurar que la hamburguesa sea clicable siempre */
+.btn-menu {
+    position: fixed !important;
+    z-index: 999999 !important;
+    pointer-events: auto !important;
+    cursor: pointer !important;
+}
+
+/* 2. Evitar que el fondo de bienvenida bloquee los clics */
+#welcome-screen {
+    pointer-events: none;
+}
+
+/* 3. Reactivar clics en los elementos internos */
+.welcome-container, .search-box-integrated, .btn-search, #sidebar, .work-card-mini, .stat-pill {
+    pointer-events: auto !important;
+}
+
+/* 4. Adaptación PC (Más chico y centrado) */
+@media (min-width: 1024px) {
+    #main-app, #welcome-screen {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+    .charts-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+}
