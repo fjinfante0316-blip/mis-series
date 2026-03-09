@@ -439,3 +439,35 @@ body {
         height: 150px;
     }
 }
+
+.stats-dashboard {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.stat-pill {
+    background: #0f0f0f; /* Color oscuro como las filas */
+    border: 1px solid #222;
+    border-radius: 12px;
+    padding: 15px;
+    text-align: center;
+    min-width: 120px;
+}
+
+.stat-number {
+    display: block;
+    color: var(--rojo);
+    font-size: 1.8rem;
+    font-weight: bold;
+    line-height: 1;
+}
+
+.stat-label {
+    font-size: 0.65rem;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
