@@ -1,81 +1,114 @@
+/* --- 1. VARIABLES Y RESET --- */
 :root {
     --rojo: #e50914;
     --negro: #000000;
-    --gris: #141414;
+    --gris-oscuro: #0f0f0f;
+    --gris-medio: #141414;
+    --gris-claro: #1f1f1f;
+    --borde: #222;
     --texto: #ffffff;
+    --texto-secundario: #bbb;
+}
+
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
 }
 
 body {
     margin: 0;
     background-color: var(--negro);
     color: var(--texto);
-    font-family: 'Segoe UI', sans-serif;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     overflow-x: hidden;
+    max-width: 100vw;
 }
 
 .hidden { display: none !important; }
 
-/* ELIMINAR BLOQUEOS DE CLIC */
+/* --- 2. LAYOUT Y NAVEGACIÓN --- */
 .btn-menu {
-    position: fixed !important;
-    top: 20px !important;
-    left: 20px !important;
-    z-index: 999999 !important; /* Por encima de todo */
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 999999;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
     pointer-events: auto !important;
-    cursor: pointer !important;
 }
 
-#welcome-screen {
-    pointer-events: none; /* Deja pasar los clics al botón de atrás si fuera necesario */
-}
-
-.welcome-container, .search-box-integrated, .btn-search, #sidebar, .work-card-mini, .card {
-    pointer-events: auto !important; /* Pero estos elementos sí reaccionan */
-}
-
-/* Temporadas en Mi Colección */
-.seasons-carousel .card {
-    min-width: 90px !important;
-    max-width: 90px !important;
-}
-
-/* Sidebar Estilo Mi-Cine */
 #sidebar {
     position: fixed;
     left: -260px;
     top: 0;
     width: 250px;
     height: 100vh;
-    background: #000;
+    background: var(--negro);
     z-index: 999998;
-    transition: 0.3s;
+    transition: transform 0.3s ease;
     padding-top: 80px;
-    border-right: 1px solid #222;
+    border-right: 1px solid var(--borde);
 }
 
-#sidebar.active { left: 0; }
+#sidebar.active { transform: translateX(260px); }
+
+#sidebar ul { list-style: none; padding: 0; }
 
 #sidebar ul li {
     padding: 15px 25px;
     cursor: pointer;
-    font-size: 1.1rem;
+    transition: background 0.2s;
 }
 
 #sidebar ul li:hover { background: var(--rojo); }
 
-/* Buscador Integrado */
+/* --- 3. SECCIONES Y CONTENEDORES --- */
+.section-content {
+    padding-top: 20px;
+    padding-bottom: 50px;
+}
+
+#welcome-screen {
+    pointer-events: none; /* Permite clics a través del fondo */
+    position: relative;
+    z-index: 100;
+}
+
+.welcome-container, 
+.search-box-integrated, 
+.btn-search, 
+#sidebar, 
+.card, 
+.work-card-mini,
+.stat-pill {
+    pointer-events: auto !important;
+}
+
+.top-spacer { height: 80px; }
+
+.title-sec {
+    margin-left: 20px;
+    font-size: 1.8rem;
+    border-left: 4px solid var(--rojo);
+    padding-left: 15px;
+}
+
+/* --- 4. COMPONENTES: BUSCADOR --- */
 .search-box-integrated {
     display: flex;
     align-items: center;
-    background: #1f1f1f;
+    background: var(--gris-claro);
     border-radius: 50px;
     padding: 5px 15px;
     width: 90%;
     max-width: 500px;
     margin: 30px auto;
+    position: relative;
+    z-index: 1000;
 }
-
-.search-icon { color: #666; }
 
 .search-box-integrated input {
     flex: 1;
@@ -95,18 +128,21 @@ body {
     cursor: pointer;
 }
 
-/* Carruseles Horizontales (Igual que Mi-Cine) */
+/* --- 5. CARRUSELES Y TARJETAS --- */
 .results-carousel, .seasons-carousel, .actor-works-carousel {
     display: flex;
     overflow-x: auto;
     gap: 15px;
     padding: 20px;
-    width: 100vw;
-    margin-left: calc(-50vw + 50%);
     scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
 }
 
-.results-carousel::-webkit-scrollbar, .seasons-carousel::-webkit-scrollbar { display: none; }
+.results-carousel::-webkit-scrollbar, 
+.seasons-carousel::-webkit-scrollbar,
+.actor-works-carousel::-webkit-scrollbar { 
+    display: none; 
+}
 
 .card {
     min-width: 140px;
@@ -118,62 +154,26 @@ body {
     width: 100%;
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-}
-
-/* Actores y Creadores */
-.row-item {
-    background: #111;
-    margin: 15px;
-    padding: 15px;
-    border-radius: 15px;
-}
-
-.row-header {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-.photo-circle {
-    width: 55px;
-    height: 55px;
-    border-radius: 50%;
     object-fit: cover;
-    border: 2px solid var(--rojo);
 }
 
-/* Evitar choque con la hamburguesa */
-.section-content {
-    padding-top: 20px; /* Ya no choca gracias al spacer o este padding */
-    padding-bottom: 50px;
-}
-
-.title-sec {
-    margin-left: 20px;
-    font-size: 1.8rem;
-    border-left: 4px solid var(--rojo);
-    padding-left: 15px;
-}
-
-/* --- CONTENEDOR DE FILA (ACTOR/CREADOR) --- */
+/* --- 6. ACTORES Y CREADORES --- */
 .actor-row-container {
     display: flex;
-    align-items: center; /* Alineación vertical perfecta */
-    background: #0f0f0f;
+    align-items: center;
+    background: var(--gris-oscuro);
     margin: 10px 15px;
     padding: 15px;
     border-radius: 15px;
-    border: 1px solid #222;
-    overflow: hidden; /* Evita desbordamientos */
+    border: 1px solid var(--borde);
+    overflow: hidden;
 }
 
-/* --- COLUMNA DEL ACTOR (IZQUIERDA) --- */
 .actor-profile {
-    flex: 0 0 110px; /* Ancho fijo un poco más amplio para que quepan bien los nombres */
+    flex: 0 0 110px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
     border-right: 1px solid #333;
     padding-right: 10px;
     text-align: center;
@@ -185,272 +185,45 @@ body {
     border-radius: 50%;
     object-fit: cover;
     border: 2px solid var(--rojo);
-    margin-bottom: 5px;
 }
 
 .actor-name-label {
     font-size: 0.75rem;
     font-weight: bold;
-    color: #fff;
     line-height: 1.1;
-    margin-top: 5px;
-    width: 100%;
-    /* Esto ayuda a que si hay varias palabras, se repartan en líneas */
-    display: block; 
+    margin-top: 8px;
 }
 
-/* --- CARRUSEL DE PORTADAS (DERECHA - FLEXIBLE) --- */
-.actor-works-carousel {
-    flex: 1; /* Ocupa todo el espacio restante */
-    display: flex;
-    flex-direction: row;
-    overflow-x: auto; /* Habilita el scroll horizontal */
-    gap: 12px;
-    padding-left: 15px;
-    align-items: center;
-    -webkit-overflow-scrolling: touch;
-}
-
-/* Ocultar barra de scroll para estética limpia */
-.actor-works-carousel::-webkit-scrollbar {
-    display: none;
-}
-
-/* Asegurar que las tarjetas mini no se muevan */
 .work-card-mini {
     flex: 0 0 85px;
-    display: flex;
-    flex-direction: column;
-    align-items: center; /* Centra la portada y el texto del personaje */
+    text-align: center;
 }
 
 .work-card-mini img {
     width: 85px;
-    height: 125px; /* Alto uniforme */
+    height: 125px;
     object-fit: cover;
     border-radius: 6px;
-    display: block;
 }
 
-/* --- PERSONAJE DEBAJO DE PORTADA --- */
 .character-name {
     font-size: 0.65rem;
     color: var(--rojo);
     margin-top: 6px;
-    text-align: center; /* Centra el nombre del personaje */
-    line-height: 1.1;
-    display: block;
-    width: 100%;
-    /* Evita que se amontone si es muy largo */
     overflow-wrap: break-word;
 }
 
-/* Ocultar scroll en móviles */
-.actor-works-carousel::-webkit-scrollbar {
-    display: none;
-}
-
-/* Modal Estilo Cinema */
-.modal {
-    position: fixed;
-    z-index: 20000;
-    left: 0; top: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.9);
-    display: flex; align-items: center; justify-content: center;
-}
-
-.modal-content {
-    background: #1a1a1a;
-    width: 90%; max-width: 500px;
-    padding: 20px; border-radius: 20px;
-    position: relative;
-}
-
-/* --- FIX DE COLISIONES --- */
-.top-spacer { height: 80px; width: 100%; }
-
-.logo-main {
-    margin-top: 0; 
-    padding-top: 40px; /* Baja el logo para que no lo tape la hamburguesa */
-}
-
-/* Gráficos responsivos */
-.charts-container {
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 30px;
-}
-
-.chart-box {
-    background: #111;
-    padding: 15px;
-    border-radius: 15px;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-/* Botones de Backup */
-.btn-backup {
-    background: #222;
-    color: white;
-    border: 1px solid #444;
-    padding: 10px;
-    width: 100%;
-    margin-bottom: 10px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 0.9rem;
-}
-
-/* Fix para móvil: evitar que el carrusel ensanche la pantalla */
-body {
-    max-width: 100vw;
-    overflow-x: hidden;
-}
-
-/* Añade o modifica estas reglas */
-.welcome-container {
-    position: relative;
-    z-index: 10;
-    pointer-events: none; /* El contenedor no bloquea... */
-}
-.actor-row-container {
-    flex-wrap: nowrap; /* Mantiene la foto y el carrusel en línea */
-}
-
-.logo-main, .search-box-integrated, .results-carousel {
-    pointer-events: auto; /* ...pero sus hijos sí reciben clics */
-}
-
-.search-box-integrated {
-    position: relative;
-    z-index: 20; /* Asegura que el buscador esté por encima de fondos decorativos */
-}
-
-/* 2. Evitar que la sección de bienvenida bloquee los clics */
-#welcome-screen {
-    pointer-events: none; /* Los clics atraviesan el fondo */
-    position: relative;
-    z-index: 100;
-}
-/* 3. Pero permitir clics en los elementos internos (buscador y botones) */
-.welcome-container, 
-.search-box-integrated, 
-.btn-search, 
-#sidebar, 
-.card, 
-.work-card-mini {
-    pointer-events: auto !important;
-}
-
-/* 4. Ajustar el Sidebar para que no quede debajo de la portada */
-#sidebar {
-    z-index: 999998 !important;
-}
-
-/* 5. Asegurar que el buscador esté por encima de cualquier otro elemento de la portada */
-.search-box-integrated {
-    position: relative;
-    z-index: 1000;
-}
-
-/* Carrusel de series en Mi Colección */
-#series-grid .seasons-carousel {
-    display: flex;
-    overflow-x: auto;
-    gap: 10px; /* Espacio más pequeño entre portadas */
-    padding: 10px 15px;
-    scroll-behavior: smooth;
-    -webkit-overflow-scrolling: touch;
-}
-
-/* Tarjetas de temporada más pequeñas */
-#series-grid .card {
-    min-width: 90px; /* Tamaño reducido para que quepan más */
-    max-width: 90px;
-    flex-shrink: 0;
-}
-
-#series-grid .card img {
-    width: 90px;
-    height: 130px; /* Mantiene la proporción 2:3 */
-    object-fit: cover;
-    border-radius: 6px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
-}
-
-#series-grid .card p {
-    font-size: 0.65rem; /* Texto más pequeño para el nombre de la temporada */
-    margin-top: 5px;
-    line-height: 1.1;
-    color: #bbb;
-}
-
-/* Contenedor principal para PC */
-@media (min-width: 1024px) {
-    #main-app, #welcome-screen {
-        max-width: 900px; /* Tamaño más chico en PC */
-        margin: 0 auto;   /* Centrado horizontal */
-    }
-
-    .charts-container {
-        display: grid;
-        grid-template-columns: 1fr 1fr; /* Gráficas una al lado de la otra en PC */
-        gap: 20px;
-    }
-}
-
-/* Ajustes para Móviles */
-@media (max-width: 768px) {
-    .charts-container {
-        display: flex;
-        flex-direction: column; /* Una debajo de otra */
-        padding: 10px;
-    }
-
-    .chart-box {
-        width: 100%;
-        min-height: 200px; /* Un poco más bajas en móvil */
-    }
-
-    .stat-card {
-        font-size: 0.8rem; /* Texto más pequeño para que quepan */
-        padding: 10px;
-    }
-}
-
-.work-card-mini {
-    flex: 0 0 80px; /* Ancho fijo pequeño */
-}
-
-.work-card-mini img {
-    width: 80px;
-    height: 120px;
-    border-radius: 4px;
-}
-
-@media (min-width: 1024px) {
-    .work-card-mini {
-        flex: 0 0 100px; /* Un pelín más grandes en PC */
-    }
-    .work-card-mini img {
-        width: 100px;
-        height: 150px;
-    }
-}
-
+/* --- 7. ESTADÍSTICAS --- */
 .stats-dashboard {
     display: flex;
     justify-content: center;
     gap: 15px;
     padding: 20px;
-    margin-bottom: 20px;
 }
 
 .stat-pill {
-    background: #0f0f0f; /* Color oscuro como las filas */
-    border: 1px solid #222;
+    background: var(--gris-oscuro);
+    border: 1px solid var(--borde);
     border-radius: 12px;
     padding: 15px;
     text-align: center;
@@ -462,66 +235,56 @@ body {
     color: var(--rojo);
     font-size: 1.8rem;
     font-weight: bold;
-    line-height: 1;
 }
 
 .stat-label {
     font-size: 0.65rem;
-    color: #888;
+    color: var(--texto-secundario);
     text-transform: uppercase;
-    letter-spacing: 1px;
 }
 
-/* 1. Asegurar que la hamburguesa sea clicable siempre */
-.btn-menu {
-    position: fixed !important;
-    z-index: 999999 !important;
-    pointer-events: auto !important;
-    cursor: pointer !important;
+.charts-container {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    max-width: 600px;
+    margin: 0 auto;
 }
 
-/* 2. Evitar que el fondo de bienvenida bloquee los clics */
-#welcome-screen {
-    pointer-events: none;
+.chart-box {
+    background: #111;
+    padding: 15px;
+    border-radius: 15px;
 }
 
-/* 3. Reactivar clics en los elementos internos */
-.welcome-container, .search-box-integrated, .btn-search, #sidebar, .work-card-mini, .stat-pill {
-    pointer-events: auto !important;
-}
+/* --- 8. RESPONSIVE --- */
 
-/* 4. Adaptación PC (Más chico y centrado) */
+/* Ajustes para PC */
 @media (min-width: 1024px) {
     #main-app, #welcome-screen {
         max-width: 900px;
         margin: 0 auto;
     }
+
     .charts-container {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 20px;
+        max-width: 100%;
     }
+
+    .work-card-mini { flex: 0 0 100px; }
+    .work-card-mini img { width: 100px; height: 150px; }
 }
 
-/* Limitar el tamaño en PC para que sea "más chico" */
-@media (min-width: 1024px) {
-    #main-app, #welcome-screen {
-        max-width: 900px;
-        margin: 0 auto;
+/* Ajustes para Móvil */
+@media (max-width: 768px) {
+    .title-sec { font-size: 1.4rem; }
+    
+    .stat-pill {
+        min-width: 100px;
+        padding: 10px;
     }
-}
 
-/* Evitar que la pantalla de bienvenida bloquee los botones */
-#welcome-screen {
-    pointer-events: none;
-}
-.welcome-container, .btn-menu, #sidebar, .work-card-mini, .stat-pill {
-    pointer-events: auto !important;
-}
-
-/* Ajuste de los gráficos */
-.charts-container {
-    padding: 20px;
-    max-width: 500px;
-    margin: 0 auto;
+    .stat-number { font-size: 1.5rem; }
 }
