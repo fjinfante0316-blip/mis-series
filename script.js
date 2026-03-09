@@ -103,8 +103,12 @@ function renderizarTodo() {
     // 1. Colección con Media de Serie
 const grid = document.getElementById('series-grid');
 if (grid) {
-    grid.innerHTML = coleccionSeries.map(s => {
-        // Calcular la media de la serie actual
+    // Ordenamos la colección de mayor a menor nota antes de mapear
+    const coleccionOrdenada = [...coleccionSeries].sort((a, b) => {
+        return obtenerMediaSerie(b.id) - obtenerMediaSerie(a.id);
+    });
+
+    grid.innerHTML = coleccionOrdenada.map(s => {
         const mediaSerie = obtenerMediaSerie(s.id);
         const mediaDisplay = mediaSerie > 0 ? `⭐ ${mediaSerie.toFixed(1)}` : "sin nota";
 
@@ -117,15 +121,17 @@ if (grid) {
                             ${mediaDisplay}
                         </span>
                     </div>
-                    <span onclick="eliminarSerie(${s.id})" style="cursor:pointer; color:#444; font-size:1.1rem;" title="Eliminar serie">🗑️</span>
+                    <span onclick="eliminarSerie(${s.id})" style="cursor:pointer; color:#444; font-size:1.1rem;">🗑️</span>
                 </div>
                 <div class="seasons-carousel">
                     ${s.seasons.map(t => {
                         const notaKey = `${s.id}_${t.season_number}`;
                         return `
                         <div class="card">
-                            <img src="${IMG_URL + (t.poster_path || s.poster_path)}">
-                            <p>${t.name}</p>
+                            <div class="img-container">
+                                <img src="${IMG_URL + (t.poster_path || s.poster_path)}" onerror="this.src='https://via.placeholder.com/200x300?text=No+Image'">
+                            </div>
+                            <p class="season-title">${t.name}</p>
                             <select class="nota-selector" onchange="guardarNota('${s.id}', '${t.season_number}', this.value)">
                                 <option value="">⭐</option>
                                 ${[1,2,3,4,5,6,7,8,9,10].map(n => `<option value="${n}" ${misNotas[notaKey] == n ? 'selected' : ''}>${n}</option>`).join('')}
@@ -136,7 +142,6 @@ if (grid) {
             </div>`;
     }).join('');
 }
-
     // 2. Actores y Creadores
     const actorsMap = new Map();
     const creatorsMap = new Map();
