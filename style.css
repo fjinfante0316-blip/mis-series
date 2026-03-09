@@ -502,3 +502,26 @@ body {
         gap: 20px;
     }
 }
+
+/* Limitar el tamaño en PC para que sea "más chico" */
+@media (min-width: 1024px) {
+    #main-app, #welcome-screen {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+}
+
+/* Evitar que la pantalla de bienvenida bloquee los botones */
+#welcome-screen {
+    pointer-events: none;
+}
+.welcome-container, .btn-menu, #sidebar, .work-card-mini, .stat-pill {
+    pointer-events: auto !important;
+}
+
+/* Ajuste de los gráficos */
+.charts-container {
+    padding: 20px;
+    max-width: 500px;
+    margin: 0 auto;
+}
