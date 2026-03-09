@@ -321,3 +321,15 @@ body {
     transform: scale(1.2);
     transition: 0.2s;
 }
+
+.row-item h4 {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px; /* Ajusta según prefieras en móvil */
+}
+
+/* Efecto hover para la papelera */
+.row-item span[onclick]:hover {
+    color: var(--rojo) !important;
+}
