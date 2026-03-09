@@ -204,11 +204,18 @@ let chartG, chartA;
 
 function generarStats() {
     // Comprobar si hay series, si no, avisar al usuario
-    const container = document.getElementById('stats-summary');
-    if (coleccionSeries.length === 0) {
-        container.innerHTML = "<p style='text-align:center; padding:20px;'>Añade series a tu colección para ver estadísticas.</p>";
-        return;
-    }
+const summary = document.getElementById('stats-summary');
+summary.className = "stats-dashboard"; // Aplicar clase de centrado
+summary.innerHTML = `
+    <div class="stat-pill">
+        <span class="stat-number">${coleccionSeries.length}</span>
+        <span class="stat-label">Series</span>
+    </div>
+    <div class="stat-pill">
+        <span class="stat-number">${Object.keys(generos).length}</span>
+        <span class="stat-label">Géneros</span>
+    </div>
+`;
 
     // 1. Cálculos de datos
     const totalSeries = coleccionSeries.length;
