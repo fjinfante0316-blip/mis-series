@@ -100,14 +100,24 @@ async function confirmar(id) {
 
 // --- RENDERIZADO ---
 function renderizarTodo() {
-    // 1. Colección
-    const grid = document.getElementById('series-grid');
-    if (grid) {
-        grid.innerHTML = coleccionSeries.map(s => `
+    // 1. Colección con Media de Serie
+const grid = document.getElementById('series-grid');
+if (grid) {
+    grid.innerHTML = coleccionSeries.map(s => {
+        // Calcular la media de la serie actual
+        const mediaSerie = obtenerMediaSerie(s.id);
+        const mediaDisplay = mediaSerie > 0 ? `⭐ ${mediaSerie.toFixed(1)}` : "sin nota";
+
+        return `
             <div class="row-item">
                 <div style="display:flex; justify-content:space-between; align-items:center; padding-right:15px;">
-                    <h4>${s.name}</h4>
-                    <span onclick="eliminarSerie(${s.id})" style="cursor:pointer; color:#666; font-size:1.2rem;">🗑️</span>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <h4 style="margin:0; padding:10px 0 10px 15px;">${s.name}</h4>
+                        <span style="color:#ffcc00; font-size:0.85rem; font-weight:bold; background:rgba(255,204,0,0.1); padding:2px 8px; border-radius:5px;">
+                            ${mediaDisplay}
+                        </span>
+                    </div>
+                    <span onclick="eliminarSerie(${s.id})" style="cursor:pointer; color:#444; font-size:1.1rem;" title="Eliminar serie">🗑️</span>
                 </div>
                 <div class="seasons-carousel">
                     ${s.seasons.map(t => {
@@ -123,8 +133,9 @@ function renderizarTodo() {
                         </div>`;
                     }).join('')}
                 </div>
-            </div>`).join('');
-    }
+            </div>`;
+    }).join('');
+}
 
     // 2. Actores y Creadores
     const actorsMap = new Map();
