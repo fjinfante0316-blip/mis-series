@@ -146,55 +146,54 @@ function renderizarTodo() {
         }).join('');
     }
     // --- LÓGICA DE CREADORES ---
-const creatorMap = new Map();
+const creatorsMap = new Map();
 
 coleccionSeries.forEach(s => {
-    // TMDB guarda a los creadores en 'created_by'
-    s.created_by?.forEach(c => {
-        if (!creatorMap.has(c.id)) {
-            creatorMap.set(c.id, { 
-                name: c.name || "Sin nombre", 
-                img: c.profile_path, 
-                works: [], 
-                count: 0 
-            });
-        }
-        const creatorData = creatorMap.get(c.id);
-        creatorData.count++;
-        creatorData.works.push({ poster: s.poster_path });
-    });
+    // TMDB usa 'created_by' para los creadores de la serie
+    if (s.created_by && s.created_by.length > 0) {
+        s.created_by.forEach(c => {
+            if (!creatorsMap.has(c.id)) {
+                creatorsMap.set(c.id, {
+                    name: c.name || "Sin nombre",
+                    img: c.profile_path,
+                    works: [],
+                    count: 0
+                });
+            }
+            const creator = creatorsMap.get(c.id);
+            creator.count++;
+            // Guardamos la portada de la serie que creó
+            creator.works.push({ poster: s.poster_path, name: s.name });
+        });
+    }
 });
 
-// Ordenar por más series creadas
-const sortedCreators = Array.from(creatorMap.values())
+const sortedCreators = Array.from(creatorsMap.values())
     .sort((a, b) => b.count - a.count);
 
 const directorsGrid = document.getElementById('directors-grid');
 if (directorsGrid) {
     directorsGrid.innerHTML = sortedCreators.map(c => {
-        // Dividir nombre y apellido
-        const nombreSplit = c.name.split(' ');
-        const nombreFormateado = nombreSplit.length > 1 
-            ? `${nombreSplit[0]}<br>${nombreSplit.slice(1).join(' ')}` 
-            : c.name;
+        // Formatear nombre para que quepa bien
+        const partes = c.name.split(' ');
+        const nombreLindo = partes.length > 1 ? `${partes[0]}<br>${partes.slice(1).join(' ')}` : c.name;
 
         return `
         <div class="actor-row-container">
             <div class="actor-profile">
-                <img class="actor-photo" src="https://image.tmdb.org/t/p/w200${c.img || ''}" onerror="this.src='https://via.placeholder.com/60'">
-                <div class="actor-name-label">${nombreFormateado}</div>
-                <div style="font-size:0.55rem; color:var(--rojo); margin-top:4px;">${c.count} series</div>
+                <img class="actor-photo" src="${c.img ? 'https://image.tmdb.org/t/p/w200' + c.img : 'https://via.placeholder.com/60'}" onerror="this.src='https://via.placeholder.com/60'">
+                <div class="actor-name-label">${nombreLindo}</div>
+                <div style="font-size:0.55rem; color:var(--rojo); margin-top:4px;">${c.count} creaciones</div>
             </div>
             <div class="actor-works-carousel">
                 ${c.works.map(w => `
                     <div class="work-card-mini">
                         <img src="https://image.tmdb.org/t/p/w200${w.poster}">
-                        <div class="character-name">Creador</div>
+                        <div class="character-name">Showrunner</div>
                     </div>`).join('')}
             </div>
         </div>`;
     }).join('');
-}
 }
 
 let chartG, chartA; 
