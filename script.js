@@ -165,22 +165,43 @@ function processPerson(map, person, poster, serieId) {
 function dibujarGrid(id, mapa) {
     const grid = document.getElementById(id);
     if (!grid) return;
-    const sorted = [...mapa.values()].filter(p => p.img);
-    grid.innerHTML = sorted.map(p => {
-        let sumaMedias = 0, seriesConNota = 0;
+
+    // Convertimos el mapa a Array y calculamos la media para poder ordenar
+    const listaPersonas = [...mapa.values()].map(p => {
+        let sumaMedias = 0;
+        let seriesConNota = 0;
+        
         p.idsSeries.forEach(sId => {
             const m = obtenerMediaSerie(sId);
-            if (m > 0) { sumaMedias += m; seriesConNota++; }
+            if (m > 0) {
+                sumaMedias += m;
+                seriesConNota++;
+            }
         });
-        const mediaFinal = seriesConNota > 0 ? (sumaMedias / seriesConNota).toFixed(1) : "N/A";
+
+        // Guardamos la media calculada en el objeto temporalmente para el sort
+        p.mediaCalculada = seriesConNota > 0 ? (sumaMedias / seriesConNota) : 0;
+        return p;
+    });
+
+    // ORDENACIÓN: De mayor nota a menor
+    const sorted = listaPersonas
+        .filter(p => p.img) // Solo los que tienen foto
+        .sort((a, b) => b.mediaCalculada - a.mediaCalculada);
+
+    grid.innerHTML = sorted.map(p => {
+        const mediaFinal = p.mediaCalculada > 0 ? p.mediaCalculada.toFixed(1) : "N/A";
+
         return `
         <div class="actor-row-container">
             <div class="actor-profile">
-                <img class="actor-photo" src="${IMG_URL + p.img}">
-                <div class="actor-name-label">${p.name}</div>
+                <img class="actor-photo" src="${IMG_URL + p.img}" alt="${p.name}">
+                <div class="actor-name-label">${p.name.replace(' ', '<br>')}</div>
                 <div class="actor-score">⭐ ${mediaFinal}</div>
             </div>
-            <div class="actor-works-carousel">${p.works.map(w => `<div class="work-card-mini"><img src="${IMG_URL + w}"></div>`).join('')}</div>
+            <div class="actor-works-carousel">
+                ${p.works.map(w => `<div class="work-card-mini"><img src="${IMG_URL + w}"></div>`).join('')}
+            </div>
         </div>`;
     }).join('');
 }
