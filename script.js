@@ -147,21 +147,18 @@ function processP(map, p, post, sid, notaTemporada) {
             name: p.name, 
             img: p.profile_path, 
             works: [], 
-            ids: new Set(), // Aseguramos que siempre nazca con el Set
+            ids: new Set(), 
             notasTemporadas: [] 
         });
     }
     const ref = map.get(p.id);
     
-    // Si por algún motivo 'ids' no existe (datos viejos), lo creamos al vuelo
-    if (!ref.ids) ref.ids = new Set(); 
-    
+    // Protección contra datos antiguos
+    if (!ref.ids) ref.ids = new Set();
+    if (!ref.notasTemporadas) ref.notasTemporadas = [];
+
     ref.ids.add(sid);
-    
-    if (notaTemporada) {
-        if (!ref.notasTemporadas) ref.notasTemporadas = [];
-        ref.notasTemporadas.push(notaTemporada);
-    }
+    if (notaTemporada) ref.notasTemporadas.push(notaTemporada);
     
     if (ref.works.length < 5 && !ref.works.includes(post)) {
         ref.works.push(post);
@@ -175,28 +172,29 @@ function dibujarGrid(id, mapa) {
     const lista = [...mapa.values()].map(p => {
         const notas = p.notasTemporadas || [];
         const suma = notas.reduce((a, b) => a + b, 0);
+        // Calculamos la media de las temporadas donde aparece
         p.media = notas.length > 0 ? suma / notas.length : 0;
         return p;
     })
     .filter(p => p.img)
-    .sort((a,b) => {
-        // PROTECCIÓN CRÍTICA: Si ids no existe, devolvemos 0 para que no pete
-        const sizeA = a.ids ? a.ids.size : 0;
-        const sizeB = b.ids ? b.ids.size : 0;
-        return sizeB - sizeA;
-    });
+    .sort((a, b) => (b.ids?.size || 0) - (a.ids?.size || 0)); // Sigue ordenado por cantidad
 
     el.innerHTML = lista.map(p => {
         const numSeries = p.ids ? p.ids.size : 0;
+        const notaTxt = p.media > 0 ? p.media.toFixed(1) : '---';
+        
         return `
-        <div class="actor-row-container" onclick="mostrarTimeline('${p.name}', ${JSON.stringify([...(p.ids || [])])})">
+        <div class="actor-row-container" onclick="mostrarTimeline('${p.name}', ${JSON.stringify([...p.ids])})">
             <div class="actor-profile">
-                <img class="actor-photo" src="${IMG_URL+p.img}">
+                <img class="actor-photo" src="${IMG_URL + p.img}">
                 <div class="actor-name-label">${p.name}</div>
-                <div class="actor-score">📺 ${numSeries}</div>
+                <div class="actor-stats">
+                    <span class="stat-item">📺 ${numSeries}</span>
+                    <span class="stat-item">⭐ ${notaTxt}</span>
+                </div>
             </div>
             <div class="actor-works-carousel">
-                ${p.works.map(w => `<div class="work-card-mini"><img src="${IMG_URL+w}"></div>`).join('')}
+                ${p.works.map(w => `<div class="work-card-mini"><img src="${IMG_URL + w}"></div>`).join('')}
             </div>
         </div>`;
     }).join('');
