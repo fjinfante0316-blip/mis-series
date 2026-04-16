@@ -147,45 +147,59 @@ function processP(map, p, post, sid, notaTemporada) {
             name: p.name, 
             img: p.profile_path, 
             works: [], 
-            notasTemporadas: [] // Nueva lista para guardar notas individuales
+            ids: new Set(), // Aseguramos que siempre nazca con el Set
+            notasTemporadas: [] 
         });
     }
     const ref = map.get(p.id);
     
-    // Guardamos la nota si existe
+    // Si por algún motivo 'ids' no existe (datos viejos), lo creamos al vuelo
+    if (!ref.ids) ref.ids = new Set(); 
+    
+    ref.ids.add(sid);
+    
     if (notaTemporada) {
+        if (!ref.notasTemporadas) ref.notasTemporadas = [];
         ref.notasTemporadas.push(notaTemporada);
     }
     
     if (ref.works.length < 5 && !ref.works.includes(post)) {
         ref.works.push(post);
     }
-} // Llave cerrada correctamente ahora
+}
 
 function dibujarGrid(id, mapa) {
     const el = document.getElementById(id);
     if (!el) return;
     
     const lista = [...mapa.values()].map(p => {
-        const suma = p.notasTemporadas.reduce((a, b) => a + b, 0);
-        p.media = p.notasTemporadas.length > 0 ? suma / p.notasTemporadas.length : 0;
+        const notas = p.notasTemporadas || [];
+        const suma = notas.reduce((a, b) => a + b, 0);
+        p.media = notas.length > 0 ? suma / notas.length : 0;
         return p;
     })
     .filter(p => p.img)
-    // CAMBIO: Ordenar por cantidad de series (tamaño del Set de IDs)
-    .sort((a,b) => b.ids.size - a.ids.size);
+    .sort((a,b) => {
+        // PROTECCIÓN CRÍTICA: Si ids no existe, devolvemos 0 para que no pete
+        const sizeA = a.ids ? a.ids.size : 0;
+        const sizeB = b.ids ? b.ids.size : 0;
+        return sizeB - sizeA;
+    });
 
-    el.innerHTML = lista.map(p => `
-        <div class="actor-row-container" onclick="mostrarTimeline('${p.name}', ${JSON.stringify([...p.ids])})">
+    el.innerHTML = lista.map(p => {
+        const numSeries = p.ids ? p.ids.size : 0;
+        return `
+        <div class="actor-row-container" onclick="mostrarTimeline('${p.name}', ${JSON.stringify([...(p.ids || [])])})">
             <div class="actor-profile">
                 <img class="actor-photo" src="${IMG_URL+p.img}">
                 <div class="actor-name-label">${p.name}</div>
-                <div class="actor-score">📺 ${p.ids.size} ${p.ids.size === 1 ? 'serie' : 'series'}</div>
+                <div class="actor-score">📺 ${numSeries}</div>
             </div>
             <div class="actor-works-carousel">
                 ${p.works.map(w => `<div class="work-card-mini"><img src="${IMG_URL+w}"></div>`).join('')}
             </div>
-        </div>`).join('');
+        </div>`;
+    }).join('');
 }
 
 async function mostrarTimeline(nombre, serieIds) {
