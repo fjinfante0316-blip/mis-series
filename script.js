@@ -167,23 +167,72 @@ function dibujarGrid(id, mapa) {
     if (!el) return;
     
     const lista = [...mapa.values()].map(p => {
-        // Calculamos la media basada SOLO en las temporadas donde aparece
         const suma = p.notasTemporadas.reduce((a, b) => a + b, 0);
         p.media = p.notasTemporadas.length > 0 ? suma / p.notasTemporadas.length : 0;
         return p;
-    }).filter(p => p.img).sort((a,b) => b.media - a.media);
+    })
+    .filter(p => p.img)
+    // CAMBIO: Ordenar por cantidad de series (tamaño del Set de IDs)
+    .sort((a,b) => b.ids.size - a.ids.size);
 
     el.innerHTML = lista.map(p => `
-        <div class="actor-row-container">
+        <div class="actor-row-container" onclick="mostrarTimeline('${p.name}', ${JSON.stringify([...p.ids])})">
             <div class="actor-profile">
-                <img class="actor-photo" src="${p.img ? IMG_URL+p.img : 'https://via.placeholder.com/60x90'}">
+                <img class="actor-photo" src="${IMG_URL+p.img}">
                 <div class="actor-name-label">${p.name}</div>
-                <div class="actor-score">⭐ ${p.media > 0 ? p.media.toFixed(1) : '---'}</div>
+                <div class="actor-score">📺 ${p.ids.size} ${p.ids.size === 1 ? 'serie' : 'series'}</div>
             </div>
             <div class="actor-works-carousel">
                 ${p.works.map(w => `<div class="work-card-mini"><img src="${IMG_URL+w}"></div>`).join('')}
             </div>
         </div>`).join('');
+}
+
+async function mostrarTimeline(nombre, serieIds) {
+    const modal = document.getElementById('info-modal');
+    const modalBody = document.getElementById('modal-body');
+    modal.classList.remove('hidden');
+    
+    // Obtener datos completos de las series del actor que están en mi colección
+    const misSeriesDelActor = coleccionSeries.filter(s => serieIds.includes(s.id));
+    
+    // Ordenar por año de estreno
+    misSeriesDelActor.sort((a, b) => {
+        const añoA = new Date(a.first_air_date).getFullYear() || 0;
+        const añoB = new Date(b.first_air_date).getFullYear() || 0;
+        return añoA - añoB;
+    });
+
+    modalBody.innerHTML = `
+        <div class="timeline-header">
+            <button onclick="document.getElementById('info-modal').classList.add('hidden')" class="btn-close">×</button>
+            <h2>${nombre}</h2>
+            <p>Trayectoria en tu colección</p>
+        </div>
+        <div class="timeline-container">
+            ${misSeriesDelActor.map(s => {
+                const año = new Date(s.first_air_date).getFullYear();
+                // Buscar qué temporadas de ESTA serie tienen nota (las que has visto)
+                const tempsVistas = s.seasons.filter(t => misNotas[`${s.id}_${t.season_number}`]);
+                
+                return `
+                <div class="timeline-item">
+                    <div class="timeline-year">${año}</div>
+                    <div class="timeline-content">
+                        <img src="${IMG_URL + s.poster_path}" class="timeline-poster">
+                        <div class="timeline-info">
+                            <h4>${s.name}</h4>
+                            <div class="timeline-seasons">
+                                ${tempsVistas.map(t => `
+                                    <span class="badge-season">${t.name} (⭐${misNotas[s.id+'_'+t.season_number]})</span>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('')}
+        </div>
+    `;
 }
     
 function eliminarSerie(id) {
