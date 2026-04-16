@@ -99,58 +99,102 @@ async function confirmar(id) {
 }
 
 // --- RENDERIZADO ---
-function renderizarTodo() {
-    // 1. Colección con Media de Serie
-const grid = document.getElementById('series-grid');
-if (grid) {
-    // Ordenamos la colección de mayor a menor nota antes de mapear
-    const coleccionOrdenada = [...coleccionSeries].sort((a, b) => {
-        return obtenerMediaSerie(b.id) - obtenerMediaSerie(a.id);
-    });
-
-    grid.innerHTML = coleccionOrdenada.map(s => {
-        const mediaSerie = obtenerMediaSerie(s.id);
-        const mediaDisplay = mediaSerie > 0 ? `⭐ ${mediaSerie.toFixed(1)}` : "sin nota";
-
-        return `
-            <div class="row-item">
-                <div style="display:flex; justify-content:space-between; align-items:center; padding-right:15px;">
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <h4 style="margin:0; padding:10px 0 10px 15px;">${s.name}</h4>
-                        <span style="color:#ffcc00; font-size:0.85rem; font-weight:bold; background:rgba(255,204,0,0.1); padding:2px 8px; border-radius:5px;">
-                            ${mediaDisplay}
-                        </span>
+async function renderizarTodo() {
+    // 1. Renderizar Series (Mantenemos la lógica de ordenación por nota que ya tenías)
+    const gridSeries = document.getElementById('series-grid');
+    if (gridSeries) {
+        const coleccionOrdenada = [...coleccionSeries].sort((a, b) => obtenerMediaSerie(b.id) - obtenerMediaSerie(a.id));
+        gridSeries.innerHTML = coleccionOrdenada.map(s => {
+            const mediaS = obtenerMediaSerie(s.id);
+            return `
+                <div class="row-item">
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding-right:15px;">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <h4 style="margin:0; padding:10px 0 10px 15px;">${s.name}</h4>
+                            <span class="serie-media-badge">${mediaS > 0 ? '⭐ ' + mediaS.toFixed(1) : 'sin nota'}</span>
+                        </div>
+                        <span onclick="eliminarSerie(${s.id})" style="cursor:pointer; color:#444;">🗑️</span>
                     </div>
-                    <span onclick="eliminarSerie(${s.id})" style="cursor:pointer; color:#444; font-size:1.1rem;">🗑️</span>
-                </div>
-                <div class="seasons-carousel">
-                    ${s.seasons.map(t => {
-                        const notaKey = `${s.id}_${t.season_number}`;
-                        return `
-                        <div class="card">
-                            <div class="img-container">
-                                <img src="${IMG_URL + (t.poster_path || s.poster_path)}" onerror="this.src='https://via.placeholder.com/200x300?text=No+Image'">
-                            </div>
-                            <p class="season-title">${t.name}</p>
-                            <select class="nota-selector" onchange="guardarNota('${s.id}', '${t.season_number}', this.value)">
-                                <option value="">⭐</option>
-                                ${[1,2,3,4,5,6,7,8,9,10].map(n => `<option value="${n}" ${misNotas[notaKey] == n ? 'selected' : ''}>${n}</option>`).join('')}
-                            </select>
-                        </div>`;
-                    }).join('')}
-                </div>
-            </div>`;
-    }).join('');
+                    <div class="seasons-carousel">
+                        ${s.seasons.map(t => {
+                            const notaKey = `${s.id}_${t.season_number}`;
+                            return `
+                            <div class="card">
+                                <div class="img-container">
+                                    <img src="${IMG_URL + (t.poster_path || s.poster_path)}">
+                                </div>
+                                <p class="season-title">${t.name}</p>
+                                <select class="nota-selector" onchange="guardarNota('${s.id}', '${t.season_number}', this.value)">
+                                    <option value="">⭐</option>
+                                    ${[1,2,3,4,5,6,7,8,9,10].map(n => `<option value="${n}" ${misNotas[notaKey] == n ? 'selected' : ''}>${n}</option>`).join('')}
+                                </select>
+                            </div>`;
+                        }).join('')}
+                    </div>
+                </div>`;
+        }).join('');
+    }
+
+    // 2. Obtener datos de personas (Actores, Cameos y Creadores)
+    const { actorsMap, cameosMap, creatorsMap } = await obtenerActoresYPersonas();
+
+    // 3. Dibujar los 3 Grids
+    dibujarGrid('actors-grid', actorsMap);
+    dibujarGrid('cameos-grid', cameosMap); // Asegúrate de tener este ID en tu HTML
+    dibujarGrid('directors-grid', creatorsMap);
 }
     // 2. Actores y Creadores
+async function obtenerActoresYPersonas() {
     const actorsMap = new Map();
+    const cameosMap = new Map();
     const creatorsMap = new Map();
-    coleccionSeries.forEach(s => {
-        s.credits?.cast?.forEach(a => processPerson(actorsMap, a, s.poster_path, s.id));
-        s.created_by?.forEach(c => processPerson(creatorsMap, c, s.poster_path, s.id));
-    });
-    dibujarGrid('actors-grid', actorsMap);
-    dibujarGrid('directors-grid', creatorsMap);
+
+    for (const serie of coleccionSeries) {
+        // 1. Procesar Creadores (Lógica general de la serie, siempre se añaden)
+        serie.created_by?.forEach(c => processPerson(creatorsMap, c, serie.poster_path, serie.id));
+
+        // 2. Procesar Actores solo de temporadas puntuadas
+        const temporadasPuntuadas = serie.seasons.filter(t => {
+            return misNotas[`${serie.id}_${t.season_number}`] !== undefined;
+        });
+
+        for (const temp of temporadasPuntuadas) {
+            try {
+                // Consultamos los créditos específicos de la temporada para ver los capítulos
+                const url = `${BASE_URL}/tv/${serie.id}/season/${temp.season_number}/credits?api_key=${API_KEY}&language=es-ES`;
+                const data = await fetch(url).then(r => r.json());
+
+                data.cast?.forEach(actor => {
+                    // TMDB devuelve el conteo de episodios en créditos de temporada
+                    const totalEpisodios = actor.episode_count || 1;
+                    
+                    // Decidir si va a Actores Principales o Cameos
+                    const targetMap = totalEpisodios >= 5 ? actorsMap : cameosMap;
+                    
+                    if (!targetMap.has(actor.id)) {
+                        targetMap.set(actor.id, { 
+                            name: actor.name, 
+                            img: actor.profile_path, 
+                            works: [], 
+                            idsSeries: new Set(),
+                            episodios Totales: 0 
+                        });
+                    }
+                    
+                    const ref = targetMap.get(actor.id);
+                    ref.idsSeries.add(serie.id);
+                    ref.episodiosTotales += totalEpisodios;
+                    // Evitar duplicar la misma portada en el carrusel del actor
+                    if (ref.works.length < 10 && !ref.works.includes(serie.poster_path)) {
+                        ref.works.push(serie.poster_path);
+                    }
+                });
+            } catch (e) {
+                console.error(`Error cargando créditos de ${serie.name} T${temp.season_number}:`, e);
+            }
+        }
+    }
+    return { actorsMap, cameosMap, creatorsMap };
 }
 
 function processPerson(map, person, poster, serieId) {
@@ -166,44 +210,31 @@ function dibujarGrid(id, mapa) {
     const grid = document.getElementById(id);
     if (!grid) return;
 
-    // Convertimos el mapa a Array y calculamos la media para poder ordenar
-    const listaPersonas = [...mapa.values()].map(p => {
-        let sumaMedias = 0;
-        let seriesConNota = 0;
-        
-        p.idsSeries.forEach(sId => {
-            const m = obtenerMediaSerie(sId);
-            if (m > 0) {
-                sumaMedias += m;
-                seriesConNota++;
-            }
-        });
-
-        // Guardamos la media calculada en el objeto temporalmente para el sort
-        p.mediaCalculada = seriesConNota > 0 ? (sumaMedias / seriesConNota) : 0;
-        return p;
-    });
-
-    // ORDENACIÓN: De mayor nota a menor
-    const sorted = listaPersonas
-        .filter(p => p.img) // Solo los que tienen foto
+    const sorted = [...mapa.values()]
+        .map(p => {
+            let sumaMedias = 0, seriesConNota = 0;
+            p.idsSeries.forEach(sId => {
+                const m = obtenerMediaSerie(sId);
+                if (m > 0) { sumaMedias += m; seriesConNota++; }
+            });
+            p.mediaCalculada = seriesConNota > 0 ? (sumaMedias / seriesConNota) : 0;
+            return p;
+        })
+        .filter(p => p.img)
         .sort((a, b) => b.mediaCalculada - a.mediaCalculada);
 
-    grid.innerHTML = sorted.map(p => {
-        const mediaFinal = p.mediaCalculada > 0 ? p.mediaCalculada.toFixed(1) : "N/A";
-
-        return `
+    grid.innerHTML = sorted.map(p => `
         <div class="actor-row-container">
             <div class="actor-profile">
-                <img class="actor-photo" src="${IMG_URL + p.img}" alt="${p.name}">
-                <div class="actor-name-label">${p.name.replace(' ', '<br>')}</div>
-                <div class="actor-score">⭐ ${mediaFinal}</div>
+                <img class="actor-photo" src="${IMG_URL + p.img}">
+                <div class="actor-name-label">${p.name}</div>
+                <div class="actor-score">⭐ ${p.mediaCalculada > 0 ? p.mediaCalculada.toFixed(1) : 'N/A'}</div>
+                ${p.episodiosTotales ? `<div style="font-size:0.6rem; color:#888; margin-top:3px;">${p.episodiosTotales} caps</div>` : ''}
             </div>
             <div class="actor-works-carousel">
                 ${p.works.map(w => `<div class="work-card-mini"><img src="${IMG_URL + w}"></div>`).join('')}
             </div>
-        </div>`;
-    }).join('');
+        </div>`).join('');
 }
 
 function generarStats() {
