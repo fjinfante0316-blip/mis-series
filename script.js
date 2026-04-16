@@ -109,38 +109,54 @@ async function renderizarTodo() {
     const actorsMap = new Map(), creatorsMap = new Map();
     
     for (const s of coleccionSeries) {
-        // PROCESAR CREADORES
+        // PROCESAR CREADORES 
+        // (Usamos la media de la serie porque su impacto es en toda la obra)
+        const mediaSerie = obtenerMediaSerie(s.id);
         s.created_by?.forEach(c => {
-            processP(creatorsMap, c, s.poster_path, s.id);
+            processP(creatorsMap, c, s.poster_path, s.id, mediaSerie);
         });
         
         // PROCESAR ACTORES
-        const puntuadas = s.seasons.filter(t => misNotas[`${s.id}_${t.season_number}`]);
-        for (const t of puntuadas) {
+        // Solo iteramos por las temporadas que tienen nota guardada
+        const temporadasPuntuadas = s.seasons.filter(t => misNotas[`${s.id}_${t.season_number}`]);
+        
+        for (const t of temporadasPuntuadas) {
             try {
+                // Obtenemos la nota específica de esta temporada
+                const notaEstaTemporada = misNotas[`${s.id}_${t.season_number}`];
+                
                 const data = await fetch(`${BASE_URL}/tv/${s.id}/season/${t.season_number}/credits?api_key=${API_KEY}&language=es-ES`).then(r=>r.json());
+                
                 data.cast?.forEach(a => {
-                    processP(actorsMap, a, s.poster_path, s.id);
+                    // Pasamos la nota de la temporada a la función processP
+                    processP(actorsMap, a, s.poster_path, s.id, notaEstaTemporada);
                 });
-            } catch(e) { console.error("Error cargando créditos:", e); }
+            } catch(e) { 
+                console.error("Error cargando créditos de la temporada:", e); 
+            }
         }
     }
     
     dibujarGrid('actors-grid', actorsMap);
-    dibujarGrid('directors-grid', creatorsMap); // Esto ahora funcionará
+    dibujarGrid('directors-grid', creatorsMap);
 }
 
-function processP(map, p, post, sid) {
+function processP(map, p, post, sid, notaTemporada) {
     if (!map.has(p.id)) {
         map.set(p.id, { 
             name: p.name, 
             img: p.profile_path, 
             works: [], 
-            ids: new Set() 
+            notasTemporadas: [] // Nueva lista para guardar notas individuales
         });
     }
     const ref = map.get(p.id);
-    ref.ids.add(sid);
+    
+    // Guardamos la nota si existe
+    if (notaTemporada) {
+        ref.notasTemporadas.push(notaTemporada);
+    }
+    
     if (ref.works.length < 5 && !ref.works.includes(post)) {
         ref.works.push(post);
     }
@@ -151,12 +167,9 @@ function dibujarGrid(id, mapa) {
     if (!el) return;
     
     const lista = [...mapa.values()].map(p => {
-        let suma = 0, conta = 0;
-        p.ids.forEach(sid => { 
-            const m = obtenerMediaSerie(sid); 
-            if(m > 0) { suma += m; conta++; }
-        });
-        p.media = conta > 0 ? suma / conta : 0;
+        // Calculamos la media basada SOLO en las temporadas donde aparece
+        const suma = p.notasTemporadas.reduce((a, b) => a + b, 0);
+        p.media = p.notasTemporadas.length > 0 ? suma / p.notasTemporadas.length : 0;
         return p;
     }).filter(p => p.img).sort((a,b) => b.media - a.media);
 
