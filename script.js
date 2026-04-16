@@ -4,7 +4,6 @@ const IMG_URL = 'https://image.tmdb.org/t/p/w200';
 
 let coleccionSeries = JSON.parse(localStorage.getItem('mis_series_data')) || [];
 let misNotas = JSON.parse(localStorage.getItem('mis_notas_blip')) || {};
-let chartG;
 
 document.addEventListener('DOMContentLoaded', () => {
     const btnMenu = document.getElementById('sidebarCollapse');
@@ -18,20 +17,62 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     document.addEventListener('click', () => side?.classList.remove('active'));
+    
+    // Ejecutamos el renderizado inicial
     renderizarTodo();
 });
 
-function showSection(id) {
-    document.querySelectorAll('.section-content, #welcome-screen, #main-app').forEach(el => el.classList.add('hidden'));
-    if (id === 'welcome') {
-        document.getElementById('welcome-screen').classList.remove('hidden');
-    } else {
-        document.getElementById('main-app').classList.remove('hidden');
-        document.getElementById(`sec-${id}`)?.classList.remove('hidden');
-        if (id === 'stats') setTimeout(generarStats, 100);
+// --- BUSCADOR ---
+async function buscarSeries() {
+    const input = document.getElementById('initialInput');
+    if (!input) return;
+    
+    const query = input.value.trim();
+    if (!query) return;
+
+    try {
+        const url = `${BASE_URL}/search/tv?api_key=${API_KEY}&query=${encodeURIComponent(query)}&language=es-ES`;
+        const resp = await fetch(url);
+        const data = await resp.json();
+
+        const resultsDiv = document.getElementById('search-results-main');
+        if (resultsDiv && data.results) {
+            resultsDiv.innerHTML = data.results.map(s => `
+                <div class="work-card-mini" onclick="agregarALaColeccion(${s.id})" style="cursor:pointer;">
+                    <img src="${s.poster_path ? IMG_URL + s.poster_path : 'https://via.placeholder.com/85x125'}" style="border-radius:5px;">
+                    <p style="font-size:0.6rem; margin-top:5px; color:white;">${s.name}</p>
+                </div>
+            `).join('');
+            resultsDiv.classList.remove('hidden');
+        }
+    } catch (err) {
+        console.error("Error en la búsqueda:", err);
     }
 }
 
+// --- AÑADIR SERIE (Nombre cambiado para evitar conflictos) ---
+async function agregarALaColeccion(id) {
+    if (coleccionSeries.some(s => s.id === id)) {
+        return alert("Esta serie ya está en tu colección.");
+    }
+
+    try {
+        const url = `${BASE_URL}/tv/${id}?api_key=${API_KEY}&language=es-ES&append_to_response=credits`;
+        const resp = await fetch(url);
+        const serie = await resp.json();
+
+        if (serie.id) {
+            coleccionSeries.push(serie);
+            localStorage.setItem('mis_series_data', JSON.stringify(coleccionSeries));
+            alert(`¡${serie.name} añadida!`);
+            renderizarTodo(); 
+        }
+    } catch (err) {
+        console.error("Error al añadir:", err);
+    }
+}
+
+// --- UTILIDADES ---
 function obtenerMediaSerie(serieId) {
     const notas = Object.keys(misNotas).filter(k => k.startsWith(`${serieId}_`)).map(k => misNotas[k]);
     return notas.length ? notas.reduce((a, b) => a + b, 0) / notas.length : 0;
@@ -54,64 +95,8 @@ function eliminarSerie(id) {
     }
 }
 
-async function buscarSeries() {
-    const input = document.getElementById('initialInput');
-    if (!input) return console.error("No se encontró el input con ID initialInput");
-    
-    const query = input.value.trim();
-    if (!query) return;
-
-    console.log("Buscando:", query); // Para depuración
-
-    try {
-        const url = `${BASE_URL}/search/tv?api_key=${API_KEY}&query=${encodeURIComponent(query)}&language=es-ES`;
-        const resp = await fetch(url);
-        const data = await resp.json();
-
-        const resultsDiv = document.getElementById('search-results-main');
-        if (data.results && data.results.length > 0) {
-            resultsDiv.innerHTML = data.results.map(s => `
-                <div class="work-card-mini" onclick="confirmar(${s.id})" style="cursor:pointer;">
-                    <img src="${s.poster_path ? IMG_URL + s.poster_path : 'https://via.placeholder.com/85x125'}" style="border-radius:5px;">
-                    <p style="font-size:0.6rem; margin-top:5px; color:white;">${s.name}</p>
-                </div>
-            `).join('');
-            resultsDiv.classList.remove('hidden');
-        } else {
-            resultsDiv.innerHTML = "<p>No se encontraron resultados.</p>";
-        }
-    } catch (err) {
-        console.error("Error en la búsqueda:", err);
-        alert("Error al conectar con la base de datos.");
-    }
-}
-
-async function confirmar(id) {
-    // Evitar duplicados
-    if (coleccionSeries.some(s => s.id === id)) {
-        return alert("Esta serie ya está en tu colección.");
-    }
-
-    try {
-        console.log("Añadiendo serie ID:", id);
-        const url = `${BASE_URL}/tv/${id}?api_key=${API_KEY}&language=es-ES&append_to_response=credits`;
-        const resp = await fetch(url);
-        const serie = await resp.json();
-
-        if (serie.id) {
-            coleccionSeries.push(serie);
-            localStorage.setItem('mis_series_data', JSON.stringify(coleccionSeries));
-            alert(`¡${serie.name} ha sido añadida!`);
-            renderizarTodo(); // Actualiza la vista
-        }
-    } catch (err) {
-        console.error("Error al añadir la serie:", err);
-        alert("No se pudo obtener la información de la serie.");
-    }
-}
-
+// --- RENDERIZADO ---
 async function renderizarTodo() {
-    // SERIES (Ordenadas por nota)
     const gridS = document.getElementById('series-grid');
     if (gridS) {
         const ordenada = [...coleccionSeries].sort((a,b) => obtenerMediaSerie(b.id) - obtenerMediaSerie(a.id));
@@ -141,7 +126,7 @@ async function renderizarTodo() {
         }).join('');
     }
 
-    // PERSONAS (Actores, Cameos, Creadores)
+    // Actualización de mapas de personas
     const actorsMap = new Map(), cameosMap = new Map(), creatorsMap = new Map();
 
     for (const s of coleccionSeries) {
@@ -149,11 +134,13 @@ async function renderizarTodo() {
         const puntuadas = s.seasons.filter(t => misNotas[`${s.id}_${t.season_number}`]);
         
         for (const t of puntuadas) {
-            const data = await fetch(`${BASE_URL}/tv/${s.id}/season/${t.season_number}/credits?api_key=${API_KEY}&language=es-ES`).then(r=>r.json());
-            data.cast?.forEach(a => {
-                const map = (a.episode_count || 1) >= 5 ? actorsMap : cameosMap;
-                processP(map, a, s.poster_path, s.id, a.episode_count || 1);
-            });
+            try {
+                const data = await fetch(`${BASE_URL}/tv/${s.id}/season/${t.season_number}/credits?api_key=${API_KEY}&language=es-ES`).then(r=>r.json());
+                data.cast?.forEach(a => {
+                    const map = (a.episode_count || 1) >= 5 ? actorsMap : cameosMap;
+                    processP(map, a, s.poster_path, s.id, a.episode_count || 1);
+                });
+            } catch(e) { console.error(e); }
         }
     }
     dibujarGrid('actors-grid', actorsMap);
