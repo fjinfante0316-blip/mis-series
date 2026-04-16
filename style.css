@@ -366,3 +366,31 @@ body {
     text-overflow: ellipsis; /* Corta el nombre si es muy largo */
     color: #eee;
 }
+
+.img-container {
+    width: 100px;
+    height: 150px; /* Tamaño uniforme fijo */
+    overflow: hidden;
+    border-radius: 8px;
+    background: #222;
+}
+
+.img-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Evita que la imagen se estire */
+}
+
+.seasons-carousel .card {
+    min-width: 100px;
+    text-align: center;
+}
+
+.serie-media-badge {
+    background: rgba(229, 9, 20, 0.2);
+    color: #e50914;
+    padding: 2px 8px;
+    border-radius: 5px;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
