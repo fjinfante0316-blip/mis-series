@@ -113,19 +113,30 @@ async function renderizarTodo() {
     }
 
     const actorsMap = new Map(), cameosMap = new Map(), creatorsMap = new Map();
-    for (const s of coleccionSeries) {
-        s.created_by?.forEach(c => processP(creatorsMap, c, s.poster_path, s.id));
-        const puntuadas = s.seasons.filter(t => misNotas[`${s.id}_${t.season_number}`]);
-        for (const t of puntuadas) {
+    for (const t of puntuadas) {
             try {
-                const data = await fetch(`${BASE_URL}/tv/${s.id}/season/${t.season_number}/credits?api_key=${API_KEY}&language=es-ES`).then(r=>r.json());
+                const resp = await fetch(`${BASE_URL}/tv/${s.id}/season/${t.season_number}/credits?api_key=${API_KEY}&language=es-ES`);
+                const data = await resp.json();
+                
+                // Obtenemos el número de episodios de esta temporada desde el objeto de la serie
+                const totalEpisodiosTemporada = t.episode_count || 1;
+
                 data.cast?.forEach(a => {
-                    const map = (a.episode_count || 1) >= 5 ? actorsMap : cameosMap;
-                    processP(map, a, s.poster_path, s.id, a.episode_count || 1);
+                    // LÓGICA CORREGIDA: 
+                    // Si TMDB dice que tiene 1 episodio pero es un actor principal (order < 10), 
+                    // asumimos que sale en toda la temporada (totalEpisodiosTemporada).
+                    let capsActor = a.episode_count || 1;
+                    
+                    if (capsActor === 1 && a.order < 10) {
+                        capsActor = totalEpisodiosTemporada;
+                    }
+
+                    // Decidir si es Actor Principal o Cameo (5 o más capítulos)
+                    const map = capsActor >= 5 ? actorsMap : cameosMap;
+                    processP(map, a, s.poster_path, s.id, capsActor);
                 });
-            } catch(e) {}
+            } catch(e) { console.error("Error en créditos:", e); }
         }
-    }
     dibujarGrid('actors-grid', actorsMap);
     dibujarGrid('cameos-grid', cameosMap);
     dibujarGrid('directors-grid', creatorsMap);
