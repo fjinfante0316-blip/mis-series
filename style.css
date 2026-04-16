@@ -1,4 +1,3 @@
-/* --- 1. VARIABLES Y RESET --- */
 :root {
     --rojo: #e50914;
     --negro: #000000;
@@ -8,8 +7,10 @@
     --borde: #222;
     --texto: #ffffff;
     --texto-secundario: #bbb;
+    --shadow: 0 4px 15px rgba(0,0,0,0.8);
 }
 
+/* --- 1. BASE --- */
 * {
     box-sizing: border-box;
     -webkit-tap-highlight-color: transparent;
@@ -29,28 +30,35 @@ body {
 /* --- 2. LAYOUT Y NAVEGACIÓN --- */
 .btn-menu {
     position: fixed;
-    top: 20px;
-    left: 20px;
+    top: 15px;
+    left: 15px;
     z-index: 999999;
-    background: none;
+    background: rgba(0,0,0,0.6);
     border: none;
     color: white;
-    font-size: 1.5rem;
+    font-size: 1.8rem;
     cursor: pointer;
-    pointer-events: auto !important;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(5px);
 }
 
 #sidebar {
     position: fixed;
     left: -260px;
     top: 0;
-    width: 250px;
+    width: 260px;
     height: 100vh;
-    background: var(--negro);
+    background: var(--gris-oscuro);
     z-index: 999998;
-    transition: transform 0.3s ease;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     padding-top: 80px;
     border-right: 1px solid var(--borde);
+    box-shadow: 10px 0 20px rgba(0,0,0,0.5);
 }
 
 #sidebar.active { transform: translateX(260px); }
@@ -58,56 +66,29 @@ body {
 #sidebar ul { list-style: none; padding: 0; }
 
 #sidebar ul li {
-    padding: 15px 25px;
+    padding: 18px 25px;
+    font-size: 1.1rem;
     cursor: pointer;
-    transition: background 0.2s;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    transition: all 0.2s;
 }
 
-#sidebar ul li:hover { background: var(--rojo); }
-
-/* --- 3. SECCIONES Y CONTENEDORES --- */
-.section-content {
-    padding-top: 20px;
-    padding-bottom: 50px;
+#sidebar ul li:hover { 
+    background: var(--rojo); 
+    padding-left: 35px;
 }
 
-#welcome-screen {
-    pointer-events: none; /* Permite clics a través del fondo */
-    position: relative;
-    z-index: 100;
-}
-
-.welcome-container, 
-.search-box-integrated, 
-.btn-search, 
-#sidebar, 
-.card, 
-.work-card-mini,
-.stat-pill {
-    pointer-events: auto !important;
-}
-
-.top-spacer { height: 80px; }
-
-.title-sec {
-    margin-left: 20px;
-    font-size: 1.8rem;
-    border-left: 4px solid var(--rojo);
-    padding-left: 15px;
-}
-
-/* --- 4. COMPONENTES: BUSCADOR --- */
+/* --- 3. BUSCADOR INTEGRADO --- */
 .search-box-integrated {
     display: flex;
     align-items: center;
     background: var(--gris-claro);
     border-radius: 50px;
-    padding: 5px 15px;
-    width: 90%;
+    padding: 5px 10px;
+    width: 92%;
     max-width: 500px;
-    margin: 30px auto;
-    position: relative;
-    z-index: 1000;
+    margin: 20px auto;
+    border: 1px solid var(--borde);
 }
 
 .search-box-integrated input {
@@ -115,62 +96,103 @@ body {
     background: transparent;
     border: none;
     color: white;
-    padding: 12px;
+    padding: 10px 15px;
     outline: none;
+    font-size: 1rem;
 }
 
 .btn-search {
     background: var(--rojo);
     color: white;
     border: none;
-    padding: 8px 20px;
+    padding: 10px 20px;
     border-radius: 40px;
     cursor: pointer;
+    font-weight: bold;
 }
 
-/* --- 5. CARRUSELES Y TARJETAS --- */
-.results-carousel, .seasons-carousel, .actor-works-carousel {
+/* --- 4. SECCIONES --- */
+.top-spacer { height: 75px; }
+
+.title-sec {
+    margin: 20px;
+    font-size: 1.6rem;
+    border-left: 5px solid var(--rojo);
+    padding-left: 15px;
+    letter-spacing: -0.5px;
+}
+
+/* --- 5. SERIES Y CARRUSELES --- */
+.row-item {
+    background: linear-gradient(180deg, #111 0%, #000 100%);
+    margin-bottom: 25px;
+    border-bottom: 1px solid var(--borde);
+}
+
+.seasons-carousel, .actor-works-carousel {
     display: flex;
     overflow-x: auto;
-    gap: 15px;
-    padding: 20px;
-    scroll-behavior: smooth;
-    -webkit-overflow-scrolling: touch;
+    gap: 12px;
+    padding: 10px 20px 25px 20px;
+    scrollbar-width: none; /* Firefox */
 }
 
-.results-carousel::-webkit-scrollbar, 
-.seasons-carousel::-webkit-scrollbar,
-.actor-works-carousel::-webkit-scrollbar { 
-    display: none; 
-}
+.seasons-carousel::-webkit-scrollbar { display: none; }
 
 .card {
-    min-width: 140px;
+    min-width: 105px;
     flex-shrink: 0;
-    text-align: center;
 }
 
-.card img {
+.img-container {
+    width: 105px;
+    height: 155px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #222;
+    box-shadow: var(--shadow);
+    margin-bottom: 8px;
+}
+
+.img-container img {
     width: 100%;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    height: 100%;
     object-fit: cover;
 }
 
-/* --- 6. ACTORES Y CREADORES --- */
+.season-title {
+    font-size: 0.75rem;
+    color: var(--texto-secundario);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+select {
+    width: 100%;
+    background: var(--gris-claro);
+    color: var(--rojo);
+    border: 1px solid #333;
+    border-radius: 4px;
+    padding: 4px;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+/* --- 6. ACTORES Y CREADORES (LISTA) --- */
 .actor-row-container {
     display: flex;
     align-items: center;
-    background: var(--gris-oscuro);
-    margin: 10px 15px;
-    padding: 15px;
-    border-radius: 15px;
+    background: var(--gris-medio);
+    margin: 12px 15px;
+    padding: 12px;
+    border-radius: 12px;
     border: 1px solid var(--borde);
-    overflow: hidden;
+    cursor: pointer;
 }
 
 .actor-profile {
-    flex: 0 0 110px;
+    flex: 0 0 100px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -180,270 +202,144 @@ body {
 }
 
 .actor-photo {
-    width: 60px;
-    height: 60px;
+    width: 55px;
+    height: 55px;
     border-radius: 50%;
     object-fit: cover;
     border: 2px solid var(--rojo);
+    margin-bottom: 5px;
 }
 
 .actor-name-label {
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     font-weight: bold;
-    line-height: 1.1;
-    margin-top: 8px;
-}
-
-.work-card-mini {
-    flex: 0 0 85px;
-    text-align: center;
-}
-
-.work-card-mini img {
-    width: 85px;
-    height: 125px;
-    object-fit: cover;
-    border-radius: 6px;
-}
-
-.character-name {
-    font-size: 0.65rem;
-    color: var(--rojo);
-    margin-top: 6px;
-    overflow-wrap: break-word;
-}
-
-/* --- 7. ESTADÍSTICAS --- */
-.stats-dashboard {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    padding: 20px;
-}
-
-.stat-pill {
-    background: var(--gris-oscuro);
-    border: 1px solid var(--borde);
-    border-radius: 12px;
-    padding: 15px;
-    text-align: center;
-    min-width: 120px;
-}
-
-.stat-number {
-    display: block;
-    color: var(--rojo);
-    font-size: 1.8rem;
-    font-weight: bold;
-}
-
-.stat-label {
-    font-size: 0.65rem;
-    color: var(--texto-secundario);
-    text-transform: uppercase;
-}
-
-.charts-container {
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 30px;
-    max-width: 600px;
-    margin: 0 auto;
-}
-
-.chart-box {
-    background: #111;
-    padding: 15px;
-    border-radius: 15px;
-}
-
-/* --- 8. RESPONSIVE --- */
-
-/* Ajustes para PC */
-@media (min-width: 1024px) {
-    #main-app, #welcome-screen {
-        max-width: 900px;
-        margin: 0 auto;
-    }
-
-    .charts-container {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        max-width: 100%;
-    }
-
-    .work-card-mini { flex: 0 0 100px; }
-    .work-card-mini img { width: 100px; height: 150px; }
-}
-
-/* Ajustes para Móvil */
-@media (max-width: 768px) {
-    .title-sec { font-size: 1.4rem; }
-    
-    .stat-pill {
-        min-width: 100px;
-        padding: 10px;
-    }
-
-    .stat-number { font-size: 1.5rem; }
-}
-
-.nota-selector {
-    background: #222;
-    color: var(--rojo);
-    border: none;
-    border-radius: 4px;
-    font-size: 0.7rem;
-    margin-top: 5px;
-    cursor: pointer;
-    outline: none;
-}
-
-.actor-score {
-    background: var(--rojo);
-    color: white;
-    font-size: 0.65rem;
-    font-weight: bold;
-    padding: 2px 8px;
-    border-radius: 10px;
-    margin-top: 5px;
-}
-
-.row-item h4 {
-    margin: 0;
-    padding: 10px 15px;
     color: var(--texto);
 }
 
-.row-item span:hover {
-    color: var(--rojo) !important;
-    transform: scale(1.2);
-    transition: 0.2s;
-}
-
-.row-item h4 {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 200px; /* Ajusta según prefieras en móvil */
-}
-
-/* Efecto hover para la papelera */
-.row-item span[onclick]:hover {
-    color: var(--rojo) !important;
-}
-
-/* Tamaño uniforme para todas las portadas de temporada */
-.seasons-carousel .card {
-    min-width: 100px; /* Ancho fijo */
-    max-width: 100px;
-    flex-shrink: 0;
+/* Stats dentro de la fila de actor */
+.actor-stats {
     display: flex;
-    flex-direction: column;
+    gap: 5px;
+    margin-top: 5px;
 }
 
-.seasons-carousel .img-container {
-    width: 100%;
-    aspect-ratio: 2 / 3; /* Proporción estándar de póster */
-    overflow: hidden;
-    border-radius: 8px;
-    background: #1a1a1a;
+.stat-item {
+    font-size: 0.65rem;
+    background: rgba(255,255,255,0.1);
+    padding: 2px 5px;
+    border-radius: 4px;
+    color: var(--texto-secundario);
 }
 
-.seasons-carousel img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover; /* Recorta la imagen para llenar el contenedor sin deformarse */
-    display: block;
+.work-card-mini {
+    flex: 0 0 75px;
 }
 
-.season-title {
-    font-size: 0.7rem;
-    margin: 5px 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis; /* Corta el nombre si es muy largo */
-    color: #eee;
+.work-card-mini img {
+    width: 75px;
+    height: 110px;
+    object-fit: cover;
+    border-radius: 5px;
 }
 
-.img-container {
-    width: 100px;
-    height: 150px; /* Tamaño uniforme fijo */
-    overflow: hidden;
-    border-radius: 8px;
-    background: #222;
+/* --- 7. MODAL Y TIMELINE (LÍNEA DEL TIEMPO) --- */
+#info-modal {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.95);
+    z-index: 9999999;
+    overflow-y: auto;
+    backdrop-filter: blur(10px);
 }
 
-.img-container img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover; /* Evita que la imagen se estire */
-}
-
-.seasons-carousel .card {
-    min-width: 100px;
+.timeline-header {
+    padding: 20px;
+    border-bottom: 1px solid var(--borde);
     text-align: center;
 }
 
-.serie-media-badge {
-    background: rgba(229, 9, 20, 0.2);
-    color: #e50914;
-    padding: 2px 8px;
-    border-radius: 5px;
-    font-size: 0.8rem;
-    font-weight: bold;
-}
-
 .timeline-container {
-    padding: 20px;
-    border-left: 2px solid #e50914;
-    margin-left: 20px;
+    padding: 30px 20px;
+    max-width: 600px;
+    margin: 0 auto;
+    border-left: 2px solid var(--rojo);
+    margin-left: 30px;
 }
 
 .timeline-item {
     position: relative;
-    margin-bottom: 30px;
-    padding-left: 30px;
+    margin-bottom: 40px;
+    padding-left: 25px;
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -32px;
+    top: 5px;
+    width: 12px;
+    height: 12px;
+    background: var(--rojo);
+    border-radius: 50%;
+    box-shadow: 0 0 10px var(--rojo);
 }
 
 .timeline-year {
+    font-size: 1.4rem;
     font-weight: bold;
-    color: #e50914;
-    font-size: 1.2rem;
+    color: var(--rojo);
     margin-bottom: 10px;
 }
 
 .timeline-content {
     display: flex;
     gap: 15px;
-    background: #1a1a1a;
-    padding: 15px;
-    border-radius: 8px;
-    align-items: center;
+    background: var(--gris-claro);
+    padding: 12px;
+    border-radius: 10px;
 }
 
 .timeline-poster {
-    width: 60px;
-    border-radius: 4px;
+    width: 70px;
+    border-radius: 5px;
 }
 
 .badge-season {
     display: inline-block;
-    background: #333;
-    padding: 2px 8px;
-    border-radius: 12px;
+    background: rgba(229, 9, 20, 0.15);
+    color: var(--rojo);
+    padding: 3px 10px;
+    border-radius: 20px;
     font-size: 0.75rem;
-    margin-top: 5px;
-    margin-right: 5px;
-    color: #ccc;
+    margin: 3px 3px 0 0;
+    border: 1px solid rgba(229, 9, 20, 0.3);
 }
 
 .btn-close {
     float: right;
-    background: none;
+    background: var(--gris-claro);
     border: none;
     color: white;
-    font-size: 2rem;
+    font-size: 1.5rem;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
     cursor: pointer;
+}
+
+/* --- 8. RESPONSIVE --- */
+@media (max-width: 768px) {
+    .actor-row-container { margin: 10px 8px; padding: 10px; }
+    .title-sec { font-size: 1.4rem; }
+    .timeline-container { margin-left: 20px; }
+}
+
+@media (min-width: 1024px) {
+    #main-app, #welcome-screen {
+        max-width: 1100px;
+        margin: 0 auto;
+    }
+    .actor-row-container { padding: 20px; }
+    .actor-photo { width: 80px; height: 80px; }
+    .actor-profile { flex: 0 0 150px; }
 }
