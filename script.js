@@ -19,7 +19,6 @@ document.addEventListener('DOMContentLoaded', () => {
     renderizarTodo();
 });
 
-// --- NAVEGACIÓN ---
 function showSection(id) {
     document.querySelectorAll('.section-content, #welcome-screen, #main-app').forEach(el => el.classList.add('hidden'));
     
@@ -32,7 +31,6 @@ function showSection(id) {
     }
 }
 
-// --- BUSCADOR ---
 async function buscarSeries() {
     const input = document.getElementById('initialInput');
     const query = input.value.trim();
@@ -69,7 +67,6 @@ async function agregarSerie(id) {
     } catch (err) { console.error(err); }
 }
 
-// --- LÓGICA DE NOTAS ---
 function obtenerMediaSerie(serieId) {
     const notas = Object.keys(misNotas).filter(k => k.startsWith(`${serieId}_`)).map(k => misNotas[k]);
     return notas.length ? notas.reduce((a, b) => a + b, 0) / notas.length : 0;
@@ -82,7 +79,6 @@ function guardarNota(serieId, tempNum, valor) {
     renderizarTodo();
 }
 
-// --- RENDERIZADO ---
 async function renderizarTodo() {
     const gridS = document.getElementById('series-grid');
     if (gridS) {
@@ -113,7 +109,12 @@ async function renderizarTodo() {
     const actorsMap = new Map(), creatorsMap = new Map();
     
     for (const s of coleccionSeries) {
-        s.created_by?.forEach(c => processP(creatorsMap, c, s.poster_path, s.id));
+        // PROCESAR CREADORES
+        s.created_by?.forEach(c => {
+            processP(creatorsMap, c, s.poster_path, s.id);
+        });
+        
+        // PROCESAR ACTORES
         const puntuadas = s.seasons.filter(t => misNotas[`${s.id}_${t.season_number}`]);
         for (const t of puntuadas) {
             try {
@@ -126,15 +127,24 @@ async function renderizarTodo() {
     }
     
     dibujarGrid('actors-grid', actorsMap);
-    dibujarGrid('directors-grid', creatorsMap);
+    dibujarGrid('directors-grid', creatorsMap); // Esto ahora funcionará
 }
 
 function processP(map, p, post, sid) {
-    if (!map.has(p.id)) map.set(p.id, { name: p.name, img: p.profile_path, works: [], ids: new Set() });
+    if (!map.has(p.id)) {
+        map.set(p.id, { 
+            name: p.name, 
+            img: p.profile_path, 
+            works: [], 
+            ids: new Set() 
+        });
+    }
     const ref = map.get(p.id);
     ref.ids.add(sid);
-    if (ref.works.length < 5 && !ref.works.includes(post)) ref.works.push(post);
-} // <--- ESTA ES LA LLAVE QUE FALTABA
+    if (ref.works.length < 5 && !ref.works.includes(post)) {
+        ref.works.push(post);
+    }
+} // Llave cerrada correctamente ahora
 
 function dibujarGrid(id, mapa) {
     const el = document.getElementById(id);
@@ -153,11 +163,13 @@ function dibujarGrid(id, mapa) {
     el.innerHTML = lista.map(p => `
         <div class="actor-row-container">
             <div class="actor-profile">
-                <img class="actor-photo" src="${IMG_URL+p.img}">
+                <img class="actor-photo" src="${p.img ? IMG_URL+p.img : 'https://via.placeholder.com/60x90'}">
                 <div class="actor-name-label">${p.name}</div>
-                <div class="actor-score">⭐ ${p.media > 0 ? p.media.toFixed(1) : 'N/A'}</div>
+                <div class="actor-score">⭐ ${p.media > 0 ? p.media.toFixed(1) : '---'}</div>
             </div>
-            <div class="actor-works-carousel">${p.works.map(w => `<div class="work-card-mini"><img src="${IMG_URL+w}"></div>`).join('')}</div>
+            <div class="actor-works-carousel">
+                ${p.works.map(w => `<div class="work-card-mini"><img src="${IMG_URL+w}"></div>`).join('')}
+            </div>
         </div>`).join('');
 }
     
