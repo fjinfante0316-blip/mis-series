@@ -21,14 +21,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // --- NAVEGACIÓN ---
 function showSection(id) {
-    // Ocultar todas las secciones
     document.querySelectorAll('.section-content, #welcome-screen, #main-app').forEach(el => el.classList.add('hidden'));
     
     if (id === 'welcome') {
         document.getElementById('welcome-screen').classList.remove('hidden');
     } else {
         document.getElementById('main-app').classList.remove('hidden');
-        // El ID en el HTML es 'sec-X', por eso concatenamos
         const target = document.getElementById(`sec-${id}`);
         if(target) target.classList.remove('hidden');
     }
@@ -86,7 +84,6 @@ function guardarNota(serieId, tempNum, valor) {
 
 // --- RENDERIZADO ---
 async function renderizarTodo() {
-    // 1. Renderizar Series (Igual que antes)
     const gridS = document.getElementById('series-grid');
     if (gridS) {
         const ordenada = [...coleccionSeries].sort((a,b) => obtenerMediaSerie(b.id) - obtenerMediaSerie(a.id));
@@ -113,18 +110,15 @@ async function renderizarTodo() {
         }).join('');
     }
 
-    // 2. Procesar Personas (Todo a un único mapa de actores)
     const actorsMap = new Map(), creatorsMap = new Map();
     
     for (const s of coleccionSeries) {
         s.created_by?.forEach(c => processP(creatorsMap, c, s.poster_path, s.id));
-        
         const puntuadas = s.seasons.filter(t => misNotas[`${s.id}_${t.season_number}`]);
         for (const t of puntuadas) {
             try {
                 const data = await fetch(`${BASE_URL}/tv/${s.id}/season/${t.season_number}/credits?api_key=${API_KEY}&language=es-ES`).then(r=>r.json());
                 data.cast?.forEach(a => {
-                    // Ahora todo va a actorsMap directamente, sin filtros de capítulos
                     processP(actorsMap, a, s.poster_path, s.id);
                 });
             } catch(e) { console.error("Error cargando créditos:", e); }
@@ -140,6 +134,8 @@ function processP(map, p, post, sid) {
     const ref = map.get(p.id);
     ref.ids.add(sid);
     if (ref.works.length < 5 && !ref.works.includes(post)) ref.works.push(post);
+} // <--- ESTA ES LA LLAVE QUE FALTABA
+
 function dibujarGrid(id, mapa) {
     const el = document.getElementById(id);
     if (!el) return;
