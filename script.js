@@ -55,24 +55,59 @@ function eliminarSerie(id) {
 }
 
 async function buscarSeries() {
-    const q = document.getElementById('initialInput').value;
-    if (!q) return;
-    const resp = await fetch(`${BASE_URL}/search/tv?api_key=${API_KEY}&query=${encodeURIComponent(q)}&language=es-ES`);
-    const data = await resp.json();
-    document.getElementById('search-results-main').innerHTML = data.results.map(s => `
-        <div class="work-card-mini" onclick="confirmar(${s.id})">
-            <img src="${s.poster_path ? IMG_URL+s.poster_path : 'https://via.placeholder.com/85x125'}">
-            <p>${s.name}</p>
-        </div>`).join('');
+    const input = document.getElementById('initialInput');
+    if (!input) return console.error("No se encontró el input con ID initialInput");
+    
+    const query = input.value.trim();
+    if (!query) return;
+
+    console.log("Buscando:", query); // Para depuración
+
+    try {
+        const url = `${BASE_URL}/search/tv?api_key=${API_KEY}&query=${encodeURIComponent(query)}&language=es-ES`;
+        const resp = await fetch(url);
+        const data = await resp.json();
+
+        const resultsDiv = document.getElementById('search-results-main');
+        if (data.results && data.results.length > 0) {
+            resultsDiv.innerHTML = data.results.map(s => `
+                <div class="work-card-mini" onclick="confirmar(${s.id})" style="cursor:pointer;">
+                    <img src="${s.poster_path ? IMG_URL + s.poster_path : 'https://via.placeholder.com/85x125'}" style="border-radius:5px;">
+                    <p style="font-size:0.6rem; margin-top:5px; color:white;">${s.name}</p>
+                </div>
+            `).join('');
+            resultsDiv.classList.remove('hidden');
+        } else {
+            resultsDiv.innerHTML = "<p>No se encontraron resultados.</p>";
+        }
+    } catch (err) {
+        console.error("Error en la búsqueda:", err);
+        alert("Error al conectar con la base de datos.");
+    }
 }
 
 async function confirmar(id) {
-    if (coleccionSeries.some(s => s.id === id)) return alert("Ya existe");
-    const s = await fetch(`${BASE_URL}/tv/${id}?api_key=${API_KEY}&language=es-ES&append_to_response=credits`).then(r => r.json());
-    coleccionSeries.push(s);
-    localStorage.setItem('mis_series_data', JSON.stringify(coleccionSeries));
-    renderizarTodo();
-    alert("Añadida");
+    // Evitar duplicados
+    if (coleccionSeries.some(s => s.id === id)) {
+        return alert("Esta serie ya está en tu colección.");
+    }
+
+    try {
+        console.log("Añadiendo serie ID:", id);
+        const url = `${BASE_URL}/tv/${id}?api_key=${API_KEY}&language=es-ES&append_to_response=credits`;
+        const resp = await fetch(url);
+        const serie = await resp.json();
+
+        if (serie.id) {
+            coleccionSeries.push(serie);
+            localStorage.setItem('mis_series_data', JSON.stringify(coleccionSeries));
+            alert(`¡${serie.name} ha sido añadida!`);
+            renderizarTodo(); // Actualiza la vista
+        }
+    } catch (err) {
+        console.error("Error al añadir la serie:", err);
+        alert("No se pudo obtener la información de la serie.");
+    }
 }
 
 async function renderizarTodo() {
