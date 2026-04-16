@@ -394,3 +394,56 @@ body {
     font-size: 0.8rem;
     font-weight: bold;
 }
+
+.timeline-container {
+    padding: 20px;
+    border-left: 2px solid #e50914;
+    margin-left: 20px;
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 30px;
+    padding-left: 30px;
+}
+
+.timeline-year {
+    font-weight: bold;
+    color: #e50914;
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+}
+
+.timeline-content {
+    display: flex;
+    gap: 15px;
+    background: #1a1a1a;
+    padding: 15px;
+    border-radius: 8px;
+    align-items: center;
+}
+
+.timeline-poster {
+    width: 60px;
+    border-radius: 4px;
+}
+
+.badge-season {
+    display: inline-block;
+    background: #333;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    margin-top: 5px;
+    margin-right: 5px;
+    color: #ccc;
+}
+
+.btn-close {
+    float: right;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 2rem;
+    cursor: pointer;
+}
