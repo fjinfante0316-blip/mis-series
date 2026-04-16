@@ -86,6 +86,7 @@ function guardarNota(serieId, tempNum, valor) {
 
 // --- RENDERIZADO ---
 async function renderizarTodo() {
+    // 1. Renderizar Series (Igual que antes)
     const gridS = document.getElementById('series-grid');
     if (gridS) {
         const ordenada = [...coleccionSeries].sort((a,b) => obtenerMediaSerie(b.id) - obtenerMediaSerie(a.id));
@@ -112,51 +113,44 @@ async function renderizarTodo() {
         }).join('');
     }
 
-    const actorsMap = new Map(), cameosMap = new Map(), creatorsMap = new Map();
-    for (const t of puntuadas) {
+    // 2. Procesar Personas (Todo a un único mapa de actores)
+    const actorsMap = new Map(), creatorsMap = new Map();
+    
+    for (const s of coleccionSeries) {
+        s.created_by?.forEach(c => processP(creatorsMap, c, s.poster_path, s.id));
+        
+        const puntuadas = s.seasons.filter(t => misNotas[`${s.id}_${t.season_number}`]);
+        for (const t of puntuadas) {
             try {
-                const resp = await fetch(`${BASE_URL}/tv/${s.id}/season/${t.season_number}/credits?api_key=${API_KEY}&language=es-ES`);
-                const data = await resp.json();
-                
-                // Obtenemos el número de episodios de esta temporada desde el objeto de la serie
-                const totalEpisodiosTemporada = t.episode_count || 1;
-
+                const data = await fetch(`${BASE_URL}/tv/${s.id}/season/${t.season_number}/credits?api_key=${API_KEY}&language=es-ES`).then(r=>r.json());
                 data.cast?.forEach(a => {
-                    // LÓGICA CORREGIDA: 
-                    // Si TMDB dice que tiene 1 episodio pero es un actor principal (order < 10), 
-                    // asumimos que sale en toda la temporada (totalEpisodiosTemporada).
-                    let capsActor = a.episode_count || 1;
-                    
-                    if (capsActor === 1 && a.order < 10) {
-                        capsActor = totalEpisodiosTemporada;
-                    }
-
-                    // Decidir si es Actor Principal o Cameo (5 o más capítulos)
-                    const map = capsActor >= 5 ? actorsMap : cameosMap;
-                    processP(map, a, s.poster_path, s.id, capsActor);
+                    // Ahora todo va a actorsMap directamente, sin filtros de capítulos
+                    processP(actorsMap, a, s.poster_path, s.id);
                 });
-            } catch(e) { console.error("Error en créditos:", e); }
+            } catch(e) { console.error("Error cargando créditos:", e); }
         }
+    }
+    
     dibujarGrid('actors-grid', actorsMap);
-    dibujarGrid('cameos-grid', cameosMap);
     dibujarGrid('directors-grid', creatorsMap);
 }
 
-function processP(map, p, post, sid, caps = 0) {
-    if (!map.has(p.id)) map.set(p.id, { name: p.name, img: p.profile_path, works: [], ids: new Set(), caps: 0 });
+function processP(map, p, post, sid) {
+    if (!map.has(p.id)) map.set(p.id, { name: p.name, img: p.profile_path, works: [], ids: new Set() });
     const ref = map.get(p.id);
     ref.ids.add(sid);
-    ref.caps += caps;
     if (ref.works.length < 5 && !ref.works.includes(post)) ref.works.push(post);
-}
-
 function dibujarGrid(id, mapa) {
     const el = document.getElementById(id);
     if (!el) return;
+    
     const lista = [...mapa.values()].map(p => {
         let suma = 0, conta = 0;
-        p.ids.forEach(sid => { const m = obtenerMediaSerie(sid); if(m>0){ suma+=m; conta++; }});
-        p.media = conta > 0 ? suma/conta : 0;
+        p.ids.forEach(sid => { 
+            const m = obtenerMediaSerie(sid); 
+            if(m > 0) { suma += m; conta++; }
+        });
+        p.media = conta > 0 ? suma / conta : 0;
         return p;
     }).filter(p => p.img).sort((a,b) => b.media - a.media);
 
@@ -166,12 +160,11 @@ function dibujarGrid(id, mapa) {
                 <img class="actor-photo" src="${IMG_URL+p.img}">
                 <div class="actor-name-label">${p.name}</div>
                 <div class="actor-score">⭐ ${p.media > 0 ? p.media.toFixed(1) : 'N/A'}</div>
-                <div style="font-size:10px; color:gray">${p.caps} caps</div>
             </div>
             <div class="actor-works-carousel">${p.works.map(w => `<div class="work-card-mini"><img src="${IMG_URL+w}"></div>`).join('')}</div>
         </div>`).join('');
 }
-
+    
 function eliminarSerie(id) {
     if(confirm("¿Eliminar?")) {
         coleccionSeries = coleccionSeries.filter(s => s.id !== id);
